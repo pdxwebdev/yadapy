@@ -1,0 +1,193 @@
+import logging, os, marshal, json, cPickle, time, copy, time, datetime, re, urllib, httplib, inspect
+from base64 import b64encode, b64decode
+from uuid import uuid4
+from random import randrange
+from pymongo import Connection
+from node import Node as YadaNode
+from indexer import Indexer as YadaIndexer
+
+ 
+class YadaMongo(object):
+    def __init__(*args, **kwargs):
+        if not len(args)>1:
+            host='localhost'
+        if not len(args)>2:
+            port=27021
+        self = args[0]
+        self.conn = Connection(host, port)
+        self.db = self.conn.yadaserver
+        self.col = self.db.identities
+    
+    def queryIndexerByHost(self, host):
+        
+        indexerQuery = self.db.command(
+                {
+                    "aggregate" : "identities", "pipeline" : [
+                                                              
+                        {
+                            "$match" : {
+                                "data.identity.name" : host
+                            }
+                        },
+                        
+                        {
+                            "$match" : {
+                                "data.type" : "indexer"
+                            }
+                        },
+                    ]
+                })['result']
+        if not indexerQuery:
+            return None
+        else:
+            return indexerQuery[0]
+    
+    def publicKeyLookup(self, public_key):
+        return self.col.find({
+                                "data.friends" : {
+                                                  "$elemMatch" : {
+                                                                  "public_key" : public_key
+                                                                  }
+                                                  }
+                    })
+        
+    def getFriend(self, public_key):
+        friend = self.db.command(
+            {
+                "aggregate" : "identities", "pipeline" : [
+                    {
+                        "$match" : {
+                            "public_key" : self.get('public_key')
+                        }
+                    },
+                    {
+                        "$project" : {
+                            "_id" : 0,
+                            "friend" : "$data.friends",
+                            "data" : 0,
+                            "public_key" : 0,
+                            "private_key" : 0,
+                            "modified":0
+                        }
+                    },
+                    {
+                        "$unwind" : "$friend"
+                    },
+                    {
+                        "$match" : {
+                            "friend.public_key" : public_key
+                        }
+                    },
+                ]
+            });
+            
+        if friend['result']:
+            return friend['result'][0]['friend']
+        else:
+            return None
+        
+    def getFriendPublicKeyList(self):
+        return self.db.command(
+        {
+            "aggregate" : "identities", "pipeline" : [
+            {
+                "$match" : {
+                    "public_key" : self.get('public_key')
+                }
+            },
+            {
+            "$unwind" : "$data.friends"
+            },
+            {
+                "$project" : {
+                    "public_key" : "$data.friends.public_key",
+                    "_id" : 0
+                }
+            }
+            ]
+        })['result'];
+    
+    def getFriendTopLevelMeta(self, public_key):
+        return self.db.command(
+        {
+            "aggregate" : "identities", "pipeline" : [
+            {
+                "$match" : {
+                    "public_key" : self.get('public_key')
+                }
+            },
+            {
+                "$project" : {
+                    "friend" : "$data.friends",
+                }
+            },
+            {
+            "$unwind" : "$friend"
+            },
+            {
+                "$project" : {
+                    "public_key" : "$friend.public_key",
+                    "data" : 0
+                }
+            },
+            {
+                "$match" : {
+                    "public_key" : public_key
+                }
+            },
+            ]
+        })['result'][0]['friend'];
+    
+    def getProfileIdentity(self, public_key):
+        return self.db.command(
+            {
+                "aggregate" : "identities", "pipeline" : [
+                {
+                    "$match" : {
+                        "public_key" : public_key
+                    }
+                },
+                {
+                    "$project" : {
+                        "data" : {"identity" : "$data.identity","type" : "$data.type"},
+                        "_id" : 0,
+                        "modified" : "$modified",
+                    }
+                }
+                ]
+            })['result'][0];
+    
+    def save(self):
+        try:
+            result = self.col.find({'public_key':self.get('public_key')})
+            if result.count() > 0:
+                self.set('_id', result[0]['_id'])
+                self.setModifiedToNow()
+                self.col.update({'public_key': self.get('public_key')}, self.get())
+            else:
+                self.setModifiedToNow()
+                self.col.insert(self.get())
+            return "save ok"
+        except:
+            raise
+    
+    def addFriendForProfile(self, friend):
+        self.update({'public_key':self.get('public_key')}, {'$push' : {'data.friends': friend}})
+        self.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+    
+    def addMessageForProfile(self, message):
+        self.update({'public_key':self.get('public_key')}, {'$push' : {'data.messages': message}})
+        self.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+
+attrDict = {}
+for i, x in YadaMongo.__dict__.items():
+    if not "__" in i:
+        attrDict[i] = x
+
+attrDict['conn'] = Connection('localhost', 27021)
+attrDict['db'] = attrDict['conn'].yadaserver
+attrDict['col'] = attrDict['db'].identities
+
+Node = type("Node", (YadaNode,), attrDict)
+
+Indexer = type("Node", (YadaIndexer,), attrDict)
