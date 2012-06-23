@@ -17,8 +17,14 @@ Features / Capabilities:
 - Integration capabilities enabling multiple web sites to share one social network
 - Enhanced control over privacy
 
-Examples Available:
+Proof of Concepts Completed:
 ---
 - iPhone App
 - Generic forum web site demonstrating automatic account registration and login
-- Server web site demonstrating identity management
+- Server web site demonstrating identity management / hosting
+
+Road Map:
+---
+Testing
+Refactoring
+Gathering User input / feature requests
