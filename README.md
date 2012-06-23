@@ -25,6 +25,6 @@ Proof of Concepts Completed:
 
 Road Map:
 ---
-Testing
-Refactoring
-Gathering User input / feature requests
+- Testing
+- Refactoring
+- Gathering User input / feature requests
