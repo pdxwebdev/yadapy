@@ -11,7 +11,14 @@ The Yada Project Protocol allows you to host your identity on any device capable
 
 Features / Capabilities:
 ---
-- Identity Hosting - Like web hosting, only for identities.
+- Identity Management (Kind of like web hosting, only you're hosting identities instead of web sites.)
 - O-Auth style authentication
+- Automatic account registration
 - Integration capabilities enabling multiple web sites to share one social network
 - Enhanced control over privacy
+
+Examples Available:
+---
+- iPhone App
+- Generic forum web site demonstrating automatic account registration and login
+- Server web site demonstrating identity management
