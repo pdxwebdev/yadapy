@@ -1,8 +1,8 @@
 import json, time, unittest, os
 from uuid import uuid4
-from node import Node
-from sqlite.yadasqliteserver import YadaSQLiteServer as YadaServer
-from nodecommunicator import NodeCommunicator
+from yadapy.node import Node
+from yadapy.manager import YadaServer
+from yadapy.nodecommunicator import NodeCommunicator
 from twisted.web import server, resource
 from twisted.internet import reactor
 

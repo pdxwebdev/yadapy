@@ -5,7 +5,7 @@ from uuid import uuid4
 from node import Node, InvalidIdentity
 
 
-class YadaServer(Indexer):
+class YadaServer(Node):
     
     def __init__(self, identityData={}, newIdentity={}, initialFriends=[]):
 
@@ -131,7 +131,7 @@ class YadaServer(Indexer):
                 posts.extend(message)
                 conn.close()
     
-    def loadInboundJson(request):
+    def loadInboundJson(self, request):
         jsonDict = {}
         try:
             jsonDict = json.loads(request.POST['data'])
@@ -374,18 +374,13 @@ class YadaServer(Indexer):
     
     def handleManageRequest(self, packet):
         self.addManagedNode(packet)
-        
-    def addManagedNode(self, packet):
-        node = Node(packet)
-        self.add('data/managed_nodes', node.get(), True)
-        self.save()
 
     def forceJoinNodes(self, sourceNode, destNode):
         
         newFriendRequest = Node({}, sourceNode.get('data/identity'), sourceNode.getFriendPublicKeysDict())
         newFriendRequest.set('status', 'FRIEND_REQUEST', True)
         
-        newIndexerFriendRequest = Indexer({}, destNode.get('data/identity'), destNode.getFriendPublicKeysDict())
+        newIndexerFriendRequest = Node({}, destNode.get('data/identity'), destNode.getFriendPublicKeysDict())
         newIndexerFriendRequest.set('public_key', newFriendRequest.get('public_key'))
         newIndexerFriendRequest.set('private_key', newFriendRequest.get('private_key'))
         
@@ -406,6 +401,6 @@ class YadaServer(Indexer):
         return newFriendRequest.get()
     
     def getFriendRequestsFromIndexer(self, node, indexer):
-        selectedFriendIndexer = Indexer(node.matchFriend(indexer))
-        dataToSend = '{"method" : "GET", "public_key" : "%s", "data" : "%s"}' %(selectedFriendIndexer.get('public_key'), encrypt(selectedFriendIndexer.get('private_key'), selectedFriendIndexer.get('private_key'), json.dumps({'query':'friend_requests', 'data':{'friends':[{'public_key':x['public_key']} for x in node.get('data/friends')]}}, cls=JsonEncoder)))
+        selectedFriendIndexer = Node(node.matchFriend(indexer))
+        dataToSend = '{"method" : "GET", "public_key" : "%s", "data" : "%s"}' %(selectedFriendIndexer.get('public_key'), encrypt(selectedFriendIndexer.get('private_key'), selectedFriendIndexer.get('private_key'), json.dumps({'query':'friend_requests', 'data':{'friends':[{'public_key':x['public_key']} for x in node.get('data/friends')]}})))
         return self.queryIndexer(dataToSend, selectedFriendIndexer, node) 
