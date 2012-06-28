@@ -7,6 +7,7 @@ import sys
 
 setup(
     name = "Yada Project",
+    packages=['yadapy','yadapy/lib', 'yadapy/sqlite', 'yadapy/mongodb'],
     version = '0.1',
     url = 'http://www.yadaproject.com/',
     author = 'Matthew Reynold Vogel',
