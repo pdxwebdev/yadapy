@@ -6,7 +6,7 @@ class Node(BaseNode):
     
     def __init__(*args, **kwargs):
         self = args[0]
-        s = sqlite3.connect(kwargs['location'] + "%s.db" % str(uuid4()))
+        s = sqlite3.connect(kwargs['location'])
         self.cursor = s.cursor()
         try:
             self.cursor.execute('CREATE TABLE node (id INTEGER PRIMARY KEY, public_key varchar(50), data TEXT)')

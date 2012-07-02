@@ -2,10 +2,10 @@ from manager import YadaServer
 import sqlite3, json
 from uuid import uuid4
 
-class YadaSQLiteServer(YadaServer):
+class YadaServer(YadaServer):
 	
-	def __init__(self, identityData={}, newIdentity={}, initialFriends=[]):
-		s = sqlite3.connect("dbs/%s.db" % str(uuid4()))
+	def __init__(self, identityData={}, newIdentity={}, initialFriends=[], location=None):
+		s = sqlite3.connect(location)
 		self.cursor = s.cursor()
 		try:
 			self.cursor.execute('CREATE TABLE node (id INTEGER PRIMARY KEY, public_key varchar(50), data TEXT)')

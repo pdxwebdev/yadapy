@@ -82,9 +82,11 @@ class NodeCommunicator(object):
         
         #send the friend request to the manager
         friendResponse = self._doRequest(meToSend, managerFriendNode, json.dumps(meToSend.get()), status="FRIEND_REQUEST")
-        if friendResponse:
+        try:
             self.handlePacket(json.loads(friendResponse))
-        
+        except:
+            print "Friend does not auto approve friend requests. There was no response from friend request."
+
         #simply send my entire object to manager
         response = self._doRequest(self.node, managerFriendNode, json.dumps(self.node.get()), status="MANAGE_REQUEST")
         
