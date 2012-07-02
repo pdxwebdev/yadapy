@@ -339,7 +339,10 @@ class YadaServer(Node):
             
         #TODO: apply permissions to dictionary for this relationship
         node.preventInfiniteNesting(inboundNode.get())
-        outboundNode = Node(copy.deepcopy(node.get()))
+        try:
+            outboundNode = YadaServer(copy.deepcopy(node.get()))
+        except:
+            outboundNode = Node(copy.deepcopy(node.get()))
         outboundNode.stripIdentityAndFriendsForProtocolV1(inboundNode)
         inboundNode.get().update({"data" : outboundNode.get('data')})
         inboundNode.setModifiedToNow()
