@@ -1,8 +1,8 @@
-from manager import YadaServer
+from yadapy.manager import YadaServer as ServerNode
 import sqlite3, json
 from uuid import uuid4
 
-class YadaServer(YadaServer):
+class YadaServer(ServerNode):
 	
 	def __init__(self, identityData={}, newIdentity={}, initialFriends=[], location=None):
 		s = sqlite3.connect(location)
@@ -12,7 +12,7 @@ class YadaServer(YadaServer):
 		except:
 			print "table already exists"
 		
-		super(YadaSQLiteServer, self).__init__(identityData=identityData, newIdentity=newIdentity, initialFriends=initialFriends)
+		super(YadaServer, self).__init__(identityData=identityData, newIdentity=newIdentity, initialFriends=initialFriends)
 	
 	def save(self):
 		res = self.cursor.execute("SELECT id FROM node WHERE public_key = ?", [self.get('public_key')])
