@@ -11,8 +11,11 @@ Quick start instructions:
 Now on your client machine:
 
 4. python
+
 . >>> from yadapy.node import Node
+
 . >>> from yadapy.nodecommunicator import NodeCommunicator
+
 . >>> node = Node({}, {"name" : "Node Name"})
  >>> nc = NodeCommunicator(node)
  >>> ncServerFriend = Node(node.get('data/friends')[0])
