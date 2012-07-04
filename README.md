@@ -2,6 +2,7 @@ yadapy
 ======
 
 Quick start instructions: 
+https://github.com/pdxwebdev/yadapy/wiki/Quick-Start-Instructions
 
 
 yadapy is a python implementation of the Yada Project Protocol.
