@@ -283,6 +283,7 @@ class Node(object):
     def addFriend(self, friend):
         try:
             node = Node(friend)
+            self.setModifiedToNow()
             self.add('data/friends', friend)
         except:
             InvalidIdentity("cannot add friend, invalid node")
@@ -290,12 +291,14 @@ class Node(object):
     def addFriendRequest(self, friendRequest):
         try:
             node = Node(friendRequest)
+            self.setModifiedToNow()
             self.add('friend_requests', friendRequest)
         except:
             InvalidIdentity("cannot add friend, invalid node")
 
     def addMessage(self, message):
         try:
+            self.setModifiedToNow()
             self.add('data/messages', message)
         except:
             InvalidIdentity("cannot add friend, invalid node")
@@ -729,7 +732,7 @@ class Node(object):
         self.add('data/identity/ip_address', self.createIPAddress(host, port, protocol))
         
     def save(self):
-        pass
+        self.setModifiedToNow()
 
 class InvalidIdentity(Exception):
     def __init__(self, value):

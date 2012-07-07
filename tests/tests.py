@@ -150,7 +150,7 @@ class UnitTests(unittest.TestCase):
         
     def test_Messaging(self):
                 
-        if not os.getenv('PRODUCTION'):
+        if os.getenv('PRODUCTION'):
             host1 = 'localhost:8040'
         else:
             host1 = 'yadaproject.com:8040'
