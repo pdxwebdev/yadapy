@@ -2,24 +2,7 @@ yadapy
 ======
 
 Quick start instructions: 
-1. python setup.py install
-2. clone this repo https://github.com/pdxwebdev/yadaproject
-3. python server.py hostname:port sqlite.database.path manager
-* You now have a server running that can host multiple identities.
-* This server must be accessible from the anywhere on the internet.
-
-Now on your client machine:
-4. python
->>> from yadapy.node import Node
->>> from yadapy.nodecommunicator import NodeCommunicator
->>> node = Node({}, {"name" : "Node Name"})
->>> nc = NodeCommunicator(node)
->>> ncServerFriend = Node(node.get('data/friends')[0])
->>> nc.updateRelationship(ncServerFriend)
-* You now have a friendship with your server from your client machine
-* You are also now hosting your identity on this server.
-* This relationship can be used for authentication of apps, create new friendships, send messages, host additional identities, etc.
-
+https://github.com/pdxwebdev/yadapy/wiki/Quick-Start-Instructions
 
 
 yadapy is a python implementation of the Yada Project Protocol.
