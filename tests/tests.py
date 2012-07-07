@@ -90,7 +90,7 @@ class UnitTests(unittest.TestCase):
         self.assertEqual(friendRequests.keys(),{'friend_requests' : ''}.keys())
         self.assertEqual(friendRequests['friend_requests'][0]['public_key'], newFriend['public_key'])
     
-    def test_addRemoteManager(self):
+    def _addRemoteManager(self):
                 
         if not os.getenv('PRODUCTION'):
             host1 = 'localhost'
@@ -147,6 +147,29 @@ class UnitTests(unittest.TestCase):
         
         #now we verify that we can pull down the information from the new friend
         self.assertEqual(Node(node1.get('data/friends')[2]).get('data/identity/name'), node2name)
+        
+    def test_Messaging(self):
+                
+        if not os.getenv('PRODUCTION'):
+            host1 = 'localhost:8040'
+        else:
+            host1 = 'yadaproject.com:8040'
+            
+        node1name = str(uuid4())
+        node2name = str(uuid4())
+        node1 = Node({}, {"name" : node1name})
+        
+ 
+        nc1 = NodeCommunicator(node1)
+         
+        nc1.requestFriend(host1)
+        
+        uuidSubject = str(uuid4())
+        
+        nc1.sendMessage(nc1.node.getFriendPublicKeysArray(), uuidSubject, "message")
+        nc1.sendMessage(nc1.node.getFriendPublicKeysArray(), uuidSubject, "message")
+        pass
+        
 
 if __name__ == '__main__':
     unittest.main()

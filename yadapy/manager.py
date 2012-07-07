@@ -216,7 +216,7 @@ class YadaServer(Node):
             #this or clause is only for the case where yada server is in the friendship and 
             #the managed node only has yada server as a friend
             if p.get('public_key') == self.get('public_key'):
-                return YadaServer(copy.deepcopy(self.get()))
+                return self
         
         for node in r:
             p = Node(node)

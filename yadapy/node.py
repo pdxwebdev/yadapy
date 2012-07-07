@@ -293,6 +293,12 @@ class Node(object):
             self.add('friend_requests', friendRequest)
         except:
             InvalidIdentity("cannot add friend, invalid node")
+
+    def addMessage(self, message):
+        try:
+            self.add('data/messages', message)
+        except:
+            InvalidIdentity("cannot add friend, invalid node")
             
     def updateFromNode(self, inboundNode):
         node = Node(inboundNode)

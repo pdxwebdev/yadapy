@@ -10,10 +10,13 @@ class Node(BaseNode):
         self.cursor = s.cursor()
         try:
             self.cursor.execute('CREATE TABLE node (id INTEGER PRIMARY KEY, public_key varchar(50), data TEXT)')
+            super(Node, self).__init__(*args[1:], **kwargs)
         except:
             print "table already exists"
+            res = self.cursor.execute("SELECT data FROM node WHERE public_key = ?", [self.get('public_key')])
+            super(Node, self).__init__(res[0])
         
-        super(Node, args[0]).__init__(*args[1:], **kwargs)
+        
     
     def save(self):
         res = self.cursor.execute("SELECT id FROM node WHERE public_key = ?", [self.get('public_key')])
