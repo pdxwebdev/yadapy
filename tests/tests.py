@@ -166,7 +166,10 @@ class UnitTests(unittest.TestCase):
         
         uuidSubject = str(uuid4())
         nc1.sendMessage(nc1.node.getFriendPublicKeysArray(), uuidSubject, "message")
-        pass
+        import urllib2
+        json = urllib2.urlopen("http://" + host1).read()
+        self.assertTrue(uuidSubject in json)
+
         
 
 if __name__ == '__main__':
