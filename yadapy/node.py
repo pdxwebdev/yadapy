@@ -318,6 +318,7 @@ class Node(object):
                         friend.set('permissions', node['permissions'])
                         
             if not 'modified' in friend.get() or float(friend.get('modified')) < float(node.get('modified')):
+                #we're going to directly set this element because we want to retain the modified time
                 friend._data['data'] = node.get('data')
                 if "web_token" in node.get():
                     friend.set('web_token', node.get('web_token'))
