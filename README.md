@@ -11,6 +11,14 @@ yadapy is a python implementation of the Yada Project Protocol.
 What is the Yada Project Protocol?
 -
 The Yada Project Protocol allows you to host your identity on any device capable of sending, receiving and storing data. Once hosted, you are able to create relationships and communicate with other identities hosted elsewhere on the internet.  
+        Yada Project stack
+____________________________________________
+|                  Server
+|___________________________________________
+|                   Yada
+|___________________________________________
+|                Data Store
+|___________________________________________
 
 
 Features / Capabilities:
