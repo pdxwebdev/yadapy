@@ -318,7 +318,7 @@ class Node(object):
                         friend.set('permissions', node['permissions'])
                         
             if not 'modified' in friend.get() or float(friend.get('modified')) < float(node.get('modified')):
-                friend.set('data', node.get('data'))
+                friend._data['data'] = node.get('data')
                 if "web_token" in node.get():
                     friend.set('web_token', node.get('web_token'))
                 self.save()
