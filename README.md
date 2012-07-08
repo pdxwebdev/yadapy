@@ -18,7 +18,8 @@ Features / Capabilities:
 - Identity Management (Kind of like web hosting, only you're hosting identities instead of web sites.)
 - O-Auth style authentication
 - Automatic account registration
-- Integration capabilities enabling multiple web sites to share one social network
+- Ability to create a social graph spanning multiple web sites
+- Web Service management by creating relationships with end points
 - Enhanced control over privacy
 
 Proof of Concepts Completed:
