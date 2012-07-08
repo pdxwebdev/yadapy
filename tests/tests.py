@@ -156,7 +156,7 @@ class UnitTests(unittest.TestCase):
             host1 = 'yadaproject.com:8040'
             
         node1name = str(uuid4())
-        node2name = str(uuid4())
+        
         node1 = Node({}, {"name" : node1name})
         
  
@@ -165,8 +165,16 @@ class UnitTests(unittest.TestCase):
         nc1.requestFriend(host1)
         
         uuidSubject = str(uuid4())
-        
         nc1.sendMessage(nc1.node.getFriendPublicKeysArray(), uuidSubject, "message")
+        uuidSubject2 = str(uuid4())
+        nc1.sendMessage(nc1.node.getFriendPublicKeysArray(), uuidSubject, "message")
+        uuidSubject3 = str(uuid4())
+        nc1.sendMessage(nc1.node.getFriendPublicKeysArray(), uuidSubject, "message")
+        uuidSubject4 = str(uuid4())
+        nc1.sendMessage(nc1.node.getFriendPublicKeysArray(), uuidSubject, "message")
+        uuidSubject5 = str(uuid4())
+        nc1.sendMessage(nc1.node.getFriendPublicKeysArray(), uuidSubject, "message")
+        uuidSubject6 = str(uuid4())
         nc1.sendMessage(nc1.node.getFriendPublicKeysArray(), uuidSubject, "message")
         pass
         

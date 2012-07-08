@@ -455,12 +455,12 @@ class Node(object):
         friendNode.setModifiedToNow()
         return friendNode.get()
     
-    @staticmethod
-    def sendMessage(pub_keys, subject, message, thread_id=None):
+    
+    def sendMessage(self, pub_keys, subject, message, thread_id=None):
         if thread_id:
-            return {'public_key':pub_keys, 'timestamp':int(time.time()),'thread_id':thread_id,'subject':subject,'message':b64encode(message),'guid':str(uuid4())}
+            return {'public_key':pub_keys, 'timestamp':self.newTimeStamp(),'thread_id':thread_id,'subject':subject,'message':b64encode(message),'guid':str(uuid4())}
         else:
-            return {'public_key':pub_keys, 'timestamp':int(time.time()),'thread_id':str(uuid4()),'subject':subject,'message':b64encode(message),'guid':str(uuid4())} 
+            return {'public_key':pub_keys, 'timestamp':self.newTimeStamp(),'thread_id':str(uuid4()),'subject':subject,'message':b64encode(message),'guid':str(uuid4())} 
 
     def sync(self, inbound, is_self=True, permission_object={}):
         self.updateTree(self.get(), inbound, is_self, permission_object)
