@@ -6,12 +6,11 @@ from pymongo import Connection
 from json import JSONEncoder
 from crypt import encrypt, decrypt
 from pymongo.objectid import ObjectId
-from node import Node, InvalidIdentity
-from indexer import Indexer
-from manager import YadaServer
+from yadapy.node import Node, InvalidIdentity
+from yadapy.manager import YadaServer as Manager
 
 
-class YadaMongoServer(YadaServer):
+class YadaServer(Manager):
         
     def __init__(self, yadaServerIdentity = {}, host='localhost', port=27021):
         
@@ -226,7 +225,7 @@ class YadaMongoServer(YadaServer):
         newFriendRequest = Node({}, sourceNode.get('data/identity'), sourceNode.getFriendPublicKeysDict())
         newFriendRequest.set('status', 'FRIEND_REQUEST', True)
         
-        newIndexerFriendRequest = Indexer({}, destNode.get('data/identity'), destNode.getFriendPublicKeysDict())
+        newIndexerFriendRequest = Node({}, destNode.get('data/identity'), destNode.getFriendPublicKeysDict())
         newIndexerFriendRequest.set('public_key', newFriendRequest.get('public_key'))
         newIndexerFriendRequest.set('private_key', newFriendRequest.get('private_key'))
         

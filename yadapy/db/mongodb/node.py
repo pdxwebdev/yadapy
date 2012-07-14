@@ -3,11 +3,10 @@ from base64 import b64encode, b64decode
 from uuid import uuid4
 from random import randrange
 from pymongo import Connection
-from node import Node as YadaNode
-from indexer import Indexer as YadaIndexer
+from yadapy.node import Node as YadaNode
 
  
-class YadaMongo(object):
+class Node(YadaNode):
     def __init__(*args, **kwargs):
         if not len(args)>1:
             host='localhost'
@@ -178,16 +177,3 @@ class YadaMongo(object):
     def addMessageForProfile(self, message):
         self.update({'public_key':self.get('public_key')}, {'$push' : {'data.messages': message}})
         self.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
-
-attrDict = {}
-for i, x in YadaMongo.__dict__.items():
-    if not "__" in i:
-        attrDict[i] = x
-
-attrDict['conn'] = Connection('localhost', 27021)
-attrDict['db'] = attrDict['conn'].yadaserver
-attrDict['col'] = attrDict['db'].identities
-
-Node = type("Node", (YadaNode,), attrDict)
-
-Indexer = type("Node", (YadaIndexer,), attrDict)
