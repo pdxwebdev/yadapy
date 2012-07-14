@@ -151,7 +151,7 @@ class Node(object):
 
     def add(self, path="", assignment="", create=False):
         """
-        Takes a key path separated by forward slashes / to find an entity of the identity
+        @path string Takes a key path separated by forward slashes / to find an entity of the identity
         Second parameter is the value or expression being assigned
         
         Example:
@@ -281,6 +281,11 @@ class Node(object):
         return None
     
     def addFriend(self, friend):
+        """
+        adds a friend to the data/friends element. also validates the friend is a valid identity
+        
+        returns void
+        """
         try:
             node = Node(friend)
             self.setModifiedToNow()
@@ -289,6 +294,11 @@ class Node(object):
             InvalidIdentity("cannot add friend, invalid node")
             
     def addFriendRequest(self, friendRequest):
+        """
+        adds a friend to the friend_requests element. also validates the friend request is a valid identity
+        
+        returns void
+        """
         try:
             node = Node(friendRequest)
             self.setModifiedToNow()
@@ -297,6 +307,11 @@ class Node(object):
             InvalidIdentity("cannot add friend, invalid node")
 
     def addMessage(self, message):
+        """
+        adds a friend to the data/messages element.
+        
+        returns void
+        """
         try:
             self.setModifiedToNow()
             self.add('data/messages', message)
@@ -304,6 +319,12 @@ class Node(object):
             InvalidIdentity("cannot add friend, invalid node")
             
     def updateFromNode(self, inboundNode):
+        """
+        inboundNode is an Node instance of a friend of self and used to update the information
+        for that friend in your friends list.
+        
+        returns void
+        """
         node = Node(inboundNode)
         friend = self.getFriend(node.get('public_key'))
         if friend:
@@ -336,9 +357,6 @@ class Node(object):
             return friend
         else:
             return None
-    
-    def addRoutedFriendRequest(self):
-        pass
 
     def getFriendPublicKeysArray(self):
         return [x['public_key'] for x in self.get('data/friends')]
@@ -362,20 +380,18 @@ class Node(object):
                     self.stripFriendIdentityForFriend(friend)
                     
     def stripIdentityAndFriendsForFriend(self):
-        if 'data' in identity:
-            self.stripFriendIdentityForFriend()
-            if 'friends' in identity['data']:
-                for i, friend in enumerate(self.get('data/friends')):
-                    self.stripFriendIdentityForFriend(friend)
+        self.stripFriendIdentityForFriend()
+        for friend in self.get('data/friends'):
+            self.stripFriendIdentityForFriend(friend)
     
     def stripFriendIdentityForFriend(self, friend={}):
         if not friend:
             friend = self.get()
         if 'data' in friend:
-            stripIdentityOfIrrelevantMessages(friend)
-            replaceIdentityOfFriendsWithPubKeys(friend)
-            stripIdentityOfFriendRequests(friend)
-            base64DecodeMessages(friend)
+            self.stripIdentityOfIrrelevantMessages(friend)
+            self.replaceIdentityOfFriendsWithPubKeys(friend)
+            self.stripIdentityOfFriendRequests(friend)
+            self.base64DecodeMessages(friend)
         
     def stripIdentityOfIrrelevantMessages(self):
         messageList = []
@@ -448,8 +464,14 @@ class Node(object):
         print "friend request added"
         
     def respondWithRelationship(self, friendNode):
+        """
+        This method will return a dictionary prepared to be encrypted, encoded and sent
+        
+        @friendNode Node instance This is used for the public and private key information
+        
+        returns dictionary
+        """
         #TODO: apply permissions to dictionary for this relationship
-        #TODO: pune fields to limit the data sent
         friendNode.get().update({"data" : copy.deepcopy(self.get('data'))})
         friendNode.preventInfiniteNesting(friendNode.get())
         friendNode.stripIdentityAndFriendsForProtocolV1(friendNode)
@@ -458,16 +480,34 @@ class Node(object):
     
     
     def sendMessage(self, pub_keys, subject, message, thread_id=None):
+        """
+        Creates either a new message thread or replies to an existing thread if @thread_id is given.
+        
+        @pub_keys list A list of public_keys to send to
+        @subject string Just like an email subject
+        @message string The body of the message, just like email
+        @thread_id string The thread_id to allow aggregation of a topic
+        
+        returns a new message object that can be inserted into data/messages
+        """
         if thread_id:
             return {'public_key':pub_keys, 'timestamp':self.newTimeStamp(),'thread_id':thread_id,'subject':subject,'message':b64encode(message),'guid':str(uuid4())}
         else:
             return {'public_key':pub_keys, 'timestamp':self.newTimeStamp(),'thread_id':str(uuid4()),'subject':subject,'message':b64encode(message),'guid':str(uuid4())} 
 
     def sync(self, inbound, is_self=True, permission_object={}):
-        self.updateTree(self.get(), inbound, is_self, permission_object)
+        """
+        This kicks off the _updateTree method which will synchronize the two identity objects
+        @inbound dictionary Is the object to synchronize against
+        @is_self bool This is necessary because a friend has the ability to impersonate you.
+        @permission_object dictionary This object should match the index structure of
+        
+        returns void
+        """
+        self._updateTree(self.get(), inbound, is_self, permission_object)
         
 
-    def updateTree(self, internal, inbound, is_self=True, permission_object={}):
+    def _updateTree(self, internal, inbound, is_self=True, permission_object={}):
         if not internal or not inbound: return
         if type(inbound) == type({}):
             if 'modified' not in internal or 'modified' not in inbound:
@@ -508,7 +548,7 @@ class Node(object):
                         internal[key] = inboundRef
                     continue
                 if type(inboundRef) == type({}):
-                    self.updateTree(internalRef,inboundRef,is_self,permission_object_ref)
+                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref)
                     if type(inboundRef) == type({}):
                         curTime = int(time.time())
                         inboundRef['modified'] = curTime
@@ -584,7 +624,7 @@ class Node(object):
                                 newList.append(item)
                         internal[key]=newList
                     else:
-                        self.updateTree(internalRef,inboundRef,is_self,permission_object_ref)
+                        self._updateTree(internalRef,inboundRef,is_self,permission_object_ref)
                         if type(inboundRef) == type({}):
                             curTime = int(time.time())
                             #CRUD: UPDATE
@@ -643,13 +683,13 @@ class Node(object):
                         continue
                 curTime = int(time.time())
                 if type(inboundRef) == type({}):
-                    self.updateTree(internalRef,inboundRef,is_self,permission_object_ref)
+                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref)
                     if type(inboundRef) == type({}):
                         inboundRef['modified'] = curTime
                         if 'label' not in inboundRef:
                             inboundRef['label'] = 'default'
                 elif type(inboundRef) == type([]):
-                    self.updateTree(internalRef,inboundRef,is_self,permission_object_ref)
+                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref)
                     if type(inboundRef) == type({}):
                         inboundRef['modified'] = curTime
                         if 'label' not in inboundRef:
@@ -681,6 +721,12 @@ class Node(object):
 
 
     def updateStatus(self, jsonData, arrayKey, elementKey, newOrUpdate):
+        """
+        This method will attempt to update your status automatically based on activity
+        during the sync process.
+        
+        returns void        
+        """
         lookup={}
         if arrayKey=='status': return
         if 'status' not in jsonData: return
@@ -697,6 +743,12 @@ class Node(object):
     
     @staticmethod
     def updatePair(key,internal,internalRef,inbound,inboundRef):
+        """
+        This function will handle assigning a value to a key in a list or dictionary
+        while in the updateTree method.
+        
+        returns void
+        """
         if float(internal['modified'])<float(inbound['modified']):
             if key != 'modified':
                 print 'update made to dict %s to %s' %(internal[key],inboundRef)
@@ -704,6 +756,14 @@ class Node(object):
                 internal[key] = inboundRef
                 
     def searchForNode(self, searchNode):
+        """
+        tries to find the relationship of self with the friend of your friend.
+        Because even though you have the mutual friend node gotten from your friend's friend list,
+        that node will not have the correct public key.
+        So we need to return the corresponding friend in your list
+        
+        returns none or Node instance
+        """
         for node in self.get('data/friends'):
             try:
                 node = Node(node)
@@ -714,6 +774,14 @@ class Node(object):
         return None
     
     def createIPAddress(self, host, port='80', protocol='4'):
+        """
+        generates a new IP Address object
+        @host string Can be an IP address or a host name.
+        @port string Can be any string port number
+        @protocol is the version of IP being used. 4 or 6
+        
+        returns dictionary
+        """
         if ":" in host:
             parts = host.split(':')
             host = parts[0]
@@ -730,9 +798,21 @@ class Node(object):
         }
         
     def addIPAddress(self, host, port='80', protocol='4'):
+        """
+        Adds an IP address object to the data/identity/ip_address element.
+        This object is used by your friends to contact you.
+        
+        returns void
+        """
         self.add('data/identity/ip_address', self.createIPAddress(host, port, protocol))
         
     def save(self):
+        """
+        This is a place holder method to indicate that subclasses with persistent storage 
+        should override this method
+        
+        returns void
+        """
         self.setModifiedToNow()
 
 class InvalidIdentity(Exception):
