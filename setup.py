@@ -2,12 +2,13 @@ from distutils.core import setup
 from distutils.command.install_data import install_data
 from distutils.command.install import INSTALL_SCHEMES
 from distutils.sysconfig import get_python_lib
+from setuptools import setup, find_packages
 import os
 import sys
 
 setup(
     name = "Yada Project",
-    packages=['yadapy'],
+    packages=find_packages(exclude=['ez_setup', 'tests', 'tests.*']),
     version = '0.1',
     url = 'http://www.yadaproject.com/',
     author = 'Matthew Reynold Vogel',
