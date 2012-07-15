@@ -3,16 +3,20 @@ from base64 import b64encode, b64decode
 from uuid import uuid4
 from random import randrange
 from pymongo import Connection
-from yadapy.node import Node as YadaNode
+from yadapy.node import Node as BaseNode
 
  
-class Node(YadaNode):
+class Node(BaseNode):
     def __init__(self, *args, **kwargs):
 
         self.conn = Connection(kwargs['host'], kwargs['port'])
         self.db = self.conn.yadaserver
         self.col = self.db.identities
-        super(Node, self).__init__(*args, **kwargs)
+        argz = []
+        argz.extend(args)
+        if 'public_key' in kwargs:
+            argz.insert(0, self.getProfileIdentity(kwargs['public_key']))
+        super(Node, self).__init__(*argz, **kwargs)
     
     def queryIndexerByHost(self, host):
         
@@ -143,13 +147,6 @@ class Node(YadaNode):
                         "public_key" : public_key
                     }
                 },
-                {
-                    "$project" : {
-                        "data" : {"identity" : "$data.identity","type" : "$data.type"},
-                        "_id" : 0,
-                        "modified" : "$modified",
-                    }
-                }
                 ]
             })['result'][0];
     
