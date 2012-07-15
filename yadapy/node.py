@@ -9,10 +9,8 @@ class Node(object):
     identityData = {}
     _initialFriends = []
     
-    def __init__(*args, **kwargs):
-        super(Node, args[0]).__init__()
-        
-        self = args[0]
+    def __init__(self, *args, **kwargs):
+        super(Node, self).__init__()
         
         self.defaultHost = "staging.yadaproject.com"
         self.defaultPort = "8089"
@@ -28,15 +26,15 @@ class Node(object):
             newIdentity = args[2]
             
         if len(args)>3:
-            args[0]._initialFriends = args[3]
+            self._initialFriends = args[3]
         elif 'initialFriends' in kwargs:
-            args[0]._initialFriends = kwargs.get('initialFriends', None)
+            self._initialFriends = kwargs.get('initialFriends', None)
         else:
-            args[0]._initialFriends = []
+            self._initialFriends = []
             
-        args[0].identityData = copy.deepcopy({
+        self.identityData = copy.deepcopy({
           "name" : "",
-          "modified" : args[0].newTimeStamp(),
+          "modified" : self.newTimeStamp(),
           "label" : "default",
           "location" : [
             {
@@ -63,7 +61,7 @@ class Node(object):
                   "label" : "home"
                 }
               ],
-              "guid" : args[0].newUuid(),
+              "guid" : self.newUuid(),
               "email" : [
                 {
                   "username" : "",
@@ -77,15 +75,15 @@ class Node(object):
             "label" : "default",
             "year" : "",
             "day" : "",
-            "modified" : args[0].newTimeStamp(),
+            "modified" : self.newTimeStamp(),
             "month" : ""
           },
           "ip_address" : []
         })
         if identityData:
-            args[0].setData(identityData)
+            self.setData(identityData)
         elif newIdentity:
-            args[0].setData(args[0].newIdentity(newIdentity))
+            self.setData(self.newIdentity(newIdentity))
         else:
             raise InvalidIdentity("An identity cannot be created. No identity data provided. Try ({}, {'name': 'my name'})")
         

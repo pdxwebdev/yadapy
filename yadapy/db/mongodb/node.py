@@ -7,12 +7,12 @@ from yadapy.node import Node as YadaNode
 
  
 class Node(YadaNode):
-    def __init__(*args, **kwargs):
-        self = args[0]
+    def __init__(self, *args, **kwargs):
+
         self.conn = Connection(kwargs['host'], kwargs['port'])
         self.db = self.conn.yadaserver
         self.col = self.db.identities
-        super(Node, self).__init__(args[1:], kwargs)
+        super(Node, self).__init__(*args[1:], **kwargs)
     
     def queryIndexerByHost(self, host):
         
