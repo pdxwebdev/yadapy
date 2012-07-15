@@ -8,14 +8,11 @@ from yadapy.node import Node as YadaNode
  
 class Node(YadaNode):
     def __init__(*args, **kwargs):
-        if not len(args)>1:
-            host='localhost'
-        if not len(args)>2:
-            port=27021
         self = args[0]
-        self.conn = Connection(host, port)
+        self.conn = Connection(kwargs['host'], kwargs['port'])
         self.db = self.conn.yadaserver
         self.col = self.db.identities
+        super(Node, self).__init__(args, kwargs)
     
     def queryIndexerByHost(self, host):
         
