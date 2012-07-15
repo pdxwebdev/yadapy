@@ -12,7 +12,7 @@ class Node(YadaNode):
         self.conn = Connection(kwargs['host'], kwargs['port'])
         self.db = self.conn.yadaserver
         self.col = self.db.identities
-        super(Node, self).__init__(*args[1:], **kwargs)
+        super(Node, self).__init__(*args, **kwargs)
     
     def queryIndexerByHost(self, host):
         
