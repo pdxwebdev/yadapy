@@ -203,7 +203,9 @@ class NodeCommunicator(object):
             self.node.handleRoutedMessage(data['data'])
             
         elif packet.get('status', None) == 'MANAGE_REQUEST':
-            self.node.handleManageRequest(json.loads(packetData))
+            node = self.node.getFriend(packet['public_key'])
+            data = decrypt(node['private_key'], node['private_key'], b64encode(packetData))
+            self.node.handleManageRequest(json.loads(data))
             
         elif packet.get('status', None) == 'MANAGE_SYNC':
             node = self.node.getManagedNode(packet['public_key'])
@@ -239,6 +241,12 @@ class NodeCommunicator(object):
                     "public_key" : responseData.get('public_key'),
                     "data" : encrypt(responseData.get('private_key'), responseData.get('private_key'), json.dumps(responseData.get()))
                 } 
+        elif packet.get('method', None) == 'QUERY':
+            if isinstance(self.node, YadaServer):
+                friend = self.node.getFriend(packet['public_key'])
+                packetData = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
+                responseData = self.node.query(json.loads(packetData))
+                return json.dumps(responseData)
         
     def newTimeStamp(self):
         return time.time()

@@ -64,7 +64,10 @@ class YadaServer(Node):
         self.stripManagedNodes()
         
     def stripManagedNodes(self):
-        self.set('data/managed_nodes', [])
+        try:
+            self.set('data/managed_nodes', [])
+        except:
+            pass
         
     #this method was invented just so an incomming packet can be decrypted
     #so it doesn't matter with node in the relationship we return
@@ -73,7 +76,12 @@ class YadaServer(Node):
         if friend:
             return Node(friend[0]).getFriend(public_key)
         else:
-            return super(YadaServer, self).getFriend(public_key)
+            friend = super(YadaServer, self).getFriend(public_key)
+            if friend:
+                return friend
+            else:
+                friend = self.getManagedNode(public_key)
+                return friend
         
     def getManagedNode(self, public_key):
         for friend in self.get('data/managed_nodes'):
