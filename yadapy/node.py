@@ -15,15 +15,20 @@ class Node(object):
         self.defaultHost = "staging.yadaproject.com"
         self.defaultPort = "8089"
         
-        if len(args)==0:
-            identityData = kwargs.get('identityData', None)
-        else:
+        try:
+            identityData = ''
             identityData = args[0]
+        except:
+            if kwargs.get('identityData', None):
+                identityData = kwargs.get('identityData', None)
             
-        if len(args)<=1:
-            newIdentity = kwargs.get('newIdentity', None)
-        else:
+            
+        try:
+            newIdentity = ''
             newIdentity = args[1]
+        except:
+            if kwargs.get('newIdentity', None):
+                newIdentity = kwargs.get('newIdentity', None)
             
         if len(args)>2:
             self._initialFriends = args[2]

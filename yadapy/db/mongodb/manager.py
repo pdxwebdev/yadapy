@@ -12,19 +12,28 @@ from yadapy.manager import YadaServer as Manager
 
 class YadaServer(Manager):
         
-    def __init__(self, yadaServerIdentity = {}, host='localhost', port=27021):
+    def __init__(self, *args, **kwargs):
+        
+        if 'host' not in kwargs:
+            host = 'localhost'
+            
+        if 'port' not in kwargs:
+            port = 27021
+            
+        identityData = args[0]
+        newIdentity = args[1]
         
         self.conn = Connection(host, port)
         self.db = self.conn.yadaserver
         self.col = self.db.identities
         
-        if type(yadaServerIdentity) == type(u'') or type(yadaServerIdentity) == type(''):
-            identityData = self.getManagedNode(yadaServerIdentity)
-        elif type(yadaServerIdentity) == type({}):
-            identityData = identityData
+        if type(identityData) == type(u'') or type(identityData) == type(''):
+            identityData = self.getManagedNode(identityData)
+        elif type(identityData) == type({}):
+            newIdentity = newIdentity
         else:
             raise InvalidIdentity("A valid server Identity was not given nor was a public_key specified.")
-        super(YadaServer, self).__init__(identityData=identityData)
+        super(YadaServer, self).__init__(identityData=identityData, newIdentity=newIdentity)
     
     def getManagedNode(self, public_key):
         res = self.col.find({'public_key':public_key})
@@ -207,7 +216,7 @@ class YadaServer(Manager):
             })['result'][0];
 
     def save(self):
-        self.col.update({'public_key':self.get('public_key')},self.get())
+        self.col.update({'public_key':self.get('public_key')},self.get(), True)
         
     def updateManagedNode(self, node):
         self.col.update({'public_key':node.get('public_key')},node.get())

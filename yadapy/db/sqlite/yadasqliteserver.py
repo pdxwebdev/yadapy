@@ -6,13 +6,7 @@ from uuid import uuid4
 class YadaServer(ServerNode):
 	
 	def __init__(self, identityData={}, newIdentity={}, initialFriends=[], location=None):
-		s = sqlite3.connect(location)
-		self.cursor = s.cursor()
-		try:
-			self.cursor.execute('CREATE TABLE node (id INTEGER PRIMARY KEY, public_key varchar(50), data TEXT)')
-		except:
-			print "table already exists"
-		
+				
 		super(YadaServer, self).__init__(identityData=identityData, newIdentity=newIdentity, initialFriends=initialFriends, location=location)
 	
 	def save(self):

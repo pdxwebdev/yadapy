@@ -8,15 +8,25 @@ from yadapy.node import Node as BaseNode
  
 class Node(BaseNode):
     def __init__(self, *args, **kwargs):
-
-        self.conn = Connection(kwargs['host'], kwargs['port'])
+        
+        if 'host' in kwargs:
+            host = kwargs['host'] 
+        else:
+            host = 'localhost'
+        if 'port' in kwargs:
+            port = kwargs['port']
+        else:
+            port = 27021
+            
+        self.conn = Connection(host, port)
         self.db = self.conn.yadaserver
         self.col = self.db.identities
-        argz = []
-        argz.extend(args)
+
         if 'public_key' in kwargs:
-            argz.insert(0, self.getProfileIdentity(kwargs['public_key']))
-        super(Node, self).__init__(*argz, **kwargs)
+            args = [x for x in args]
+            args.insert(0, self.getProfileIdentity(kwargs['public_key']))
+            
+        super(Node, self).__init__(*args, **kwargs)
     
     def queryIndexerByHost(self, host):
         
