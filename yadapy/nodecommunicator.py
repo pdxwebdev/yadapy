@@ -5,6 +5,10 @@ from lib.crypt import encrypt, decrypt
 from node import Node
 from manager import YadaServer
 
+
+class GetOutOfLoop( Exception ):
+     pass
+ 
 class NodeCommunicator(object):
     
     def __init__(self, node):
@@ -13,47 +17,56 @@ class NodeCommunicator(object):
     def _doRequest(self, toNode, hostNode, data, method='PUT', status=None):
         
         response = None
+        try:
+            for hostElement in hostNode.get('data/identity/ip_address'):
+                host = hostElement['address']
+                port = None
+                if len(host.split(':')) > 1:
+                    port = int(host.split(':')[1])
+                    host = host.split(':')[0]
+                elif 'port' in hostElement:
+                    try:
+                        port = int(hostElement['port'])
+                    except:
+                        pass
+                    
+                if not port:
+                    port = 80
         
-        for hostElement in hostNode.get('data/identity/ip_address'):
-            host = hostElement['address']
-            port = None
-            if len(host.split(':')) > 1:
-                port = int(host.split(':')[1])
-                host = host.split(':')[0]
-            elif 'port' in hostElement:
-                try:
-                    port = int(hostElement['port'])
-                except:
-                    pass
+                headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
                 
-            if not port:
-                port = 80
-    
-            headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-            
-            packet = \
-                {
-                    "public_key" : toNode.get('public_key'), 
-                    "method" : method, 
-                    "data" : b64encode(data)
-                }
+                packet = \
+                    {
+                        "public_key" : toNode.get('public_key'), 
+                        "method" : method, 
+                        "data" : b64encode(data)
+                    }
+                    
+                if status:
+                    packet.update({"status" : status})
+                    
+                dataToSend = json.dumps(packet)
                 
-            if status:
-                packet.update({"status" : status})
+                params = urllib.urlencode({'data': dataToSend})
                 
-            dataToSend = json.dumps(packet)
-            
-            params = urllib.urlencode({'data': dataToSend})
-            
-            conn = httplib.HTTPConnection(host, port)
-            conn.request("POST", "", params, headers)
-            
-            response = conn.getresponse()
-            response = response.read()
-            conn.close()
-            
-            break
-            
+                for ipEl in self.node.get('data/identity/ip_address'):
+                    if host == ipEl['address'] and port == ipEl['port']:
+                        self.handlePacket(json.loads(dataToSend))
+                        raise GetOutOfLoop
+                    elif host + ":" + str(port) == ipEl['address']:
+                        self.handlePacket(json.loads(dataToSend))
+                        raise GetOutOfLoop
+                
+                conn = httplib.HTTPConnection(host, port)
+                conn.request("POST", "", params, headers)
+                
+                response = conn.getresponse()
+                response = response.read()
+                conn.close()
+                
+                break
+        except GetOutOfLoop:
+            pass
         return response
         
 
@@ -168,9 +181,11 @@ class NodeCommunicator(object):
         sourceNodeCopy.set('public_key', destNode.get('public_key'))
         sourceNodeCopy.set('private_key', destNode.get('private_key'))
         data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(sourceNodeCopy.get())))
-        packet = json.loads(self._doRequest(sourceNodeCopy, destNode, data, method="GET"))
-        packetData = decrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(packet['data']))
-        self.node.updateFromNode(json.loads(packetData))
+        response = self._doRequest(sourceNodeCopy, destNode, data, method="GET")
+        if response:
+            packet = json.loads(response)
+            packetData = decrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(packet['data']))
+            self.node.updateFromNode(json.loads(packetData))
     
     def handlePacket(self, packet):
         
@@ -240,13 +255,7 @@ class NodeCommunicator(object):
                     "method" : "PUT",
                     "public_key" : responseData.get('public_key'),
                     "data" : encrypt(responseData.get('private_key'), responseData.get('private_key'), json.dumps(responseData.get()))
-                } 
-        elif packet.get('method', None) == 'QUERY':
-            if isinstance(self.node, YadaServer):
-                friend = self.node.getFriend(packet['public_key'])
-                packetData = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
-                responseData = self.node.query(json.loads(packetData))
-                return json.dumps(responseData)
+                }
         
     def newTimeStamp(self):
         return time.time()

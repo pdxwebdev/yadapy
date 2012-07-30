@@ -4,6 +4,7 @@ from uuid import uuid4
 from random import randrange
 from pymongo import Connection
 from yadapy.node import Node as BaseNode
+from pymongo.objectid import ObjectId
 
  
 class Node(BaseNode):
@@ -149,7 +150,7 @@ class Node(BaseNode):
         })['result'][0]['friend'];
     
     def getProfileIdentity(self, public_key):
-        return self.db.command(
+        ret = self.db.command(
             {
                 "aggregate" : "identities", "pipeline" : [
                 {
@@ -159,12 +160,18 @@ class Node(BaseNode):
                 },
                 ]
             })['result'][0];
+        ret['_id'] = str(ret['_id'])
+        return ret
     
     def save(self):
         try:
             result = self.col.find({'public_key':self.get('public_key')})
             if result.count() > 0:
-                self.set('_id', result[0]['_id'])
+                if type(result[0]['_id']) == type(''):
+                    id = ObjectId(result[0]['_id'])
+                else:
+                    id = result[0]['_id']
+                self.set('_id', )
                 self.setModifiedToNow()
                 self.col.update({'public_key': self.get('public_key')}, self.get())
             else:
@@ -176,8 +183,8 @@ class Node(BaseNode):
     
     def addFriend(self, friend):
         self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.friends': friend}})
-        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.newTimeStamp()}})
     
     def addMessage(self, message):
         self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.messages': message}})
-        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.newTimeStamp()}})

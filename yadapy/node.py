@@ -421,10 +421,11 @@ class Node(object):
                 
     def stripIdentityOfIrrelevantFriendRequests(self, node):
         newFriendRequestList = []
-        for request in self.get('data/routed_friend_requests'):
-            if request['routed_public_key'] == node.get('public_key'):
-                newFriendRequestList.append(request)
-        self.set('data/routed_friend_requests', newFriendRequestList)
+        if 'routed_friend_requests' in self.get()['data']:
+            for request in self.get('data/routed_friend_requests'):
+                if request['routed_public_key'] == node.get('public_key'):
+                    newFriendRequestList.append(request)
+            self.set('data/routed_friend_requests', newFriendRequestList)
 
     def preventInfiniteNesting(self, newFriendNode):
         node = Node(newFriendNode)
