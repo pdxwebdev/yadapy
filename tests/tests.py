@@ -14,16 +14,32 @@ class UnitTests(unittest.TestCase):
         
         self.user2 = Node({}, {"name" : "user2"})
         
-    def Node_sync_simple(self):
+    def test_Node_sync_simple(self):
         
         time.sleep(1)
         
         newName = 'mike'
+        newPhone = {
+                  "prefix" : "503",
+                  "area_code" : "257",
+                  "number" : "0484",
+                  "country_code" : "1",
+                  "label" : "home"
+                }
         self.user2.set('data/identity/name', newName)
+        self.user2.add('data/identity/location/0/phone', newPhone, True)
+        self.user2.set('data/identity/location/0/phone/0', newPhone, True)
+        self.user2.set('data/identity/location/0/phone/0/area_code', '360', True)
+        
+        self.user1.set('data/identity/location/0/guid', u'asdf', True)
+        self.user2.set('data/identity/location/0/guid', u'asdf', True)
+        
+        self.assertTrue(self.user2.get('data/identity/location/0/phone/0/area_code') == '360')
         self.assertTrue(self.user2.get('data/identity/name') == newName)
         
         self.user1.sync(self.user2.get())
         self.assertTrue(self.user1.get('data/identity/name') == newName)
+        self.assertTrue(self.user1.get('data/identity/location/0/phone/0/area_code') == '360')
         
         
     def Node_sync_friend(self):
@@ -90,7 +106,7 @@ class UnitTests(unittest.TestCase):
         self.assertEqual(friendRequests.keys(),{'friend_requests' : ''}.keys())
         self.assertEqual(friendRequests['friend_requests'][0]['public_key'], newFriend['public_key'])
     
-    def _addRemoteManager(self):
+    def addRemoteManager(self):
                 
         if not os.getenv('PRODUCTION'):
             host1 = 'localhost'
@@ -148,7 +164,7 @@ class UnitTests(unittest.TestCase):
         #now we verify that we can pull down the information from the new friend
         self.assertEqual(Node(node1.get('data/friends')[2]).get('data/identity/name'), node2name)
         
-    def test_Messaging(self):
+    def Messaging(self):
                 
         if os.getenv('PRODUCTION'):
             host1 = 'localhost:8040'

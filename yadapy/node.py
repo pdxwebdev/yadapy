@@ -108,6 +108,8 @@ class Node(object):
             entity = self._data
             num = len(splitPath) - 1
             for idx, el in enumerate(splitPath):
+                if type(entity) == type([]):
+                    el = int(el)
                 entity = entity[el]
             return entity
         except KeyError:
@@ -133,13 +135,19 @@ class Node(object):
             entity = self._data
             num = len(splitPath) - 1
             for idx, el in enumerate(splitPath):
+                if type(entity) == type([]):
+                    el = int(el)
                 if idx < num:
                     entity = entity[el]
                 else:
                     if not el in entity and create == True:
                         entity[el] = assignment
-                        entity['timestamp'] = self.newTimeStamp()
-                        entity['modified'] = self.newTimeStamp()
+                        if type(entity) == type([]):
+                            entity[el]['timestamp'] = self.newTimeStamp()
+                            entity[el]['modified'] = self.newTimeStamp()
+                        else:
+                            entity['timestamp'] = self.newTimeStamp()
+                            entity['modified'] = self.newTimeStamp()
                     elif type(entity[el]) == type(assignment):
                         entity[el] = assignment
                         entity['modified'] = self.newTimeStamp()
@@ -556,7 +564,7 @@ class Node(object):
                         curTime = int(time.time())
                         inboundRef['modified'] = curTime
                 elif type(inboundRef) == type([]):
-                    
+                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref)
                     if key == 'messages':
                         pass
                     key_name = ''

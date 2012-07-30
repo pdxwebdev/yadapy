@@ -174,10 +174,10 @@ class Node(BaseNode):
         except:
             raise
     
-    def addFriendForProfile(self, friend):
-        self.update({'public_key':self.get('public_key')}, {'$push' : {'data.friends': friend}})
-        self.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+    def addFriend(self, friend):
+        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.friends': friend}})
+        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
     
-    def addMessageForProfile(self, message):
-        self.update({'public_key':self.get('public_key')}, {'$push' : {'data.messages': message}})
-        self.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+    def addMessage(self, message):
+        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.messages': message}})
+        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
