@@ -171,7 +171,7 @@ class Node(BaseNode):
                     id = ObjectId(result[0]['_id'])
                 else:
                     id = result[0]['_id']
-                self.set('_id', )
+                self._data['_id'] = id
                 self.setModifiedToNow()
                 self.col.update({'public_key': self.get('public_key')}, self.get())
             else:

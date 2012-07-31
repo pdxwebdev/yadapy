@@ -224,7 +224,11 @@ class YadaServer(Node):
             #this or clause is only for the case where yada server is in the friendship and 
             #the managed node only has yada server as a friend
             if p.get('public_key') == self.get('public_key'):
-                return self
+                if impersonate == False:
+                    return self
+                else:
+                    query = self.publicKeyLookup(inboundNode.get('public_key'))
+                    return Node(query[1]) if idx == 0 else Node(query[0])
         
         for node in r:
             p = Node(node)

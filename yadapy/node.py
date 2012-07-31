@@ -337,7 +337,8 @@ class Node(object):
         returns void
         """
         node = Node(inboundNode)
-        friend = self.getFriend(node.get('public_key'))
+        selfBaseNode = Node(self.get())
+        friend = selfBaseNode.getFriend(node.get('public_key'))
         if friend:
             friend = Node(friend)
             if 'permissions' in node.get():

@@ -17,57 +17,65 @@ class NodeCommunicator(object):
     def _doRequest(self, toNode, hostNode, data, method='PUT', status=None):
         
         response = None
-        try:
-            for hostElement in hostNode.get('data/identity/ip_address'):
-                host = hostElement['address']
-                port = None
-                if len(host.split(':')) > 1:
-                    port = int(host.split(':')[1])
-                    host = host.split(':')[0]
-                elif 'port' in hostElement:
-                    try:
-                        port = int(hostElement['port'])
-                    except:
-                        pass
+        for hostElement in hostNode.get('data/identity/ip_address'):
+            host = hostElement['address']
+            port = None
+            if len(host.split(':')) > 1:
+                port = int(host.split(':')[1])
+                host = host.split(':')[0]
+            elif 'port' in hostElement:
+                try:
+                    port = int(hostElement['port'])
+                except:
+                    pass
+                
+            if not port:
+                port = 80
+    
+            headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+            
+            packet = \
+                {
+                    "public_key" : toNode.get('public_key'), 
+                    "method" : method, 
+                    "data" : b64encode(data)
+                }
+                
+            if status:
+                packet.update({"status" : status})
+                
+            dataToSend = json.dumps(packet)
+            
+            params = urllib.urlencode({'data': dataToSend})
+            
+            for ipEl in self.node.get('data/identity/ip_address'):
+                if str(host) == str(ipEl['address']) and str(port) == str(ipEl['port']):
+                    managedNodeRelationship = self.node.publicKeyLookup(hostNode.get('public_key'))
+                    node = None
+                    if managedNodeRelationship:
+                        node = self.node.chooseRelationshipNode(managedNodeRelationship, toNode, impersonate = True)
+                    node = self.getClassInstanceFromNodeForNode(node.get())
+                    nodeComm = NodeCommunicator(node)
+                    return nodeComm.handlePacket(json.loads(dataToSend))
                     
-                if not port:
-                    port = 80
+                elif host + ":" + str(port) == ipEl['address']:
+                    managedNodeRelationship = self.node.publicKeyLookup(inboundNode.get('public_key'))
+                    node = None
+                    if managedNodeRelationship:
+                        node = self.node.chooseRelationshipNode(managedNodeRelationship, toNode, impersonate = True)
+                    node = self.getClassInstanceFromNodeForNode(node.get())
+                    nodeComm = NodeCommunicator(node)
+                    return nodeComm.handlePacket(json.loads(dataToSend))
+            
+            conn = httplib.HTTPConnection(host, port)
+            conn.request("POST", "", params, headers)
+            
+            response = conn.getresponse()
+            response = response.read()
+            conn.close()
+            return response
+            
         
-                headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-                
-                packet = \
-                    {
-                        "public_key" : toNode.get('public_key'), 
-                        "method" : method, 
-                        "data" : b64encode(data)
-                    }
-                    
-                if status:
-                    packet.update({"status" : status})
-                    
-                dataToSend = json.dumps(packet)
-                
-                params = urllib.urlencode({'data': dataToSend})
-                
-                for ipEl in self.node.get('data/identity/ip_address'):
-                    if host == ipEl['address'] and port == ipEl['port']:
-                        self.handlePacket(json.loads(dataToSend))
-                        raise GetOutOfLoop
-                    elif host + ":" + str(port) == ipEl['address']:
-                        self.handlePacket(json.loads(dataToSend))
-                        raise GetOutOfLoop
-                
-                conn = httplib.HTTPConnection(host, port)
-                conn.request("POST", "", params, headers)
-                
-                response = conn.getresponse()
-                response = response.read()
-                conn.close()
-                
-                break
-        except GetOutOfLoop:
-            pass
-        return response
         
 
     def addManager(self, host):
@@ -183,8 +191,9 @@ class NodeCommunicator(object):
         data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(sourceNodeCopy.get())))
         response = self._doRequest(sourceNodeCopy, destNode, data, method="GET")
         if response:
-            packet = json.loads(response)
-            packetData = decrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(packet['data']))
+            if not type(response) == type({}):
+                response = json.loads(response)
+            packetData = decrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(response['data']))
             self.node.updateFromNode(json.loads(packetData))
     
     def handlePacket(self, packet):
@@ -210,7 +219,13 @@ class NodeCommunicator(object):
         elif packet.get('status', None) == 'ROUTED_FRIEND_REQUEST':
             friend = self.node.getFriend(packet['public_key'])
             data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
-            return self.node.handleRoutedFriendRequest(json.loads(data))
+            decrypted = json.loads(data)
+            self.node.handleRoutedFriendRequest(decrypted)
+            requestedFriend = self.node.getFriend(decrypted['routed_public_key'])
+            node = self.getClassInstanceFromNodeForNode(requestedFriend)
+            self.updateRelationship(node)
+            friendNode = self.getClassInstanceFromNodeForNode(friend)
+            return self.updateRelationship(friendNode)
         
         elif packet.get('status', None) == 'ROUTED_MESSAGE':
             friend = self.node.getFriend(packet['public_key'])
@@ -259,3 +274,20 @@ class NodeCommunicator(object):
         
     def newTimeStamp(self):
         return time.time()
+    
+    def getClassInstanceFromNodeForNode(self, identity):
+        module = self.node.__module__
+        module = module.split(".")
+        module = ".".join(module[:-1])
+        m = self.my_import(module)
+        try:
+            node = m.manager.YadaServer(identity)
+        except:
+            node = m.node.Node(identity)
+        return node
+    
+    def my_import(self, name):
+        m = __import__(name)
+        for n in name.split(".")[1:]:
+            m = getattr(m, n)
+        return m
