@@ -118,7 +118,7 @@ class Node(object):
         except:
             raise
     
-    def set(self, path="", assignment="", create=False):
+    def set(self, path="", assignment="", create=False, force=False):
         """
         Takes a key path separated by forward slashes / to find an entity of the identity
         Second parameter is the value or expression being assigned
@@ -148,7 +148,7 @@ class Node(object):
                         else:
                             entity['timestamp'] = self.newTimeStamp()
                             entity['modified'] = self.newTimeStamp()
-                    elif type(entity[el]) == type(assignment):
+                    elif type(entity[el]) == type(assignment) or force == True:
                         entity[el] = assignment
                         entity['modified'] = self.newTimeStamp()
                     else:
@@ -377,11 +377,12 @@ class Node(object):
         return [{'public_key' : x['public_key']} for x in self.get('data/friends')]
     
     def setModifiedToNow(self):
-        self.set('modified', self.newTimeStamp())
+        self.set('modified', self.newTimeStamp(), force=True)
                 
-    def stripIdentityAndFriendsForProtocolV1(self, node):
+    def stripIdentityAndFriendsForProtocolV1(self, node=None):
         self.replaceIdentityOfFriendsWithPubKeys()
-        self.stripIdentityOfIrrelevantFriendRequests(node)
+        if node:
+            self.stripIdentityOfIrrelevantFriendRequests(node)
                     
     def stripIdentityAndFriendsForWebGUI(self):
         if 'data' in identity:

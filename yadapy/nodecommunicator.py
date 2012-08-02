@@ -16,7 +16,38 @@ class NodeCommunicator(object):
     
     def _doRequest(self, toNode, hostNode, data, method='PUT', status=None):
         
-        response = None
+        dataToSend = self._buildPacket(toNode, hostNode, data, method='PUT', status=None)
+        
+        for address in self._getHostPortArray(hostNode):
+            host, port = address
+            response = None
+            
+            headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+            
+            params = urllib.urlencode({'data': dataToSend})
+            
+            conn = httplib.HTTPConnection(host, port)
+            conn.request("POST", "", params, headers)
+            
+            response = conn.getresponse()
+            response = response.read()
+            conn.close()
+            return response
+        
+    def _buildPacket(self, toNode, hostNode, data, method='PUT', status=None):
+            packet = \
+                {
+                    "public_key" : hostNode.get('public_key'), 
+                    "method" : method, 
+                    "data" : b64encode(data)
+                }
+            if status:
+                packet.update({"status" : status})
+                
+            return json.dumps(packet)
+            
+    def _getHostPortArray(self, hostNode):
+        addresses = []
         for hostElement in hostNode.get('data/identity/ip_address'):
             host = hostElement['address']
             port = None
@@ -31,52 +62,22 @@ class NodeCommunicator(object):
                 
             if not port:
                 port = 80
-    
-            headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-            
-            packet = \
-                {
-                    "public_key" : toNode.get('public_key'), 
-                    "method" : method, 
-                    "data" : b64encode(data)
-                }
-                
-            if status:
-                packet.update({"status" : status})
-                
-            dataToSend = json.dumps(packet)
-            
-            params = urllib.urlencode({'data': dataToSend})
-            
-            for ipEl in self.node.get('data/identity/ip_address'):
-                if str(host) == str(ipEl['address']) and str(port) == str(ipEl['port']):
-                    managedNodeRelationship = self.node.publicKeyLookup(hostNode.get('public_key'))
-                    node = None
-                    if managedNodeRelationship:
-                        node = self.node.chooseRelationshipNode(managedNodeRelationship, toNode, impersonate = True)
-                    node = self.getClassInstanceFromNodeForNode(node.get())
-                    nodeComm = NodeCommunicator(node)
-                    return nodeComm.handlePacket(json.loads(dataToSend))
-                    
-                elif host + ":" + str(port) == ipEl['address']:
-                    managedNodeRelationship = self.node.publicKeyLookup(inboundNode.get('public_key'))
-                    node = None
-                    if managedNodeRelationship:
-                        node = self.node.chooseRelationshipNode(managedNodeRelationship, toNode, impersonate = True)
-                    node = self.getClassInstanceFromNodeForNode(node.get())
-                    nodeComm = NodeCommunicator(node)
-                    return nodeComm.handlePacket(json.loads(dataToSend))
-            
-            conn = httplib.HTTPConnection(host, port)
-            conn.request("POST", "", params, headers)
-            
-            response = conn.getresponse()
-            response = response.read()
-            conn.close()
-            return response
-            
+            addresses.append((host,port))
+        return addresses
         
-        
+    #this should only return true where self isinstance of YadaServer
+    def isHostedHere(self, host, port):
+        for ipEl in self.node.get('data/identity/ip_address'):
+            if str(host) == str(ipEl['address']) and str(port) == str(ipEl['port']):
+                return True
+            elif host + ":" + str(port) == ipEl['address']:
+                return True
+            
+    #this should only be executed if self isinstance of YadaServer
+    def handleInternally(self, node, packet):
+        node = self.getClassInstanceFromNodeForNode(node.get())
+        nodeComm = NodeCommunicator(node)
+        return nodeComm.handlePacket(json.loads(packet))
 
     def addManager(self, host):
         
@@ -113,10 +114,10 @@ class NodeCommunicator(object):
         
         return (response, friendResponse)
     
-    def sendMessage(self, pub_keys, subject, message, thread_id=None):
-        self.node.addMessage(self.node.sendMessage(pub_keys, subject, message, thread_id))
+    def sendMessage(self, fromNode, pub_keys, subject, message, thread_id=None):
+        fromNode.addMessage(self.node.sendMessage(pub_keys, subject, message, thread_id))
         for pub_key in pub_keys:
-            self.updateRelationship(Node(self.node.getFriend(pub_key)))
+            self.updateRelationship(Node(fromNode.getFriend(pub_key)), fromNode)
 
     def syncManager(self):
         
@@ -184,12 +185,26 @@ class NodeCommunicator(object):
         
         return self._doRequest(sourceFriendNode, destNode, data, status="ROUTED_FRIEND_REQUEST")
         
-    def updateRelationship(self, destNode):
-        sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
+    def updateRelationship(self, destNode, managedNode = None):
+        if managedNode:
+            sourceNodeCopy = Node(copy.deepcopy(managedNode.get()))
+        else:
+            sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
+        
         sourceNodeCopy.set('public_key', destNode.get('public_key'))
         sourceNodeCopy.set('private_key', destNode.get('private_key'))
         data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(sourceNodeCopy.get())))
-        response = self._doRequest(sourceNodeCopy, destNode, data, method="GET")
+        for address in self._getHostPortArray(destNode):
+            host, port = address
+            if self.isHostedHere(host, port):
+                managedNodeRelationship = self.node.publicKeyLookup(destNode.get('public_key'))
+                node = None
+                if managedNodeRelationship:
+                    node = self.node.chooseRelationshipNode([x for x in managedNodeRelationship], managedNode)
+                packet = self._buildPacket(node, destNode, data, method="GET")
+                response = self.handleInternally(node, packet)
+            else:
+                response = self._doRequest(sourceNodeCopy, destNode, data, method="GET")
         if response:
             if not type(response) == type({}):
                 response = json.loads(response)
