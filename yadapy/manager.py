@@ -227,8 +227,10 @@ class YadaServer(Node):
                 if impersonate == False:
                     return self
                 else:
-                    query = self.publicKeyLookup(inboundNode.get('public_key'))
-                    return Node(query[1]) if idx == 0 else Node(query[0])
+                    if r[0]['public_key'] != self.get('public_key'):
+                        return Node(r[0])
+                    else:
+                        return Node(r[1])
         
         for node in r:
             p = Node(node)

@@ -200,7 +200,12 @@ class NodeCommunicator(object):
                 managedNodeRelationship = self.node.publicKeyLookup(destNode.get('public_key'))
                 node = None
                 if managedNodeRelationship:
-                    node = self.node.chooseRelationshipNode([x for x in managedNodeRelationship], managedNode)
+                    if managedNode:
+                        inboundNode = managedNode
+                    else:
+                        inboundNode = destNode
+                    managedNodeRelationship = [x for x in managedNodeRelationship]
+                    node = self.node.chooseRelationshipNode(managedNodeRelationship, inboundNode, impersonate=True)
                 packet = self._buildPacket(node, destNode, data, method="GET")
                 response = self.handleInternally(node, packet)
             else:
