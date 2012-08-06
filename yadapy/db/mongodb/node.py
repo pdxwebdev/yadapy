@@ -181,13 +181,3 @@ class Node(BaseNode):
             return "save ok"
         except:
             raise
-    
-    def addFriend(self, friend):
-        self.add("data/friends", friend)
-        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.friends': friend}})
-        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.newTimeStamp()}})
-    
-    def addMessage(self, message):
-        self.add("data/messages", message)
-        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.messages': message}})
-        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.newTimeStamp()}})

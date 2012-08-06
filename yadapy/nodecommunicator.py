@@ -202,10 +202,12 @@ class NodeCommunicator(object):
                 if managedNodeRelationship:
                     if managedNode:
                         inboundNode = managedNode
+                        impersonate = False
                     else:
                         inboundNode = destNode
+                        impersonate = True
                     managedNodeRelationship = [x for x in managedNodeRelationship]
-                    node = self.node.chooseRelationshipNode(managedNodeRelationship, inboundNode, impersonate=True)
+                    node = self.node.chooseRelationshipNode(managedNodeRelationship, inboundNode, impersonate)
                 packet = self._buildPacket(node, destNode, data, method="GET")
                 response = self.handleInternally(node, packet)
             else:
