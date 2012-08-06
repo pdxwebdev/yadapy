@@ -4,7 +4,10 @@ from uuid import uuid4
 from random import randrange
 from pymongo import Connection
 from yadapy.node import Node as BaseNode
-from pymongo.objectid import ObjectId
+try:
+    from pymongo.objectid import ObjectId
+except:
+    from bson.objectid import ObjectId
 
  
 class Node(BaseNode):
