@@ -1,5 +1,8 @@
 from json import JSONEncoder
-from pymongo.objectid import ObjectId
+try:
+    from pymongo.objectid import ObjectId
+except:
+    from bson.objectid import ObjectId
 
 class JsonEncoder(JSONEncoder):      
     def _iterencode(self, o, markers=None):

@@ -5,7 +5,10 @@ from random import randrange
 from pymongo import Connection
 from json import JSONEncoder
 from yadapy.lib.crypt import encrypt, decrypt
-from pymongo.objectid import ObjectId
+try:
+    from pymongo.objectid import ObjectId
+except:
+    from bson.objectid import ObjectId
 from yadapy.node import Node, InvalidIdentity
 from yadapy.manager import YadaServer as Manager
 
