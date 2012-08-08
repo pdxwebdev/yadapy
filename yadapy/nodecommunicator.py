@@ -88,8 +88,13 @@ class NodeCommunicator(object):
             
     #this should only be executed if self isinstance of YadaServer
     def handleInternally(self, node, packet):
-        relationship = self.manager.publicKeyLookup(node.get('public_key'))
-        managedNode = self.manager.chooseRelationshipNode(relationship, self.node)
+        if self.manager:
+            relationship = self.manager.publicKeyLookup(node.get('public_key'))
+            managedNode = self.manager.chooseRelationshipNode(relationship, self.node)
+        else:
+            relationship = self.node.publicKeyLookup(node.get('public_key'))
+            managedNode = self.node.chooseRelationshipNode(relationship, self.node, impersonate=True)
+            
         managedNode = self.getClassInstanceFromNodeForNode(managedNode.get())
         nodeComm = NodeCommunicator(managedNode)
         
