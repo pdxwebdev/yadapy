@@ -11,8 +11,9 @@ class GetOutOfLoop( Exception ):
  
 class NodeCommunicator(object):
     
-    def __init__(self, node):
+    def __init__(self, node, manager = None):
         self.node = node
+        self.manager = manager
     
     def _doRequest(self, toNode, hostNode, data, method='PUT', status=None):
         
@@ -22,17 +23,29 @@ class NodeCommunicator(object):
             host, port = address
             response = None
             
-            headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+            if self.isHostedHere(host, port):
+                packet = self._buildPacket(toNode, hostNode, data, method="GET")
+                response = self.handleInternally(hostNode, packet)
+                
+            else:
             
-            params = urllib.urlencode({'data': dataToSend})
-            
-            conn = httplib.HTTPConnection(host, port)
-            conn.request("POST", "", params, headers)
-            
-            response = conn.getresponse()
-            response = response.read()
-            conn.close()
-            return response
+                headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+                
+                params = urllib.urlencode({'data': dataToSend})
+                
+                conn = httplib.HTTPConnection(host, port)
+                conn.request("POST", "", params, headers)
+                
+                response = conn.getresponse()
+                response = response.read()
+                conn.close()
+                
+            if response:
+                if not type(response) == type({}):
+                    response = json.loads(response)
+                packetData = decrypt(hostNode.get('private_key'), hostNode.get('private_key'), json.dumps(response['data']))
+                self.node.updateFromNode(json.loads(packetData))
+                response = None
         
     def _buildPacket(self, toNode, hostNode, data, method='PUT', status=None):
             packet = \
@@ -75,8 +88,11 @@ class NodeCommunicator(object):
             
     #this should only be executed if self isinstance of YadaServer
     def handleInternally(self, node, packet):
-        node = self.getClassInstanceFromNodeForNode(node.get())
-        nodeComm = NodeCommunicator(node)
+        relationship = self.manager.publicKeyLookup(node.get('public_key'))
+        managedNode = self.manager.chooseRelationshipNode(relationship, self.node)
+        managedNode = self.getClassInstanceFromNodeForNode(managedNode.get())
+        nodeComm = NodeCommunicator(managedNode)
+        
         return nodeComm.handlePacket(json.loads(packet))
 
     def addManager(self, host):
@@ -114,10 +130,10 @@ class NodeCommunicator(object):
         
         return (response, friendResponse)
     
-    def sendMessage(self, fromNode, pub_keys, subject, message, thread_id=None):
-        fromNode.addMessage(self.node.sendMessage(pub_keys, subject, message, thread_id))
+    def sendMessage(self, pub_keys, subject, message, thread_id=None):
+        self.node.addMessage(self.node.sendMessage(pub_keys, subject, message, thread_id))
         for pub_key in pub_keys:
-            self.updateRelationship(Node(fromNode.getFriend(pub_key)), fromNode)
+            self.updateRelationship(Node(self.node.getFriend(pub_key)))
 
     def syncManager(self):
         
@@ -185,38 +201,12 @@ class NodeCommunicator(object):
         
         return self._doRequest(sourceFriendNode, destNode, data, status="ROUTED_FRIEND_REQUEST")
         
-    def updateRelationship(self, destNode, managedNode = None):
-        if managedNode:
-            sourceNodeCopy = Node(copy.deepcopy(managedNode.get()))
-        else:
-            sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
-        
+    def updateRelationship(self, destNode):
+        sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
         sourceNodeCopy.set('public_key', destNode.get('public_key'))
         sourceNodeCopy.set('private_key', destNode.get('private_key'))
         data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(sourceNodeCopy.get())))
-        for address in self._getHostPortArray(destNode):
-            host, port = address
-            if self.isHostedHere(host, port):
-                managedNodeRelationship = self.node.publicKeyLookup(destNode.get('public_key'))
-                node = None
-                if managedNodeRelationship:
-                    if managedNode:
-                        inboundNode = managedNode
-                        impersonate = False
-                    else:
-                        inboundNode = destNode
-                        impersonate = True
-                    managedNodeRelationship = [x for x in managedNodeRelationship]
-                    node = self.node.chooseRelationshipNode(managedNodeRelationship, inboundNode, impersonate)
-                packet = self._buildPacket(node, destNode, data, method="GET")
-                response = self.handleInternally(node, packet)
-            else:
-                response = self._doRequest(sourceNodeCopy, destNode, data, method="GET")
-        if response:
-            if not type(response) == type({}):
-                response = json.loads(response)
-            packetData = decrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(response['data']))
-            self.node.updateFromNode(json.loads(packetData))
+        self._doRequest(sourceNodeCopy, destNode, data, method="GET")
     
     def handlePacket(self, packet):
         

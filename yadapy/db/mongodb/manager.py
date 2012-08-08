@@ -104,13 +104,13 @@ class YadaServer(Manager):
         self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.friends': friend}})
 
     def publicKeyLookup(self, public_key):
-        return self.col.find({
+        return [x for x in self.col.find({
                                 "data.friends" : {
                                                   "$elemMatch" : {
                                                                   "public_key" : public_key
                                                                   }
                                                   }
-                    })
+                    })]
         
     def getFriend(self, public_key):
         friend = self.db.command(
