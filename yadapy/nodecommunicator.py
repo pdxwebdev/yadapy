@@ -17,7 +17,7 @@ class NodeCommunicator(object):
     
     def _doRequest(self, toNode, hostNode, data, method='PUT', status=None):
         
-        dataToSend = self._buildPacket(toNode, hostNode, data, method='PUT', status=None)
+        dataToSend = self._buildPacket(toNode, hostNode, data, method, status)
         
         for address in self._getHostPortArray(hostNode):
             host, port = address
