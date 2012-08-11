@@ -93,7 +93,7 @@ class Node(BaseNode):
                         }
                     },
                 ]
-            });
+            })
             
         if friend['result']:
             return friend['result'][0]['friend']

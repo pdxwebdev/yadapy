@@ -9,11 +9,12 @@ try:
     from pymongo.objectid import ObjectId
 except:
     from bson.objectid import ObjectId
-from yadapy.node import Node, InvalidIdentity
+from node import Node
+from yadapy.node import InvalidIdentity
 from yadapy.manager import YadaServer as Manager
 
 
-class YadaServer(Manager):
+class YadaServer(Manager, Node):
         
     def __init__(self, *args, **kwargs):
         
@@ -24,7 +25,10 @@ class YadaServer(Manager):
             port = 27021
             
         identityData = args[0]
-        newIdentity = args[1]
+        try:
+            newIdentity = args[1]
+        except:
+            newIdentity = None
         
         self.conn = Connection(host, port)
         self.db = self.conn.yadaserver
@@ -39,8 +43,8 @@ class YadaServer(Manager):
         super(YadaServer, self).__init__(identityData=identityData, newIdentity=newIdentity)
     
     def getManagedNode(self, public_key):
-        res = self.col.find({'public_key':public_key})
-        if res.count():
+        res = [x for x in self.col.find({'public_key':public_key})]
+        if len(res):
             return res[0]
         else:
             return False
@@ -217,9 +221,6 @@ class YadaServer(Manager):
                 }
                 ]
             })['result'][0];
-
-    def save(self):
-        self.col.update({'public_key':self.get('public_key')},self.get(), True)
         
     def updateManagedNode(self, node):
         self.col.update({'public_key':node.get('public_key')},node.get())
@@ -254,3 +255,4 @@ class YadaServer(Manager):
             newIndexerFriendRequest.replaceIdentityOfFriendsWithPubKeys()
             sourceNode.add('data/friends', newIndexerFriendRequest.get())
             sourceNode.save()
+            

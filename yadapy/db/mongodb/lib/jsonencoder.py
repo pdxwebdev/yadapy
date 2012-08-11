@@ -4,8 +4,8 @@ try:
 except:
     from bson.objectid import ObjectId
 
-class JsonEncoder(JSONEncoder):      
-    def _iterencode(self, o, markers=None):
+class MongoEncoder(JSONEncoder):      
+    def iterencode(self, o, markers=None):
         if isinstance(o, ObjectId):
             return '""'
         else:

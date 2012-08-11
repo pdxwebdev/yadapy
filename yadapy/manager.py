@@ -55,9 +55,6 @@ class YadaServer(Node):
             }
         })
         
-    def save(self):
-        pass
-
     def stripIdentityAndFriendsForProtocolV1(self, node):
         self.replaceIdentityOfFriendsWithPubKeys()
         self.stripIdentityOfIrrelevantFriendRequests(node)
