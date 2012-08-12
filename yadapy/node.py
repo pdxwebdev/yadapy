@@ -355,6 +355,19 @@ class Node(object):
                 friend._data['data'] = node.get('data')
                 if "web_token" in node.get():
                     friend.set('web_token', node.get('web_token'))
+                tempList = []
+                for x in friend._data['data']['friends']:
+                    tempDict = {} 
+                    tempDict['public_key'] = x['public_key']
+                    if 'data' in x:
+                        if 'identity' in x['data']:
+                            if 'name' in x['data']['identity']:
+                                tempDict['data'] = {}
+                                tempDict['data']['identity'] = {}
+                                tempDict['data']['identity']['name'] = x['data']['identity']['name']
+                    tempList.append(tempDict)
+                friend._data['data']['friends'] = tempList
+                friend._data['modified'] = node._data['modified']
                 self.save()
             else:
                 pass

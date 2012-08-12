@@ -1,10 +1,12 @@
-import logging, os, json, time, copy, time, datetime, re, urllib, httplib
+import logging, os, json, time, copy, time, datetime, re, urllib, httplib, socket
 from base64 import b64encode, b64decode
 from uuid import uuid4
 from lib.crypt import encrypt, decrypt
 from node import Node
 from manager import YadaServer
 
+timeout = 1
+socket.setdefaulttimeout(timeout)
 
 class GetOutOfLoop( Exception ):
      pass
@@ -33,7 +35,7 @@ class NodeCommunicator(object):
                 
                 params = urllib.urlencode({'data': dataToSend})
                 
-                conn = httplib.HTTPConnection(host, port)
+                conn = httplib.HTTPConnection(host, port, timeout=5)
                 conn.request("POST", "", params, headers)
                 
                 response = conn.getresponse()
