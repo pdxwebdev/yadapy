@@ -380,11 +380,21 @@ class YadaServer(Node):
         pass
         
     def handleFriendRequest(self, packet):
-        newFriendDict = Node(packet)
-        self.addFriend(copy.deepcopy(newFriendDict.get()))
-        self.save()
-        logging.debug('added new friend to friends list')
-        return self.respondWithRelationship(newFriendDict)
+        
+        friendRequest = Node(packet)
+        node = self.matchFriend(friendRequest)
+        
+        if 'routed_public_key' in packet:
+            managedNodeRelationship = self.publicKeyLookup(packet['routed_public_key'])
+            node = self.chooseRelationshipNode(managedNodeRelationship, self.get(), impersonate = True)
+            node = self.getClassInstanceFromNodeForNode(node.get())
+            node.addFriendRequest(friendRequest.get())
+            node.save()
+        else:
+            self.addFriend(copy.deepcopy(friendRequest.get()))
+            self.save()
+            logging.debug('added new friend to friends list')
+        return self.respondWithRelationship(friendRequest)
     
     def handleManageRequest(self, packet):
         self.addManagedNode(packet)

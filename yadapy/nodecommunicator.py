@@ -97,7 +97,7 @@ class NodeCommunicator(object):
             relationship = self.node.publicKeyLookup(node.get('public_key'))
             managedNode = self.node.chooseRelationshipNode(relationship, self.node, impersonate=True)
             
-        managedNode = self.getClassInstanceFromNodeForNode(managedNode.get())
+        managedNode = self.node.getClassInstanceFromNodeForNode(managedNode.get())
         nodeComm = NodeCommunicator(managedNode)
         
         return nodeComm.handlePacket(json.loads(packet))
@@ -241,9 +241,9 @@ class NodeCommunicator(object):
             decrypted = json.loads(data)
             self.node.handleRoutedFriendRequest(decrypted)
             requestedFriend = self.node.getFriend(decrypted['routed_public_key'])
-            node = self.getClassInstanceFromNodeForNode(requestedFriend)
+            node = self.node.getClassInstanceFromNodeForNode(requestedFriend)
             self.updateRelationship(node)
-            friendNode = self.getClassInstanceFromNodeForNode(friend)
+            friendNode = self.node.getClassInstanceFromNodeForNode(friend)
             return self.updateRelationship(friendNode)
         
         elif packet.get('status', None) == 'ROUTED_MESSAGE':
@@ -293,20 +293,3 @@ class NodeCommunicator(object):
         
     def newTimeStamp(self):
         return time.time()
-    
-    def getClassInstanceFromNodeForNode(self, identity):
-        module = self.node.__module__
-        module = module.split(".")
-        module = ".".join(module[:-1])
-        m = self.my_import(module)
-        try:
-            node = m.manager.YadaServer(identity)
-        except:
-            node = m.node.Node(identity)
-        return node
-    
-    def my_import(self, name):
-        m = __import__(name)
-        for n in name.split(".")[1:]:
-            m = getattr(m, n)
-        return m

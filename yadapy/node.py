@@ -313,7 +313,7 @@ class Node(object):
         try:
             node = Node(friendRequest)
             self.setModifiedToNow()
-            self.add('friend_requests', friendRequest)
+            self.add('friend_requests', friendRequest, True)
         except:
             InvalidIdentity("cannot add friend, invalid node")
 
@@ -365,6 +365,7 @@ class Node(object):
                                 tempDict['data'] = {}
                                 tempDict['data']['identity'] = {}
                                 tempDict['data']['identity']['name'] = x['data']['identity']['name']
+                                tempDict['data']['identity']['ip_address'] = x['data']['identity']['ip_address']
                     tempList.append(tempDict)
                 friend._data['data']['friends'] = tempList
                 friend._data['modified'] = node._data['modified']
@@ -438,6 +439,7 @@ class Node(object):
                         tempDict['data'] = {}
                         tempDict['data']['identity'] = {}
                         tempDict['data']['identity']['name'] = friend['data']['identity']['name']
+                        tempDict['data']['identity']['ip_address'] = friend['data']['identity']['ip_address']
             tempList.append(tempDict)
         self._data['data']['friends'] = tempList
                 
@@ -844,6 +846,23 @@ class Node(object):
         """
         self.add('data/identity/ip_address', self.createIPAddress(host, port, protocol))
         
+    def getClassInstanceFromNodeForNode(self, identity):
+        module = self.__module__
+        module = module.split(".")
+        module = ".".join(module[:-1])
+        m = self.my_import(module)
+        try:
+            node = m.manager.YadaServer(identity)
+        except:
+            node = m.node.Node(identity)
+        return node
+    
+    def my_import(self, name):
+        m = __import__(name)
+        for n in name.split(".")[1:]:
+            m = getattr(m, n)
+        return m
+    
     def save(self):
         """
         This is a place holder method to indicate that subclasses with persistent storage 
