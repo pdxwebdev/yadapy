@@ -149,7 +149,7 @@ class YadaServer(Manager, Node):
         if friend['result']:
             return friend['result'][0]['friend']
         else:
-            return None
+            return super(YadaServer, self).getFriend(public_key)
         
     def getFriendPublicKeyList(self):
         return self.db.command(
