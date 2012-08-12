@@ -369,6 +369,7 @@ class YadaServer(Node):
             node = self.chooseRelationshipNode(managedNodeRelationship, Node(inboundNode), impersonate)
         
         if node:
+            node = self.getClassInstanceFromNodeForNode(node.get())
             if isinstance(node, YadaServer):
                 super(YadaServer, node).updateFromNode(inboundNode)
             else:

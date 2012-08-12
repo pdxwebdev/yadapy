@@ -140,7 +140,13 @@ class NodeCommunicator(object):
     def sendMessage(self, pub_keys, subject, message, thread_id=None):
         self.node.addMessage(self.node.sendMessage(pub_keys, subject, message, thread_id))
         for pub_key in pub_keys:
-            self.updateRelationship(Node(self.node.getFriend(pub_key)))
+            friend = self.node.getFriend(pub_key)
+            try:
+                node = Node(friend)
+            except:
+                node = Node({}, friend['data']['identity'])
+                
+            self.updateRelationship(node)
 
     def syncManager(self):
         

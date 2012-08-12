@@ -459,10 +459,11 @@ class Node(object):
         node = Node(newFriendNode)
         #DELTE MYSELF FROM FRIEND TO AVOID ENDLESS LOOP
         i=0
-        friend = Node(node.getFriend(node.get('public_key')))
-        for f in friend.get('data/friends'):
-            if f['public_key'] == friend.get('public_key'):
-                f['data'] = {}
+        friend = node.getFriend(node.get('public_key'))
+        if 'data' in friend and 'friends' in friend['data']:
+            for f in friend['data']['friends']:
+                if f['public_key'] == friend['public_key']:
+                    f['data'] = {}
         
     def base64DecodeMessages(self):
         for index, message in enumerate(self.get('data/messages')):
