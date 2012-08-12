@@ -427,8 +427,19 @@ class Node(object):
         self.set('data/messages', messageList)
         
     def replaceIdentityOfFriendsWithPubKeys(self):
+        tempList = []
         for i, friend in enumerate(self.get('data/friends')):
             self._data['data']['friends'][i] = {'public_key' : friend['public_key']}
+            tempDict = {} 
+            tempDict['public_key'] = friend['public_key']
+            if 'data' in friend:
+                if 'identity' in friend['data']:
+                    if 'name' in friend['data']['identity']:
+                        tempDict['data'] = {}
+                        tempDict['data']['identity'] = {}
+                        tempDict['data']['identity']['name'] = friend['data']['identity']['name']
+            tempList.append(tempDict)
+        self._data['data']['friends'] = tempList
                 
     def replaceIdentityOfFriendsWithPubKeysKeepPrivateKeys(self):
         for i, friend in enumerate(self.get('data/friends')):
