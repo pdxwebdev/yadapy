@@ -520,7 +520,7 @@ class Node(object):
         return friendNode.get()
     
     
-    def sendMessage(self, pub_keys, subject, message, thread_id=None):
+    def sendMessage(self, pub_keys, subject, message, thread_id=None, guid=None):
         """
         Creates either a new message thread or replies to an existing thread if @thread_id is given.
         
@@ -531,10 +531,13 @@ class Node(object):
         
         returns a new message object that can be inserted into data/messages
         """
-        if thread_id:
-            return {'public_key':pub_keys, 'timestamp':self.newTimeStamp(),'thread_id':thread_id,'subject':subject,'message':b64encode(message),'guid':str(uuid4())}
-        else:
-            return {'public_key':pub_keys, 'timestamp':self.newTimeStamp(),'thread_id':str(uuid4()),'subject':subject,'message':b64encode(message),'guid':str(uuid4())} 
+        if not thread_id:
+            thread_id = str(uuid4())
+            
+        if not guid:
+            guid = str(uuid4())
+                       
+        return {'public_key':pub_keys, 'timestamp':self.newTimeStamp(),'thread_id':thread_id,'subject':subject,'message':b64encode(message),'guid':guid} 
 
     def sync(self, inbound, is_self=True, permission_object={}):
         """

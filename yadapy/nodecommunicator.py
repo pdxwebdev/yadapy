@@ -137,8 +137,8 @@ class NodeCommunicator(object):
         
         return (response, friendResponse)
     
-    def sendMessage(self, pub_keys, subject, message, thread_id=None):
-        self.node.addMessage(self.node.sendMessage(pub_keys, subject, message, thread_id))
+    def sendMessage(self, pub_keys, subject, message, thread_id=None, guid=None):
+        self.node.addMessage(self.node.sendMessage(pub_keys, subject, message, thread_id, guid))
         for pub_key in pub_keys:
             friend = self.node.getFriend(pub_key)
             try:
