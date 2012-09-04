@@ -24,7 +24,7 @@ Features / Capabilities:
 
 Proof of Concepts Completed:
 ---
-- iPhone App
+- iPhone App - http://itunes.apple.com/us/app/yada-project/id426657120?mt=8&ls=1#
 - Generic forum web site demonstrating automatic account registration and login
 - Server web site demonstrating identity management / hosting
 
