@@ -11,6 +11,7 @@ except:
 
  
 class Node(BaseNode):
+    conn = None
     def __init__(self, *args, **kwargs):
         
         if 'host' in kwargs:
@@ -21,10 +22,11 @@ class Node(BaseNode):
             port = kwargs['port']
         else:
             port = 27021
-            
-        self.conn = Connection(host, port)
-        self.db = self.conn.yadaserver
-        self.col = self.db.identities
+        
+        if not self.conn:
+            self.conn = Connection(host, port)
+            self.db = self.conn.yadaserver
+            self.col = self.db.identities
 
         if 'public_key' in kwargs:
             args = [x for x in args]

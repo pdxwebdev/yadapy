@@ -15,7 +15,7 @@ from yadapy.manager import YadaServer as Manager
 
 
 class YadaServer(Manager, Node):
-        
+    conn = None
     def __init__(self, *args, **kwargs):
         
         if 'host' not in kwargs:
@@ -34,9 +34,10 @@ class YadaServer(Manager, Node):
         except:
             newIdentity = None
         
-        self.conn = Connection(host, port)
-        self.db = self.conn.yadaserver
-        self.col = self.db.identities
+        if not self.conn:
+            self.conn = Connection(host, port)
+            self.db = self.conn.yadaserver
+            self.col = self.db.identities
         
         if type(identityData) == type(u'') or type(identityData) == type(''):
             identityData = self.getManagedNode(identityData)
