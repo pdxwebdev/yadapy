@@ -20,9 +20,13 @@ class YadaServer(Manager, Node):
         
         if 'host' not in kwargs:
             host = 'localhost'
+        else:
+            host = kwargs['host']
             
         if 'port' not in kwargs:
             port = 27021
+        else:
+            port = kwargs['port']
             
         identityData = args[0]
         try:
