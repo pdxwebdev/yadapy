@@ -460,7 +460,7 @@ class Node(object):
         #DELTE MYSELF FROM FRIEND TO AVOID ENDLESS LOOP
         i=0
         friend = node.getFriend(node.get('public_key'))
-        if 'data' in friend and 'friends' in friend['data']:
+        if friend and 'data' in friend and 'friends' in friend['data']:
             for f in friend['data']['friends']:
                 if f['public_key'] == friend['public_key']:
                     f['data'] = {}
