@@ -301,6 +301,7 @@ class Node(object):
             node = Node(friend)
             self.setModifiedToNow()
             self.add('data/friends', friend)
+            self.save()
         except:
             InvalidIdentity("cannot add friend, invalid node")
             
@@ -314,6 +315,7 @@ class Node(object):
             node = Node(friendRequest)
             self.setModifiedToNow()
             self.add('friend_requests', friendRequest, True)
+            self.save()
         except:
             InvalidIdentity("cannot add friend, invalid node")
 
@@ -326,6 +328,7 @@ class Node(object):
         try:
             self.setModifiedToNow()
             self.add('data/messages', message)
+            self.save()
         except:
             InvalidIdentity("cannot add friend, invalid node")
             
@@ -399,10 +402,10 @@ class Node(object):
             self.stripIdentityOfIrrelevantFriendRequests(node)
                     
     def stripIdentityAndFriendsForWebGUI(self):
-        if 'data' in identity:
+        if 'data' in self.get():
             self.stripIdentityOfFriendRequests()
             self.base64DecodeMessages()
-            if 'friends' in identity['data']:
+            if 'friends' in self.get('data'):
                 for i, friend in enumerate(self.get('data/friends')):
                     self.stripFriendIdentityForFriend(friend)
                     
@@ -417,7 +420,7 @@ class Node(object):
         if 'data' in friend:
             self.stripIdentityOfIrrelevantMessages(friend)
             self.replaceIdentityOfFriendsWithPubKeys(friend)
-            self.stripIdentityOfFriendRequests(friend)
+            self.stripIdentityOfIrrelevantFriendRequests(friend)
             self.base64DecodeMessages(friend)
         
     def stripIdentityOfIrrelevantMessages(self):
@@ -436,10 +439,13 @@ class Node(object):
             if 'data' in friend:
                 if 'identity' in friend['data']:
                     if 'name' in friend['data']['identity']:
-                        tempDict['data'] = {}
-                        tempDict['data']['identity'] = {}
-                        tempDict['data']['identity']['name'] = friend['data']['identity']['name']
-                        tempDict['data']['identity']['ip_address'] = friend['data']['identity']['ip_address']
+                        try:
+                            tempDict['data'] = {}
+                            tempDict['data']['identity'] = {}
+                            tempDict['data']['identity']['name'] = friend['data']['identity']['name']
+                            tempDict['data']['identity']['ip_address'] = friend['data']['identity']['ip_address']
+                        except:
+                            continue
             tempList.append(tempDict)
         self._data['data']['friends'] = tempList
                 

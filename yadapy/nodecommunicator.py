@@ -1,4 +1,4 @@
-import logging, os, json, time, copy, time, datetime, re, urllib, httplib, socket
+import logging, os, json, time, copy, time, datetime, re, urllib, httplib, socket, requests
 from base64 import b64encode, b64decode
 from uuid import uuid4
 from lib.crypt import encrypt, decrypt
@@ -33,14 +33,9 @@ class NodeCommunicator(object):
             
                 headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
                 
-                params = urllib.urlencode({'data': dataToSend})
+                params = {'data': dataToSend}
                 
-                conn = httplib.HTTPConnection(host, port, timeout=5)
-                conn.request("POST", "", params, headers)
-                
-                response = conn.getresponse()
-                response = response.read()
-                conn.close()
+                response = requests.post("http://" + host + ":" + str(port), data={'data': dataToSend})
                 
             if response:
                 if not type(response) == type({}):
@@ -215,10 +210,11 @@ class NodeCommunicator(object):
         return self._doRequest(sourceFriendNode, destNode, data, status="ROUTED_FRIEND_REQUEST")
         
     def updateRelationship(self, destNode):
+        destNodeCopyNode = Node(copy.deepcopy(destNode.get()))
+        data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(self.node.respondWithRelationship(destNodeCopyNode))))
         sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
         sourceNodeCopy.set('public_key', destNode.get('public_key'))
         sourceNodeCopy.set('private_key', destNode.get('private_key'))
-        data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(sourceNodeCopy.get())))
         self._doRequest(sourceNodeCopy, destNode, data, method="GET")
     
     def handlePacket(self, packet):
