@@ -96,6 +96,12 @@ class YadaServer(Manager, Node):
                     }
                 },
                 {
+                            "$match" : {
+                                "data.friends" : {"$not" : { "$size" : 0 }}
+                                
+                    }
+                },
+                {
                 "$unwind" : "$data.friends"
                 },
                 {
@@ -141,6 +147,12 @@ class YadaServer(Manager, Node):
                         }
                     },
                     {
+                                "$match" : {
+                                    "friend" : {"$not" : { "$size" : 0 }}
+                                    
+                        }
+                    },
+                    {
                         "$unwind" : "$friend"
                     },
                     {
@@ -163,6 +175,12 @@ class YadaServer(Manager, Node):
             {
                 "$match" : {
                     "public_key" : self.get('public_key')
+                }
+            },
+            {
+                        "$match" : {
+                            "data.friends" : {"$not" : { "$size" : 0 }}
+                            
                 }
             },
             {
@@ -189,6 +207,12 @@ class YadaServer(Manager, Node):
             {
                 "$project" : {
                     "friend" : "$data.friends",
+                }
+            },
+            {
+                        "$match" : {
+                            "friend" : {"$not" : { "$size" : 0 }}
+                            
                 }
             },
             {

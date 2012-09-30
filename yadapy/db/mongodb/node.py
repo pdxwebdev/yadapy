@@ -87,6 +87,12 @@ class Node(BaseNode):
                         }
                     },
                     {
+                                "$match" : {
+                                    "friend" : {"$not" : { "$size" : 0 }}
+                                    
+                        }
+                    },
+                    {
                         "$unwind" : "$friend"
                     },
                     {
@@ -109,6 +115,12 @@ class Node(BaseNode):
             {
                 "$match" : {
                     "public_key" : self.get('public_key')
+                }
+            },
+            {
+                        "$match" : {
+                            "data.friends" : {"$not" : { "$size" : 0 }}
+                            
                 }
             },
             {
@@ -135,6 +147,12 @@ class Node(BaseNode):
             {
                 "$project" : {
                     "friend" : "$data.friends",
+                }
+            },
+            {
+                        "$match" : {
+                            "friend" : {"$not" : { "$size" : 0 }}
+                            
                 }
             },
             {
