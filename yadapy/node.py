@@ -313,9 +313,10 @@ class Node(object):
         """
         try:
             node = Node(friendRequest)
-            self.setModifiedToNow()
-            self.add('friend_requests', friendRequest, True)
-            self.save()
+            if not self.matchFriend(node):
+                self.setModifiedToNow()
+                self.add('friend_requests', friendRequest, True)
+                self.save()
         except:
             InvalidIdentity("cannot add friend, invalid node")
 
@@ -381,7 +382,7 @@ class Node(object):
 
     def matchFriend(self, node):
         intersection = set(self.getFriendPublicKeysArray()) & set(node.getFriendPublicKeysArray())
-        if intersection:
+        if len(intersection) == 1:
             friend = self.getFriend(list(intersection)[0])
             return friend
         else:

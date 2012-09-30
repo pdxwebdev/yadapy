@@ -36,13 +36,17 @@ class NodeCommunicator(object):
                 params = {'data': dataToSend}
                 
                 response = requests.post("http://" + host + ":" + str(port), data={'data': dataToSend})
+                response = response.content
                 
             if response:
-                if not type(response) == type({}):
-                    response = json.loads(response)
-                packetData = decrypt(hostNode.get('private_key'), hostNode.get('private_key'), json.dumps(response['data']))
-                self.node.updateFromNode(json.loads(packetData))
-                response = None
+                try:
+                    if not type(response) == type({}):
+                        response = json.loads(response)
+                    packetData = decrypt(hostNode.get('private_key'), hostNode.get('private_key'), json.dumps(response['data']))
+                    self.node.updateFromNode(json.loads(packetData))
+                    response = None
+                except:
+                    pass
         
     def _buildPacket(self, toNode, hostNode, data, method='PUT', status=None):
             packet = \
