@@ -303,7 +303,7 @@ class Node(object):
             self.add('data/friends', friend)
             self.save()
         except:
-            InvalidIdentity("cannot add friend, invalid node")
+            raise InvalidIdentity("cannot add friend, invalid node")
             
     def addFriendRequest(self, friendRequest):
         """
@@ -318,7 +318,7 @@ class Node(object):
                 self.add('friend_requests', friendRequest, True)
                 self.save()
         except:
-            InvalidIdentity("cannot add friend, invalid node")
+            raise InvalidIdentity("cannot add friend, invalid node")
 
     def addMessage(self, message):
         """
@@ -331,7 +331,7 @@ class Node(object):
             self.add('data/messages', message)
             self.save()
         except:
-            InvalidIdentity("cannot add friend, invalid node")
+            raise InvalidIdentity("cannot add friend, invalid node")
             
     def updateFromNode(self, inboundNode):
         """
