@@ -201,6 +201,7 @@ class Node(BaseNode):
             else:
                 self.setModifiedToNow()
                 self.col.insert(self.get())
+                del self._data['_id']
             return "save ok"
         except:
             raise
