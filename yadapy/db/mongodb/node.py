@@ -106,7 +106,7 @@ class Node(BaseNode):
         if friend['result']:
             return friend['result'][0]['friend']
         else:
-            return None
+            return super(Node, self).getFriend(public_key)
         
     def getFriendPublicKeyList(self):
         return self.db.command(
