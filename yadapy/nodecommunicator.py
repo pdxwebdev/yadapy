@@ -46,6 +46,10 @@ class NodeCommunicator(object):
                     pass
         
     def _buildPacket(self, toNode, hostNode, data, method='PUT', status=None):
+            try:
+                data = b64decode(data)
+            except:
+                pass
             packet = \
                 {
                     "public_key" : hostNode.get('public_key'), 
@@ -78,12 +82,15 @@ class NodeCommunicator(object):
         
     #this should only return true where self isinstance of YadaServer
     def isHostedHere(self, host, port):
-        for ipEl in self.node.get('data/identity/ip_address'):
-            if str(host) == str(ipEl['address']) and str(port) == str(ipEl['port']):
-                return True
-            elif host + ":" + str(port) == ipEl['address']:
-                return True
-            
+        if isinstance(self, YadaServer):
+            for ipEl in self.node.get('data/identity/ip_address'):
+                if str(host) == str(ipEl['address']) and str(port) == str(ipEl['port']):
+                    return True
+                elif host + ":" + str(port) == ipEl['address']:
+                    return True
+        else:
+            return False
+                
     #this should only be executed if self isinstance of YadaServer
     def handleInternally(self, node, packet):
         if self.manager:
@@ -129,7 +136,8 @@ class NodeCommunicator(object):
             print "Friend does not auto approve friend requests. There was no response from friend request."
 
         #simply send my entire object to manager
-        response = self._doRequest(self.node, managerFriendNode, json.dumps(self.node.get()), status="MANAGE_REQUEST")
+        encryptedData = encrypt(managerFriendNode.get('private_key'), managerFriendNode.get('private_key'), json.dumps(self.node.get()))
+        response = self._doRequest(self.node, managerFriendNode, encryptedData, status="MANAGE_REQUEST")
         
         return (response, friendResponse)
     
