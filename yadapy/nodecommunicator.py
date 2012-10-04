@@ -12,6 +12,8 @@ class GetOutOfLoop( Exception ):
      pass
  
 class NodeCommunicator(object):
+
+    impersonate = False
     
     def __init__(self, node, manager = None):
         self.node = node
@@ -30,11 +32,6 @@ class NodeCommunicator(object):
                 response = self.handleInternally(hostNode, packet)
                 
             else:
-            
-                headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-                
-                params = {'data': dataToSend}
-                
                 response = requests.post("http://" + host + ":" + str(port), data={'data': dataToSend})
                 response = response.content
                 
@@ -52,7 +49,7 @@ class NodeCommunicator(object):
             packet = \
                 {
                     "public_key" : hostNode.get('public_key'), 
-                    "method" : method, 
+                    "method" : "IMPERSONATE" if self.impersonate else method, 
                     "data" : b64encode(data)
                 }
             if status:
@@ -281,8 +278,8 @@ class NodeCommunicator(object):
         
         elif packet.get('method', None) == 'IMPERSONATE':
             friend = self.node.getFriend(packet['public_key'])
-            data = decrypt(friend['private_key'], friend['private_key'], packetData)
-            self.node.updateFromNode(packetData, impersonate = True)
+            data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
+            self.node.updateFromNode(json.loads(data), impersonate = True)
             
         elif packet.get('method', None) == 'GET':
             friend = self.node.getFriend(packet['public_key'])

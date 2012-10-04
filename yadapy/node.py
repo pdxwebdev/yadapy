@@ -333,7 +333,7 @@ class Node(object):
         except:
             raise InvalidIdentity("cannot add friend, invalid node")
             
-    def updateFromNode(self, inboundNode):
+    def updateFromNode(self, inboundNode, impersonate=False):
         """
         inboundNode is an Node instance of a friend of self and used to update the information
         for that friend in your friends list.
@@ -344,38 +344,41 @@ class Node(object):
         selfBaseNode = Node(self.get())
         friend = selfBaseNode.getFriend(node.get('public_key'))
         if friend:
-            friend = Node(friend)
-            if 'permissions' in node.get():
-                if not 'permissions' in friend.get():
-                    friend.set('permissions_approved', "0", True)
-                    friend.set('permissions', node.get('permissions'))
-                else:
-                    if set(node.get('permissions')) != set(friend.get('permissions')):
-                        friend.set('permissions_approved', "0")
-                        friend.set('permissions', node['permissions'])
-                        
-            if not 'modified' in friend.get() or float(friend.get('modified')) < float(node.get('modified')):
-                #we're going to directly set this element because we want to retain the modified time
-                friend._data['data'] = node.get('data')
-                if "web_token" in node.get():
-                    friend.set('web_token', node.get('web_token'))
-                tempList = []
-                for x in friend._data['data']['friends']:
-                    tempDict = {} 
-                    tempDict['public_key'] = x['public_key']
-                    if 'data' in x:
-                        if 'identity' in x['data']:
-                            if 'name' in x['data']['identity']:
-                                tempDict['data'] = {}
-                                tempDict['data']['identity'] = {}
-                                tempDict['data']['identity']['name'] = x['data']['identity']['name']
-                                tempDict['data']['identity']['ip_address'] = x['data']['identity']['ip_address']
-                    tempList.append(tempDict)
-                friend._data['data']['friends'] = tempList
-                friend._data['modified'] = node._data['modified']
-                self.save()
+            if impersonate:
+                self.sync(inboundNode)
             else:
-                pass
+                friend = Node(friend)
+                if 'permissions' in node.get():
+                    if not 'permissions' in friend.get():
+                        friend.set('permissions_approved', "0", True)
+                        friend.set('permissions', node.get('permissions'))
+                    else:
+                        if set(node.get('permissions')) != set(friend.get('permissions')):
+                            friend.set('permissions_approved', "0")
+                            friend.set('permissions', node['permissions'])
+                            
+                if not 'modified' in friend.get() or float(friend.get('modified')) < float(node.get('modified')):
+                    #we're going to directly set this element because we want to retain the modified time
+                    friend._data['data'] = node.get('data')
+                    if "web_token" in node.get():
+                        friend.set('web_token', node.get('web_token'))
+                    tempList = []
+                    for x in friend._data['data']['friends']:
+                        tempDict = {} 
+                        tempDict['public_key'] = x['public_key']
+                        if 'data' in x:
+                            if 'identity' in x['data']:
+                                if 'name' in x['data']['identity']:
+                                    tempDict['data'] = {}
+                                    tempDict['data']['identity'] = {}
+                                    tempDict['data']['identity']['name'] = x['data']['identity']['name']
+                                    tempDict['data']['identity']['ip_address'] = x['data']['identity']['ip_address']
+                        tempList.append(tempDict)
+                    friend._data['data']['friends'] = tempList
+                    friend._data['modified'] = node._data['modified']
+                    self.save()
+                else:
+                    pass
         elif self.get('public_key') == node.get('public_key'):
             self.sync(node.get())
             self.save()

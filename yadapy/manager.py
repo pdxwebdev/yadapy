@@ -373,7 +373,10 @@ class YadaServer(Node):
             if isinstance(node, YadaServer):
                 super(YadaServer, node).updateFromNode(inboundNode)
             else:
-                node.updateFromNode(inboundNode)
+                if impersonate:
+                    node.sync(inboundNode, is_self=False)
+                else:
+                    node.updateFromNode(inboundNode)
         else:
             super(YadaServer, self).updateFromNode(inboundNode)
     
