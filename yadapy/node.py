@@ -885,6 +885,8 @@ class Node(object):
         returns void
         """
         self.setModifiedToNow()
+        for friend in self.get('data/friends'):
+            Node(friend).stripIdentityAndFriendsForProtocolV1()
 
 class InvalidIdentity(Exception):
     def __init__(self, value):

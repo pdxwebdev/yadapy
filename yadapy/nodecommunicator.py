@@ -32,7 +32,7 @@ class NodeCommunicator(object):
                 response = self.handleInternally(hostNode, packet)
                 
             else:
-                response = requests.post("http://" + host + ":" + str(port), data={'data': dataToSend})
+                response = requests.post("http://" + host + ":" + str(port) + "/", data={'data': dataToSend})
                 response = response.content
                 
             if response:
@@ -46,10 +46,7 @@ class NodeCommunicator(object):
                     pass
         
     def _buildPacket(self, toNode, hostNode, data, method='PUT', status=None):
-            try:
-                data = b64decode(data)
-            except:
-                pass
+
             packet = \
                 {
                     "public_key" : hostNode.get('public_key'), 
@@ -137,7 +134,7 @@ class NodeCommunicator(object):
 
         #simply send my entire object to manager
         encryptedData = encrypt(managerFriendNode.get('private_key'), managerFriendNode.get('private_key'), json.dumps(self.node.get()))
-        response = self._doRequest(self.node, managerFriendNode, encryptedData, status="MANAGE_REQUEST")
+        response = self._doRequest(self.node, managerFriendNode, b64decode(encryptedData), status="MANAGE_REQUEST")
         
         return (response, friendResponse)
     

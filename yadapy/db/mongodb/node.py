@@ -188,6 +188,7 @@ class Node(BaseNode):
     
     def save(self):
         try:
+            super(Node, self).save()
             result = self.col.find({'public_key':self.get('public_key')})
             if result.count() > 0:
                 if type(result[0]['_id']) == type(''):
@@ -195,11 +196,9 @@ class Node(BaseNode):
                 else:
                     id = result[0]['_id']
                 self._data['_id'] = id
-                self.setModifiedToNow()
                 self.col.update({'public_key': self.get('public_key')}, self.get())
                 del self._data['_id']
             else:
-                self.setModifiedToNow()
                 self.col.insert(self.get())
                 del self._data['_id']
             return "save ok"
