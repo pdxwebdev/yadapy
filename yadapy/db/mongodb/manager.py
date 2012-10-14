@@ -49,6 +49,8 @@ class YadaServer(Manager, Node):
     
     def getManagedNode(self, public_key):
         res = [x for x in self.col.find({'public_key':public_key})]
+        if '_id' in res[0]:
+            del res[0]['_id']
         if len(res):
             return res[0]
         else:
@@ -161,7 +163,7 @@ class YadaServer(Manager, Node):
                         }
                     },
                 ]
-            });
+            })
             
         if friend['result']:
             return friend['result'][0]['friend']

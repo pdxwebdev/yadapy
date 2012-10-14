@@ -92,6 +92,7 @@ class YadaServer(Node):
             node = Node(data)
             #adding user to the database
             self.add('data/managed_nodes', node.get())
+            self.save()
         except:
             raise InvalidIdentity("cannot add invalid node to managed nodes")
         
@@ -245,63 +246,6 @@ class YadaServer(Node):
             
     def getRelationshipData(self, relationship):
         pass
-    
-    @staticmethod
-    def respondWithObject(jsonDict, request=None):
-        oldFriendDict = getJson()
-        dic = oldFriendDict.copy()
-        if jsonDict['public_key'] == oldFriendDict['public_key']:
-                jsonDataToSend = encrypt(oldFriendDict['private_key'], oldFriendDict['private_key'],json.dumps(oldFriendDict))
-                logging.debug(jsonDataToSend)
-                return '{"method":"PUT","public_key":"' + oldFriendDict['public_key'] + '","data":"' + jsonDataToSend + '"}'
-        for i, f in enumerate(oldFriendDict['data']['friends']):
-            oldFriendDict['data']['friends'][i]['public_key'] = f['public_key']
-        for friend in oldFriendDict['data']['friends']:
-            if jsonDict['public_key'] == friend['public_key']:
-                logging.debug('found this person')
-                oldFriendDict['public_key'] = friend['public_key']
-                oldFriendDict['private_key'] = friend['private_key']
-                logging.debug(friend['private_key'])
-                
-                
-                #dumb down the routed reqeust list
-                if 'routed_friend_requests' in oldFriendDict['data']:
-                    newRoutedList = []
-                    for index, friend_request in enumerate(oldFriendDict['data']['routed_friend_requests']):
-                        if friend_request['routed_public_key'] == friend['public_key'] and 'modified' in friend_request and (self.newTimeStamp()-(60*60*24)) < friend_request['modified']:
-                            newRoutedList.append(friend_request)
-                    oldFriendDict['data']['routed_friend_requests'] = newRoutedList
-                
-                #time to dumb down the friends list
-                friendList = []
-                for ind, f in enumerate(oldFriendDict['data']['friends']):
-                    friendList.append({'public_key' : f['public_key']})
-                oldFriendDict['data']['friends'] = friendList
-                
-                #dumb down messages
-                messageList = []
-                for ind, m in enumerate(messageList):
-                    if jsonDict['public_key'] in m['public_key']:
-                        messageList.append(m)
-                oldFriendDict['data']['messages'] = messageList
-                
-                jsonDataToSend = encrypt(friend['private_key'], friend['private_key'],json.dumps(oldFriendDict, cls=JsonEncoder).decode('ascii'))
-                logging.debug('encrypted data set')
-                dic['data']['messages'] = []
-                #logging.debug(jsonDataToSend)
-                return '{"method":"PUT","public_key":"' + friend['public_key'] + '","data":"' + jsonDataToSend + '"}'
-        
-        try:
-            p = Profile.objects.get(pub_key=jsonDict['public_key'])
-            data = p.getData()
-            data['public_key'] = jsonDict['public_key']
-            data['private_key'] = jsonDict['private_key']
-            jsonDataToSend = encrypt(data['private_key'], data['private_key'],json.dumps(data, cls=JsonEncoder))
-            return '{"method":"PUT","public_key":"' + data['public_key'] + '","data":"' + jsonDataToSend + '"}'
-        except:
-            #TODO: I actually need to change the DB and signup script to make this error impossible.
-            logging.critical("user has more than one account")
-
 
     def updateFriendInIdentity(self, inbound, p):
         
@@ -334,30 +278,6 @@ class YadaServer(Node):
                 friend.set('web_token', inbound.get('web_token'))
             self.updateManagedNode(p)
         p.updateFriend(inbound)
-
-    def respondWithRelationship(self, inboundNode):
-        managedNode = self.getManagedNode(inboundNode.get('public_key'))
-        managedNodeRelationship = self.publicKeyLookup(inboundNode.get('public_key'))
-        node = None
-        if managedNode:
-            self.getManagedNode(managedNode, inboundNode)
-            node = managedNode
-        elif managedNodeRelationship:
-            node = self.chooseRelationshipNode(managedNodeRelationship, inboundNode)
-        
-        if not node:
-            node = YadaServer(copy.deepcopy(self.get()))
-            
-        #TODO: apply permissions to dictionary for this relationship
-        node.preventInfiniteNesting(inboundNode.get())
-        try:
-            outboundNode = YadaServer(copy.deepcopy(node.get()))
-        except:
-            outboundNode = Node(copy.deepcopy(node.get()))
-        outboundNode.stripIdentityAndFriendsForProtocolV1(inboundNode)
-        inboundNode.get().update({"data" : outboundNode.get('data')})
-        inboundNode.setModifiedToNow()
-        return inboundNode.get()
 
     def updateFromNode(self, inboundNode, impersonate = False):
         managedNode = self.getManagedNode(inboundNode['public_key'])
@@ -402,6 +322,8 @@ class YadaServer(Node):
     
     def handleManageRequest(self, packet):
         self.addManagedNode(packet)
+        node = Node(self.getFriend(packet['public_key']))
+        return self.respondWithRelationship(node)
 
     def forceJoinNodes(self, sourceNode, destNode):
         

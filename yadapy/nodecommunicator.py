@@ -32,6 +32,8 @@ class NodeCommunicator(object):
                 response = self.handleInternally(hostNode, packet)
                 
             else:
+                s = requests.session()
+                s.config['keep_alive'] = False
                 response = requests.post("http://" + host + ":" + str(port) + "/", data={'data': dataToSend})
                 response = response.content
                 
@@ -130,12 +132,15 @@ class NodeCommunicator(object):
         try:
             self.handlePacket(json.loads(friendResponse))
         except:
-            print "Friend does not auto approve friend requests. There was no response from friend request."
+            pass
 
         #simply send my entire object to manager
         encryptedData = encrypt(managerFriendNode.get('private_key'), managerFriendNode.get('private_key'), json.dumps(self.node.get()))
         response = self._doRequest(self.node, managerFriendNode, b64decode(encryptedData), status="MANAGE_REQUEST")
-        
+        try:
+            self.handlePacket(json.loads(response))
+        except:
+            pass
         return (response, friendResponse)
     
     def sendMessage(self, pub_keys, subject, message, thread_id=None, guid=None):
@@ -227,7 +232,7 @@ class NodeCommunicator(object):
         
         packetData = b64decode(packet['data'])
         
-        if packet.get('status', None) == 'FRIEND_REQUEST':
+        if packet.get('status', None) in ['FRIEND_REQUEST', "REGISTER_REQUEST"]:
             response = self.node.handleFriendRequest(json.loads(packetData))
             
             #Response will be None if the node does not automatically approve friend requests
@@ -262,7 +267,14 @@ class NodeCommunicator(object):
         elif packet.get('status', None) == 'MANAGE_REQUEST':
             node = self.node.getFriend(packet['public_key'])
             data = decrypt(node['private_key'], node['private_key'], b64encode(packetData))
-            self.node.handleManageRequest(json.loads(data))
+            responseData = self.node.handleManageRequest(json.loads(data))
+            responseData = Node(responseData)
+            return \
+                {
+                    "method" : "PUT",
+                    "public_key" : responseData.get('public_key'),
+                    "data" : encrypt(responseData.get('private_key'), responseData.get('private_key'), json.dumps(responseData.get()))
+                }  
             
         elif packet.get('status', None) == 'MANAGE_SYNC':
             node = self.node.getManagedNode(packet['public_key'])
