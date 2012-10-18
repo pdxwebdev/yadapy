@@ -718,7 +718,7 @@ class Node(object):
                 pass
         if type(inbound) == type([]):
             i=0
-            for key, inboundRef in inbound.items():
+            for key, inboundRef in enumerate(inbound):
                 if not is_self:
                     if key not in permission_object:
                         permission_object_ref = permission_object

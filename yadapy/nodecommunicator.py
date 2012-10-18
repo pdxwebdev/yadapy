@@ -222,8 +222,12 @@ class NodeCommunicator(object):
         
     def updateRelationship(self, destNode):
         destNodeCopyNode = Node(copy.deepcopy(destNode.get()))
-        data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(self.node.respondWithRelationship(destNodeCopyNode))))
         sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
+        if self.impersonate:
+            dictToSend = destNode.respondWithRelationship(destNode)
+        else:
+            dictToSend = self.node.respondWithRelationship(destNodeCopyNode)
+        data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(dictToSend)))
         sourceNodeCopy.set('public_key', destNode.get('public_key'))
         sourceNodeCopy.set('private_key', destNode.get('private_key'))
         self._doRequest(sourceNodeCopy, destNode, data, method="GET")
