@@ -294,7 +294,8 @@ class YadaServer(Node):
                 super(YadaServer, node).updateFromNode(inboundNode)
             else:
                 if impersonate:
-                    node.sync(inboundNode, is_self=False)
+                    node.sync(inboundNode, is_self=False, permission_object=inboundNode['permissions'])
+                    node.save()
                 else:
                     node.updateFromNode(inboundNode)
         else:

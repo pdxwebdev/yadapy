@@ -701,7 +701,10 @@ class Node(object):
                             internal[key] = inboundRef
                             continue
                     try:
-                        Node.updatePair(key,internal,internalRef,inbound,inboundRef)
+                        #CRUD: UPDATE
+                        if not is_self:
+                            if 'U' in permission_object_ref:
+                                Node.updatePair(key,internal,internalRef,inbound,inboundRef)
                     except:
                         raise
             try:
