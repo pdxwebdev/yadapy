@@ -607,7 +607,6 @@ class Node(object):
                         curTime = int(time.time())
                         inboundRef['modified'] = curTime
                 elif type(inboundRef) == type([]):
-                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref)
                     if key == 'messages':
                         pass
                     key_name = ''
@@ -623,6 +622,7 @@ class Node(object):
                         key_name = key_dict[key]
                     else:
                         key_name = 'guid'
+                        self._updateTree(internalRef,inboundRef,is_self,permission_object_ref)
                     if key_name != '':
                         for index, item in enumerate(internalRef):
                             try:

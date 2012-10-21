@@ -23,6 +23,8 @@ class NodeCommunicator(object):
         
         dataToSend = self._buildPacket(toNode, hostNode, data, method, status)
         
+        responses = []
+        
         for address in self._getHostPortArray(hostNode):
             host, port = address
             response = None
@@ -41,11 +43,11 @@ class NodeCommunicator(object):
                 try:
                     if not type(response) == type({}):
                         response = json.loads(response)
-                    packetData = decrypt(hostNode.get('private_key'), hostNode.get('private_key'), json.dumps(response['data']))
-                    self.node.updateFromNode(json.loads(packetData))
-                    response = None
+                    responses.append(response)
+                    self.handlePacket(response)
                 except:
                     pass
+        return responses
         
     def _buildPacket(self, toNode, hostNode, data, method='PUT', status=None):
 
@@ -128,20 +130,12 @@ class NodeCommunicator(object):
         managerFriendNode.add('data/friends', meToSend.get())
         
         #send the friend request to the manager
-        friendResponse = self._doRequest(meToSend, managerFriendNode, json.dumps(meToSend.get()), status="FRIEND_REQUEST")
-        try:
-            self.handlePacket(json.loads(friendResponse))
-        except:
-            pass
+        friendResponses = self._doRequest(meToSend, managerFriendNode, json.dumps(meToSend.get()), status="FRIEND_REQUEST")
 
         #simply send my entire object to manager
         encryptedData = encrypt(managerFriendNode.get('private_key'), managerFriendNode.get('private_key'), json.dumps(self.node.get()))
-        response = self._doRequest(self.node, managerFriendNode, b64decode(encryptedData), status="MANAGE_REQUEST")
-        try:
-            self.handlePacket(json.loads(response))
-        except:
-            pass
-        return (response, friendResponse)
+        responses = self._doRequest(self.node, managerFriendNode, b64decode(encryptedData), status="MANAGE_REQUEST")
+        return (responses, friendResponses)
     
     def sendMessage(self, pub_keys, subject, message, thread_id=None, guid=None):
         self.node.addMessage(self.node.sendMessage(pub_keys, subject, message, thread_id, guid))
@@ -158,11 +152,8 @@ class NodeCommunicator(object):
         
         data = b64decode(encrypt(self.node.get('private_key'), self.node.get('private_key'), json.dumps(self.node.get())))
         #simply send my entire object to manager
-        response = self._doRequest(self.node, self.node, data, status="MANAGE_SYNC")
-        node = json.loads(decrypt(self.node.get('private_key'), self.node.get('private_key'), json.loads(response)['data']))
-        self.node.sync(node)
-        self.node.save()
-        return response
+        responses = self._doRequest(self.node, self.node, data, status="MANAGE_SYNC")
+        return responses
 
     def requestFriend(self, host):
                 
@@ -287,7 +278,7 @@ class NodeCommunicator(object):
             responseData = Node(responseData)
             return \
                 {
-                    "method" : "PUT",
+                    "method" : "SYNC",
                     "public_key" : responseData.get('public_key'),
                     "data" : encrypt(responseData.get('private_key'), responseData.get('private_key'), json.dumps(responseData.get()))
                 }  
@@ -314,6 +305,11 @@ class NodeCommunicator(object):
                     "public_key" : responseData.get('public_key'),
                     "data" : encrypt(responseData.get('private_key'), responseData.get('private_key'), json.dumps(responseData.get()))
                 }
-        
+        elif packet.get('method', None) == 'SYNC':
+            node = self.node.get()
+            data = decrypt(node['private_key'], node['private_key'], b64encode(packetData))
+            responseData = self.node.sync(json.loads(data))
+            responseData = Node(responseData)
+            return responseData
     def newTimeStamp(self):
         return time.time()

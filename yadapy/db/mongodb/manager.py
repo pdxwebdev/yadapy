@@ -65,6 +65,14 @@ class YadaServer(Manager, Node):
         except:
             raise InvalidIdentity("cannot add invalid node to managed nodes")
         
+    def syncManagedNode(self, node):
+        try:
+            managedNode = Node(self.getManagedNode(node.get('public_key')))
+            managedNode.sync(node.get())
+            managedNode.save()
+            return managedNode.get()
+        except:
+            raise InvalidIdentity("cannot sync invalid node in managed nodes")
 
     def getServerData(self):
         data = self.col.find({'public_key':self.get('public_key')})[0]

@@ -323,7 +323,7 @@ class YadaServer(Node):
     
     def handleManageRequest(self, packet):
         self.addManagedNode(packet)
-        node = Node(self.getFriend(packet['public_key']))
+        node = Node(self.matchFriend(Node(packet)))
         return self.respondWithRelationship(node)
 
     def forceJoinNodes(self, sourceNode, destNode):
