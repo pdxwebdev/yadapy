@@ -355,3 +355,19 @@ class YadaServer(Node):
         selectedFriendIndexer = Node(node.matchFriend(indexer))
         dataToSend = '{"method" : "GET", "public_key" : "%s", "data" : "%s"}' %(selectedFriendIndexer.get('public_key'), encrypt(selectedFriendIndexer.get('private_key'), selectedFriendIndexer.get('private_key'), json.dumps({'query':'friend_requests', 'data':{'friends':[{'public_key':x['public_key']} for x in node.get('data/friends')]}})))
         return self.queryIndexer(dataToSend, selectedFriendIndexer, node) 
+
+    def respondWithRelationship(self, inboundNode, impersonate=False):
+        inbound = inboundNode.get()
+        managedNode = self.getManagedNode(inbound['public_key'])
+        managedNodeRelationship = self.publicKeyLookup(inbound['public_key'])
+        node = None
+        if managedNode:
+            self.syncManagedNode(managedNode, inboundNode)
+        elif managedNodeRelationship:
+            node = self.chooseRelationshipNode(managedNodeRelationship, inboundNode, impersonate)
+        
+        if node:
+            node = self.getClassInstanceFromNodeForNode(node.get())
+            return node.respondWithRelationship(inboundNode)
+        else:
+            return super(YadaServer, self).respondWithRelationship(inboundNode)

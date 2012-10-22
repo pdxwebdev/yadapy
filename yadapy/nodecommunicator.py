@@ -292,6 +292,14 @@ class NodeCommunicator(object):
             friend = self.node.getFriend(packet['public_key'])
             data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             self.node.updateFromNode(json.loads(data), impersonate = True)
+            responseData = self.node.respondWithRelationship(Node(json.loads(data)), impersonate = True)
+            responseData = Node(responseData)
+            return \
+                {
+                    "method" : "PUT",
+                    "public_key" : responseData.get('public_key'),
+                    "data" : encrypt(responseData.get('private_key'), responseData.get('private_key'), json.dumps(responseData.get()))
+                }
             
         elif packet.get('method', None) == 'GET':
             friend = self.node.getFriend(packet['public_key'])
