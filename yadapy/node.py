@@ -705,6 +705,8 @@ class Node(object):
                         if not is_self:
                             if 'U' in permission_object_ref:
                                 Node.updatePair(key,internal,internalRef,inbound,inboundRef)
+                        else:
+                            Node.updatePair(key,internal,internalRef,inbound,inboundRef)
                     except:
                         raise
             try:
