@@ -483,6 +483,18 @@ class Node(object):
                     message['message'] = b64decode(message['message'])
                 except:
                     pass
+        for friend in self.get('data/friends'):
+            try:
+                friendNode = Node(friend)
+                for index, message in enumerate(friendNode.get('data/messages')):
+                    if 'message' in message:
+                        try:
+                            b64decode(message['message']).decode('utf-8')
+                            message['message'] = b64decode(message['message'])
+                        except:
+                            pass
+            except:
+                pass
                     
     def base64EncodeMessages(self):
         for index, message in enumerate(self.get('data/messages')):
