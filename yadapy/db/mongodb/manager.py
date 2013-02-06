@@ -31,6 +31,7 @@ class YadaServer(Manager, Node):
         if 'identityData' in kwargs:
             identityData = kwargs['identityData']
         else:
+            kwargs['identityData'] = args[0]
             identityData = args[0]
         
         try:
@@ -45,8 +46,10 @@ class YadaServer(Manager, Node):
         
         if type(identityData) == type(u'') or type(identityData) == type(''):
             kwargs['identityData'] = self.getManagedNode(identityData)
-        elif type(identityData) == type({}):
+        elif type(newIdentity) == type({}):
             kwargs['newIdentity'] = newIdentity
+        elif type(identityData) == type({}):
+            pass
         else:
             raise InvalidIdentity("A valid server Identity was not given nor was a public_key specified.")
         super(YadaServer, self).__init__(*args, **kwargs)

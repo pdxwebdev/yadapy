@@ -8,7 +8,17 @@ from node import Node, InvalidIdentity
 class YadaServer(Node):
     
     def __init__(self, *args, **kwargs):
-
+        
+        if 'identityData' in kwargs:
+            identityData = kwargs['identityData']
+        else:
+            identityData = args[0]
+        
+        try:
+            newIdentity = args[1]
+        except:
+            newIdentity = None
+        
         if type(kwargs['identityData']) == type(u'') or type(kwargs['identityData']) == type(''):
             identityData = self.getManagedNode(kwargs['identityData'])
         elif type(kwargs['identityData']) == type({}):
