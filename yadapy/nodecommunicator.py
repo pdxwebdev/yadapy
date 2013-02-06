@@ -83,14 +83,11 @@ class NodeCommunicator(object):
         
     #this should only return true where self isinstance of YadaServer
     def isHostedHere(self, host, port):
-        if isinstance(self, YadaServer):
-            for ipEl in self.node.get('data/identity/ip_address'):
-                if str(host) == str(ipEl['address']) and str(port) == str(ipEl['port']):
-                    return True
-                elif host + ":" + str(port) == ipEl['address']:
-                    return True
-        else:
-            return False
+        for ipEl in self.node.get('data/identity/ip_address'):
+            if str(host) == str(ipEl['address']) and str(port) == str(ipEl['port']):
+                return True
+            elif host + ":" + str(port) == ipEl['address']:
+                return True
                 
     #this should only be executed if self isinstance of YadaServer
     def handleInternally(self, node, packet):
@@ -98,8 +95,11 @@ class NodeCommunicator(object):
             relationship = self.manager.publicKeyLookup(node.get('public_key'))
             managedNode = self.manager.chooseRelationshipNode(relationship, self.node)
         else:
-            relationship = self.node.publicKeyLookup(node.get('public_key'))
-            managedNode = self.node.chooseRelationshipNode(relationship, self.node, impersonate=True)
+            if isinstance(self, YadaServer):
+                relationship = self.node.publicKeyLookup(node.get('public_key'))
+                managedNode = self.node.chooseRelationshipNode(relationship, self.node, impersonate=True)
+            else:
+                raise('no way to handle interally facing request.')
             
         managedNode = self.node.getClassInstanceFromNodeForNode(managedNode.get())
         nodeComm = NodeCommunicator(managedNode)

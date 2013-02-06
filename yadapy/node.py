@@ -12,16 +12,15 @@ class Node(object):
     def __init__(self, *args, **kwargs):
         super(Node, self).__init__()
         
+        self.args = args
+        self.kwargs = kwargs
         self.defaultHost = "staging.yadaproject.com"
         self.defaultPort = "8089"
         
-        try:
-            identityData = ''
+        if 'identityData' in kwargs:
+            identityData = kwargs['identityData']
+        else:
             identityData = args[0]
-        except:
-            if kwargs.get('identityData', None):
-                identityData = kwargs.get('identityData', None)
-            
             
         try:
             newIdentity = ''
@@ -403,6 +402,7 @@ class Node(object):
     def stripIdentityAndFriendsForProtocolV1(self, node=None):
         self.replaceIdentityOfFriendsWithPubKeys()
         if node:
+            self.stripIdentityOfIrrelevantMessages(node)
             self.stripIdentityOfIrrelevantFriendRequests(node)
                     
     def stripIdentityAndFriendsForWebGUI(self):
@@ -427,10 +427,10 @@ class Node(object):
             self.stripIdentityOfIrrelevantFriendRequests(friend)
             self.base64DecodeMessages(friend)
         
-    def stripIdentityOfIrrelevantMessages(self):
+    def stripIdentityOfIrrelevantMessages(self, friend):
         messageList = []
         for x, message in enumerate(self.get('data/messages')):
-            if self.get('public_key') in message['public_key']:
+            if friend.get('public_key') in message['public_key']:
                 messageList.append(message)
         self.set('data/messages', messageList)
         
@@ -882,10 +882,14 @@ class Node(object):
         module = module.split(".")
         module = ".".join(module[:-1])
         m = self.my_import(module)
+        
+        self.kwargs['identityData'] = identity
+        
         try:
-            node = m.manager.YadaServer(identity)
+            node = m.manager.YadaServer(**self.kwargs)
         except:
-            node = m.node.Node(identity)
+            node = m.node.Node(**self.kwargs)
+        
         return node
     
     def my_import(self, name):

@@ -27,8 +27,12 @@ class YadaServer(Manager, Node):
             port = 27021
         else:
             port = kwargs['port']
-            
-        identityData = args[0]
+        
+        if 'identityData' in kwargs:
+            identityData = kwargs['identityData']
+        else:
+            identityData = args[0]
+        
         try:
             newIdentity = args[1]
         except:
@@ -40,12 +44,12 @@ class YadaServer(Manager, Node):
             self.col = self.db.identities
         
         if type(identityData) == type(u'') or type(identityData) == type(''):
-            identityData = self.getManagedNode(identityData)
+            kwargs['identityData'] = self.getManagedNode(identityData)
         elif type(identityData) == type({}):
-            newIdentity = newIdentity
+            kwargs['newIdentity'] = newIdentity
         else:
             raise InvalidIdentity("A valid server Identity was not given nor was a public_key specified.")
-        super(YadaServer, self).__init__(identityData=identityData, newIdentity=newIdentity)
+        super(YadaServer, self).__init__(*args, **kwargs)
     
     def getManagedNode(self, public_key):
         res = [x for x in self.col.find({'public_key':public_key})]

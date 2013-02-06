@@ -7,16 +7,16 @@ from node import Node, InvalidIdentity
 
 class YadaServer(Node):
     
-    def __init__(self, identityData={}, newIdentity={}, initialFriends=[]):
+    def __init__(self, *args, **kwargs):
 
-        if type(identityData) == type(u'') or type(identityData) == type(''):
-            identityData = self.getManagedNode(identityData)
-        elif type(identityData) == type({}):
-            identityData = identityData
+        if type(kwargs['identityData']) == type(u'') or type(kwargs['identityData']) == type(''):
+            identityData = self.getManagedNode(kwargs['identityData'])
+        elif type(kwargs['identityData']) == type({}):
+            identityData = kwargs['identityData']
         else:
             raise InvalidIdentity("A valid server Identity was not given nor was a public_key specified.")
         
-        super(YadaServer, self).__init__(identityData=identityData, newIdentity=newIdentity, initialFriends=initialFriends)
+        super(YadaServer, self).__init__(*args, **kwargs)
     
     def validIdentity(self, data):
         try:
