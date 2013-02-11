@@ -376,7 +376,7 @@ class YadaServer(Node):
         elif managedNodeRelationship:
             node = self.chooseRelationshipNode(managedNodeRelationship, inboundNode, impersonate)
         
-        if node:
+        if node and not isinstance(node, YadaServer):
             node = self.getClassInstanceFromNodeForNode(node.get())
             return node.respondWithRelationship(inboundNode)
         else:
