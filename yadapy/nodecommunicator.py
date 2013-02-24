@@ -30,7 +30,7 @@ class NodeCommunicator(object):
             response = None
             
             if self.isHostedHere(host, port):
-                packet = self._buildPacket(toNode, hostNode, data, method="GET")
+                packet = self._buildPacket(toNode, hostNode, data, method=method, status=status)
                 response = self.handleInternally(hostNode, packet)
                 
             else:
@@ -222,13 +222,41 @@ class NodeCommunicator(object):
         sourceNodeCopy.set('public_key', destNode.get('public_key'))
         sourceNodeCopy.set('private_key', destNode.get('private_key'))
         self._doRequest(sourceNodeCopy, destNode, data, method="GET")
-    
+
+    def grantPromotion(self, destNode):
+        destNodeCopyNode = Node(copy.deepcopy(destNode.get()))
+        sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
+        
+        
+        data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(sourceNodeCopy.get())))
+        
+        self._doRequest(sourceNodeCopy, destNode, data, method="PUT", status="PROMOTION_REQUEST")
+
     def handlePacket(self, packet):
         
         packetData = b64decode(packet['data'])
         
         if packet.get('status', None) in ['FRIEND_REQUEST', "REGISTER_REQUEST"]:
             response = self.node.handleFriendRequest(json.loads(packetData))
+            
+            #Response will be None if the node does not automatically approve friend requests
+            if response:
+                responseData = Node(response)
+                responsePacket = \
+                    {
+                        "method" : "PUT",
+                        "public_key" : response['public_key'],
+                        "data" : encrypt(response['private_key'], response['private_key'], json.dumps(responseData.get()))
+                    }     
+                return responsePacket
+            else:
+                return None
+        
+        elif packet.get('status', None) in ['PROMOTION_REQUEST']:
+            friend = self.node.getFriend(packet['public_key'])
+            data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
+            decrypted = json.loads(data)
+            response = self.node.handlePromotionRequest(decrypted)
             
             #Response will be None if the node does not automatically approve friend requests
             if response:

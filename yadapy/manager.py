@@ -243,8 +243,6 @@ class YadaServer(Node):
         for node in r:
             p = Node(node)
             
-            
-            
             intersection = set([x['public_key'] for x in p.getFriendPublicKeyList()]) & set([x['public_key'] for x in inboundNode.get('data/friends')])
             
             if impersonate:
@@ -253,7 +251,13 @@ class YadaServer(Node):
             else:
                 if len(intersection) == 1:
                     return p
+        
+        for node in r:
+            p = Node(node)
             
+            if p.get('public_key') != inboundNode.get('public_key'):
+                return p
+        
     def getRelationshipData(self, relationship):
         pass
 

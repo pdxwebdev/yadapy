@@ -510,7 +510,10 @@ class Node(object):
     
     def newTimeStamp(self):
         return time.time()
-     
+    
+    def handlePromotionRequest(self, packet):
+        return self.addPromotionRequest(packet)
+    
     def handleRoutedFriendRequest(self, packet):
         return self.addRoutedFriendRequest(packet)
     
@@ -519,12 +522,16 @@ class Node(object):
     
     def handleFriendRequest(self, packet):
         self.addFriendRequest(packet)
-
+        
+    def addPromotionRequest(self, packet):
+        node = Node(packet)
+        self.add('promotion_requests', node.get(), True)
+        self.save()
+        
     def addRoutedFriendRequest(self, packet):
         node = Node(packet)
         self.add('data/routed_friend_requests', node.get(), True)
         self.save()
-        print "friend request added"
         
     def respondWithRelationship(self, friendNode):
         """
