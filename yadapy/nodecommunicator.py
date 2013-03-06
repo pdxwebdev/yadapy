@@ -24,8 +24,13 @@ class NodeCommunicator(object):
         dataToSend = self._buildPacket(toNode, hostNode, data, method, status)
         
         responses = []
-        
+        addresses = []
         for address in self._getHostPortArray(hostNode):
+            if address in addresses:
+                continue
+            else:
+                addresses.append(address)
+                
             host, port = address
             response = None
             
@@ -194,22 +199,20 @@ class NodeCommunicator(object):
         selectedFriend.set('public_key', newFriend.get('public_key'))
         selectedFriend.set('private_key', newFriend.get('private_key'))
         selectedFriend.setModifiedToNow()
-        selectedFriend.set('source_indexer_key', self.node.matchFriend(destNode)['public_key'], True)
+        selectedFriend.set('source_indexer_key', destNode.get('public_key'), True)
         
         sourceNodeCopy.set('public_key', newFriend.get('public_key'))
         sourceNodeCopy.set('private_key', newFriend.get('private_key'))
         
-        sourceNodeCopy.set('source_indexer_key', self.node.matchFriend(destNode)['public_key'], True)
+        sourceNodeCopy.set('source_indexer_key', destNode.get('public_key'), True)
         sourceNodeCopy.replaceIdentityOfFriendsWithPubKeys()
         
         data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(sourceNodeCopy.get())))
         
-        sourceFriendNode = Node(self.node.matchFriend(destNode))
-        
         self.node.add('data/friends', selectedFriend.get())
         self.node.save()
         
-        return self._doRequest(sourceFriendNode, destNode, data, status="ROUTED_FRIEND_REQUEST")
+        return self._doRequest(destNode, destNode, data, status="ROUTED_FRIEND_REQUEST")
         
     def updateRelationship(self, destNode):
         destNodeCopyNode = Node(copy.deepcopy(destNode.get()))
