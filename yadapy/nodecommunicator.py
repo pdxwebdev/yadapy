@@ -95,7 +95,7 @@ class NodeCommunicator(object):
             relationship = self.manager.publicKeyLookup(node.get('public_key'))
             managedNode = self.manager.chooseRelationshipNode(relationship, self.node)
         else:
-            if isinstance(self.node, YadaServer):
+            if isinstance(self.node, self.node.getClassInstanceFromNode().manager.YadaServer):
                 relationship = self.node.publicKeyLookup(node.get('public_key'))
                 managedNode = self.node.chooseRelationshipNode(relationship, self.node, impersonate=True)
             else:

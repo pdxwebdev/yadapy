@@ -885,10 +885,8 @@ class Node(object):
         self.add('data/identity/ip_address', self.createIPAddress(host, port, protocol))
         
     def getClassInstanceFromNodeForNode(self, identity):
-        module = self.__module__
-        module = module.split(".")
-        module = ".".join(module[:-1])
-        m = self.my_import(module)
+        
+        m = self.getClassInstanceFromNode()
         
         self.kwargs['identityData'] = identity
         
@@ -905,6 +903,12 @@ class Node(object):
             m = getattr(m, n)
         return m
     
+    def getClassInstanceFromNode(self):
+        module = self.__module__
+        module = module.split(".")
+        module = ".".join(module[:-1])
+        return self.my_import(module)
+        
     def save(self):
         """
         This is a place holder method to indicate that subclasses with persistent storage 
