@@ -384,8 +384,6 @@ class Node(object):
 
     def matchFriend(self, node):
         intersection = set(self.getFriendPublicKeysArray()) & set(node.getFriendPublicKeysArray())
-        logging.info(self.getFriendPublicKeysArray())
-        logging.info(node.getFriendPublicKeysArray())
         if len(intersection) == 1:
             friend = self.getFriend(list(intersection)[0])
             return friend
