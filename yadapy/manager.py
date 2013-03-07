@@ -77,7 +77,7 @@ class YadaServer(Node):
             pass
         
     #this method was invented just so an incomming packet can be decrypted
-    #so it doesn't matter with node in the relationship we return
+    #so it doesn't matter which node in the relationship we return
     def getFriend(self, public_key):
         friend = self.publicKeyLookup(public_key)
         if friend:

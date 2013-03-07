@@ -238,6 +238,11 @@ class NodeCommunicator(object):
     def handlePacket(self, packet):
         
         packetData = b64decode(packet['data'])
+        friend = self.node.getFriend(packet['public_key'])
+        if not friend and packet.get('status', None) not in ['FRIEND_REQUEST', "REGISTER_REQUEST"]:
+            raise("No identity found for packet.")
+        else:
+            node = friend
         
         if packet.get('status', None) in ['FRIEND_REQUEST', "REGISTER_REQUEST"]:
             response = self.node.handleFriendRequest(json.loads(packetData))
@@ -256,7 +261,7 @@ class NodeCommunicator(object):
                 return None
         
         elif packet.get('status', None) in ['PROMOTION_REQUEST']:
-            friend = self.node.getFriend(packet['public_key'])
+            
             data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             decrypted = json.loads(data)
             response = self.node.handlePromotionRequest(decrypted)
@@ -275,7 +280,7 @@ class NodeCommunicator(object):
                 return None
             
         elif packet.get('status', None) == 'ROUTED_FRIEND_REQUEST':
-            friend = self.node.getFriend(packet['public_key'])
+            
             data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             decrypted = json.loads(data)
             self.node.handleRoutedFriendRequest(decrypted)
@@ -286,12 +291,12 @@ class NodeCommunicator(object):
             return self.updateRelationship(friendNode)
         
         elif packet.get('status', None) == 'ROUTED_MESSAGE':
-            friend = self.node.getFriend(packet['public_key'])
+            
             data = decrypt(friend['private_key'], friend['private_key'], packetData)
             self.node.handleRoutedMessage(data['data'])
             
         elif packet.get('status', None) == 'MANAGE_REQUEST':
-            node = self.node.getFriend(packet['public_key'])
+            
             data = decrypt(node['private_key'], node['private_key'], b64encode(packetData))
             responseData = self.node.handleManageRequest(json.loads(data))
             responseData = Node(responseData)
@@ -303,7 +308,7 @@ class NodeCommunicator(object):
                 }  
             
         elif packet.get('status', None) == 'MANAGE_SYNC':
-            node = self.node.getManagedNode(packet['public_key'])
+            
             data = decrypt(node['private_key'], node['private_key'], b64encode(packetData))
             responseData = self.node.syncManagedNode(Node(json.loads(data)))
             responseData = Node(responseData)
@@ -315,12 +320,12 @@ class NodeCommunicator(object):
                 }  
             
         elif packet.get('method', None) == 'PUT':
-            friend = self.node.getFriend(packet['public_key'])
+            
             data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             self.node.updateFromNode(json.loads(data))
         
         elif packet.get('method', None) == 'IMPERSONATE':
-            friend = self.node.getFriend(packet['public_key'])
+            
             data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             self.node.updateFromNode(json.loads(data), impersonate = True)
             responseData = self.node.respondWithRelationship(Node(json.loads(data)), impersonate = True)
@@ -333,7 +338,7 @@ class NodeCommunicator(object):
                 }
             
         elif packet.get('method', None) == 'GET':
-            friend = self.node.getFriend(packet['public_key'])
+            
             packetData = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             self.node.updateFromNode(json.loads(packetData))
             responseData = self.node.respondWithRelationship(Node(json.loads(packetData)))
