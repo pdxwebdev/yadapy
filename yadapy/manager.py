@@ -13,6 +13,7 @@ class YadaServer(Node):
             identityData = kwargs['identityData']
         else:
             identityData = args[0]
+            kwargs['identityData'] = identityData
         
         try:
             newIdentity = args[1]

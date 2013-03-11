@@ -21,7 +21,7 @@ class NodeCommunicator(object):
     
     def _doRequest(self, toNode, hostNode, data, method='PUT', status=None):
         
-        dataToSend = self._buildPacket(toNode, hostNode, data, method, status)
+        packet = self._buildPacket(toNode, hostNode, data, method, status)
         
         responses = []
         addresses = []
@@ -35,14 +35,11 @@ class NodeCommunicator(object):
             response = None
             
             if self.isHostedHere(host, port):
-                packet = self._buildPacket(toNode, hostNode, data, method=method, status=status)
                 response = self.handleInternally(hostNode, packet)
-                
+                if response is False:
+                    response = self._internetRequest(host, port, packet)
             else:
-                s = requests.session()
-                s.config['keep_alive'] = False
-                response = requests.post("http://" + host + ":" + str(port) + "/", data={'data': dataToSend})
-                response = response.content
+                response = self._internetRequest(host, port, packet)
                 
             if response:
                 try:
@@ -53,6 +50,12 @@ class NodeCommunicator(object):
                 except:
                     pass
         return responses
+    
+    def _internetRequest(self, host, port, dataToSend):
+        s = requests.session()
+        s.config['keep_alive'] = False
+        response = requests.post("http://" + host + ":" + str(port) + "/", data={'data': dataToSend})
+        return response.content
         
     def _buildPacket(self, toNode, hostNode, data, method='PUT', status=None):
 
@@ -104,7 +107,7 @@ class NodeCommunicator(object):
                 relationship = self.node.publicKeyLookup(node.get('public_key'))
                 managedNode = self.node.chooseRelationshipNode(relationship, self.node, impersonate=True)
             else:
-                raise('no way to handle interally facing request.')
+                return False
             
         managedNode = self.node.getClassInstanceFromNodeForNode(managedNode.get())
         nodeComm = NodeCommunicator(managedNode)

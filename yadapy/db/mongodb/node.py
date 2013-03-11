@@ -12,19 +12,17 @@ except:
  
 class Node(BaseNode):
     conn = None
+    host = 'localhost'
+    port = 27021
     def __init__(self, *args, **kwargs):
         
         if 'host' in kwargs:
-            host = kwargs['host'] 
-        else:
-            host = 'localhost'
+            self.host = kwargs['host'] 
         if 'port' in kwargs:
-            port = kwargs['port']
-        else:
-            port = 27021
+            self.port = kwargs['port']
         
         if not self.conn:
-            self.conn = Connection(host, port)
+            self.conn = Connection(self.host, self.port)
             self.db = self.conn.yadaserver
             self.col = self.db.identities
 

@@ -16,17 +16,15 @@ from yadapy.manager import YadaServer as Manager
 
 class YadaServer(Manager, Node):
     conn = None
+    host = 'localhost'
+    port = 27021
     def __init__(self, *args, **kwargs):
         
-        if 'host' not in kwargs:
-            host = 'localhost'
-        else:
-            host = kwargs['host']
+        if 'host' in kwargs:
+            self.host = kwargs['host']
             
-        if 'port' not in kwargs:
-            port = 27021
-        else:
-            port = kwargs['port']
+        if 'port' in kwargs:
+            self.port = kwargs['port']
         
         if 'identityData' in kwargs:
             identityData = kwargs['identityData']
@@ -40,7 +38,7 @@ class YadaServer(Manager, Node):
             newIdentity = None
         
         if not self.conn:
-            self.conn = Connection(host, port)
+            self.conn = Connection(self.host, self.port)
             self.db = self.conn.yadaserver
             self.col = self.db.identities
         
