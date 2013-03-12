@@ -35,20 +35,15 @@ class NodeCommunicator(object):
             response = None
             
             if self.isHostedHere(host, port):
-                response = self.handleInternally(hostNode, packet)
+                response = self._handleInternally(hostNode, packet)
                 if response is False:
                     response = self._internetRequest(host, port, packet)
             else:
                 response = self._internetRequest(host, port, packet)
                 
             if response:
-                try:
-                    if not type(response) == type({}):
-                        response = json.loads(response)
-                    responses.append(response)
-                    self.handlePacket(response)
-                except:
-                    pass
+                responses.append(response)
+                
         return responses
     
     def _internetRequest(self, host, port, dataToSend):
@@ -98,7 +93,7 @@ class NodeCommunicator(object):
                 return True
                 
     #this should only be executed if self isinstance of YadaServer
-    def handleInternally(self, node, packet):
+    def _handleInternally(self, node, packet):
         if self.manager:
             relationship = self.manager.publicKeyLookup(node.get('public_key'))
             managedNode = self.manager.chooseRelationshipNode(relationship, self.node)
@@ -137,13 +132,18 @@ class NodeCommunicator(object):
         
         managerFriendNode.add('data/friends', meToSend.get())
         
+        responses = []
         #send the friend request to the manager
-        friendResponses = self._doRequest(meToSend, managerFriendNode, json.dumps(meToSend.get()), status="FRIEND_REQUEST")
-
+        response = self._doRequest(meToSend, managerFriendNode, json.dumps(meToSend.get()), status="FRIEND_REQUEST")
+        responses.extend(response)
+        
         #simply send my entire object to manager
         encryptedData = encrypt(managerFriendNode.get('private_key'), managerFriendNode.get('private_key'), json.dumps(self.node.get()))
-        responses = self._doRequest(self.node, managerFriendNode, b64decode(encryptedData), status="MANAGE_REQUEST")
-        return (responses, friendResponses)
+        response = self._doRequest(self.node, managerFriendNode, b64decode(encryptedData), status="MANAGE_REQUEST")
+        responses.extend(response)
+        
+        for response in responses:
+            self.handlePacket(json.loads(response))
     
     def sendMessage(self, pub_keys, subject, message, thread_id=None, guid=None):
         self.node.addMessage(self.node.sendMessage(pub_keys, subject, message, thread_id, guid))
@@ -243,7 +243,7 @@ class NodeCommunicator(object):
         packetData = b64decode(packet['data'])
         friend = self.node.getFriend(packet['public_key'])
         if not friend and packet.get('status', None) not in ['FRIEND_REQUEST', "REGISTER_REQUEST"]:
-            raise("No identity found for packet.")
+            raise BaseException("No identity found for packet.")
         else:
             node = friend
         
@@ -286,12 +286,18 @@ class NodeCommunicator(object):
             
             data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             decrypted = json.loads(data)
+            
+            #updating at the median node
             self.node.handleRoutedFriendRequest(decrypted)
+            
+            #updating the destination
             requestedFriend = self.node.getFriend(decrypted['routed_public_key'])
-            node = self.node.getClassInstanceFromNodeForNode(requestedFriend)
-            self.updateRelationship(node)
-            friendNode = self.node.getClassInstanceFromNodeForNode(friend)
-            return self.updateRelationship(friendNode)
+            requestedFriendNode = self.node.getClassInstanceFromNodeForNode(requestedFriend)
+            self.updateRelationship(requestedFriendNode)
+            
+            #updating the originator
+            requestingFriendNode = self.node.getClassInstanceFromNodeForNode(friend)
+            self.updateRelationship(requestingFriendNode)
         
         elif packet.get('status', None) == 'ROUTED_MESSAGE':
             
