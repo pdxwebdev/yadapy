@@ -14,8 +14,6 @@ class Node(object):
         
         self.args = args
         self.kwargs = kwargs
-        self.defaultHost = "staging.yadaproject.com"
-        self.defaultPort = "8089"
         
         if 'identityData' in kwargs:
             identityData = kwargs['identityData']
