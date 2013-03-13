@@ -322,9 +322,9 @@ class YadaServer(Node):
     def handleFriendRequest(self, packet):
         
         friendRequest = Node(packet)
-        node = self.matchFriend(friendRequest)
         
         if 'routed_public_key' in packet:
+            node = self.matchFriend(friendRequest)
             managedNodeRelationship = self.publicKeyLookup(packet['routed_public_key'])
             node = self.chooseRelationshipNode(managedNodeRelationship, self.get(), impersonate = True)
             node = self.getClassInstanceFromNodeForNode(node.get())
@@ -332,7 +332,6 @@ class YadaServer(Node):
             node.save()
         else:
             self.addFriend(copy.deepcopy(friendRequest.get()))
-            self.save()
             logging.debug('added new friend to friends list')
         return self.respondWithRelationship(friendRequest)
     

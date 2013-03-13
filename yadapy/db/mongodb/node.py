@@ -32,6 +32,62 @@ class Node(BaseNode):
             
         super(Node, self).__init__(*args, **kwargs)
     
+    def matchFriend(self, node):
+        friend = self.db.command(
+            {
+                "aggregate" : "identities", "pipeline" : [
+                    {
+                        "$match" : {
+                            "public_key" : self.get('public_key')
+                        }
+                    },
+                    {
+                        "$project" : {
+                            "_id" : 0,
+                            "friend" : "$data.friends",
+                            "data" : 0,
+                            "public_key" : 0,
+                            "private_key" : 0,
+                            "modified":0
+                        }
+                    },
+                    {
+                                "$match" : {
+                                    "friend" : {"$not" : { "$size" : 0 }}
+                                    
+                        }
+                    },
+                    {
+                        "$unwind" : "$friend"
+                    },
+                    {
+                        "$match" : {
+                            "friend.public_key" : {"$in" : node.getFriendPublicKeysArray()}
+                        }
+                    },
+                ]
+            })
+        if friend['result']:
+            return friend['result'][0]['friend']
+        else:
+            return None
+        
+    def addFriend(self, friend):
+        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.friends': friend}})
+        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+    
+    def addMessage(self, message):
+        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.messages': message}})
+        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+        
+    def addRoutedFriendRequest(self, packet):
+        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.routed_friend_requests': packet}})
+        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+        
+    def addPromotionRequest(self, packet):
+        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'promotion_requests': packet}})
+        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+        
     def queryIndexerByHost(self, host):
         
         indexerQuery = self.db.command(

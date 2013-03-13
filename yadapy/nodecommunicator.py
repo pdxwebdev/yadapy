@@ -233,7 +233,6 @@ class NodeCommunicator(object):
         destNodeCopyNode = Node(copy.deepcopy(destNode.get()))
         sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
         
-        
         data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(sourceNodeCopy.get())))
         
         self._doRequest(sourceNodeCopy, destNode, data, method="PUT", status="PROMOTION_REQUEST")
