@@ -73,24 +73,19 @@ class Node(BaseNode):
             return None
         
     def addFriend(self, friend):
-        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.friends': friend}})
-        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+        self.pushItem('data.friends', friend)
     
     def addMessage(self, message):
-        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.messages': message}})
-        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+        self.pushItem('data.messages', message)
         
     def addFriendRequest(self, packet):
-        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'friend_requests': packet}})
-        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+        self.pushItem('friend_requests', packet)
         
     def addRoutedFriendRequest(self, packet):
-        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.routed_friend_requests': packet}})
-        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+        self.pushItem('data.routed_friend_requests', packet)
         
     def addPromotionRequest(self, packet):
-        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'promotion_requests': packet}})
-        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+        self.pushItem('promotion_requests', packet)
         
     def queryIndexerByHost(self, host):
         
@@ -299,6 +294,20 @@ class Node(BaseNode):
             else:
                 self.col.insert(self.get())
                 del self._data['_id']
+            return "save ok"
+        except:
+            raise
+    
+    def pushItem(self, path, item):
+        try:
+            
+            result = self.col.find({'public_key':self.get('public_key')}, {'_id':1})
+            if type(result[0]['_id']) == type(''):
+                id = ObjectId(result[0]['_id'])
+            else:
+                id = result[0]['_id']
+            status = self.col.update({'_id':id}, {'$push' : {path: item}})
+            status = self.col.update({'_id':id}, {'$set' : {'modified': self.setModifiedToNow()}})
             return "save ok"
         except:
             raise
