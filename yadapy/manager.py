@@ -329,7 +329,6 @@ class YadaServer(Node):
             node = self.chooseRelationshipNode(managedNodeRelationship, self.get(), impersonate = True)
             node = self.getClassInstanceFromNodeForNode(node.get())
             node.addFriendRequest(friendRequest.get())
-            node.save()
         else:
             self.addFriend(copy.deepcopy(friendRequest.get()))
             logging.debug('added new friend to friends list')

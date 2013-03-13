@@ -143,7 +143,10 @@ class NodeCommunicator(object):
         responses.extend(response)
         
         for response in responses:
-            self.handlePacket(json.loads(response))
+            try:
+                self.handlePacket(json.loads(response))
+            except:
+                logging.debug("failed to handle packet")
     
     def sendMessage(self, pub_keys, subject, message, thread_id=None, guid=None):
         self.node.addMessage(self.node.sendMessage(pub_keys, subject, message, thread_id, guid))

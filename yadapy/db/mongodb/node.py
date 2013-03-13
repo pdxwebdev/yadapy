@@ -80,6 +80,10 @@ class Node(BaseNode):
         self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.messages': message}})
         self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
         
+    def addFriendRequest(self, packet):
+        self.col.update({'public_key':self.get('public_key')}, {'$push' : {'friend_requests': packet}})
+        self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
+        
     def addRoutedFriendRequest(self, packet):
         self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.routed_friend_requests': packet}})
         self.col.update({'public_key':self.get('public_key')}, {'$set' : {'modified': self.setModifiedToNow()}})
@@ -161,6 +165,46 @@ class Node(BaseNode):
             return friend['result'][0]['friend']
         else:
             return super(Node, self).getFriend(public_key)
+        
+    def getRoutedFriendRequests(self, public_key):
+        friend = self.db.command(
+            {
+                "aggregate" : "identities", "pipeline" : [
+                    {
+                        "$match" : {
+                            "public_key" : self.get('public_key')
+                        }
+                    },
+                    {
+                        "$project" : {
+                            "_id" : 0,
+                            "routed_friend_request" : "$data.routed_friend_requests",
+                            "data" : 0,
+                            "public_key" : 0,
+                            "private_key" : 0,
+                            "modified":0
+                        }
+                    },
+                    {
+                                "$match" : {
+                                    "routed_friend_request" : {"$not" : { "$size" : 0 }}
+                                    
+                        }
+                    },
+                    {
+                        "$unwind" : "$routed_friend_request"
+                    },
+                    {
+                        "$match" : {
+                            "routed_friend_request.routed_public_key" : {"$in" : public_key}
+                        }
+                    },
+                ]
+            })
+        if friend['result']:
+            return friend['result'][0]['friend']
+        else:
+            return None
         
     def getFriendPublicKeyList(self):
         return self.db.command(
