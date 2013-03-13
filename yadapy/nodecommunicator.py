@@ -32,14 +32,8 @@ class NodeCommunicator(object):
                 addresses.append(address)
                 
             host, port = address
-            response = None
             
-            if self.isHostedHere(host, port):
-                response = self._handleInternally(hostNode, packet)
-                if response is False:
-                    response = self._internetRequest(host, port, packet)
-            else:
-                response = self._internetRequest(host, port, packet)
+            response = self._internetRequest(host, port, packet)
                 
             if response:
                 responses.append(response)
@@ -83,31 +77,6 @@ class NodeCommunicator(object):
                 port = 80
             addresses.append((host,port))
         return addresses
-        
-    #this should only return true where self isinstance of YadaServer
-    def isHostedHere(self, host, port):
-        for ipEl in self.node.get('data/identity/ip_address'):
-            if str(host) == str(ipEl['address']) and str(port) == str(ipEl['port']):
-                return True
-            elif host + ":" + str(port) == ipEl['address']:
-                return True
-                
-    #this should only be executed if self isinstance of YadaServer
-    def _handleInternally(self, node, packet):
-        if self.manager:
-            relationship = self.manager.publicKeyLookup(node.get('public_key'))
-            managedNode = self.manager.chooseRelationshipNode(relationship, self.node)
-        else:
-            if isinstance(self.node, self.node.getClassInstanceFromNode().manager.YadaServer):
-                relationship = self.node.publicKeyLookup(node.get('public_key'))
-                managedNode = self.node.chooseRelationshipNode(relationship, self.node, impersonate=True)
-            else:
-                return False
-            
-        managedNode = self.node.getClassInstanceFromNodeForNode(managedNode.get())
-        nodeComm = NodeCommunicator(managedNode)
-        
-        return nodeComm.handlePacket(json.loads(packet))
 
     def addManager(self, host):
         
@@ -269,7 +238,7 @@ class NodeCommunicator(object):
             
             data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             decrypted = json.loads(data)
-            response = self.node.handlePromotionRequest(decrypted)
+            response = self.node.handlePromotionRequest(decrypted, friend['public_key'])
             
             #Response will be None if the node does not automatically approve friend requests
             if response:

@@ -237,9 +237,9 @@ class YadaServer(Node):
                     return self
                 else:
                     if r[0]['public_key'] != self.get('public_key'):
-                        return Node(r[0])
+                        return self.getClassInstanceFromNodeForNode(Node(r[0]).get())
                     else:
-                        return Node(r[1])
+                        return self.getClassInstanceFromNodeForNode(Node(r[1]).get())
         
         for node in r:
             p = Node(node)
@@ -248,16 +248,16 @@ class YadaServer(Node):
             
             if impersonate:
                 if len(intersection) > 1:
-                    return p
+                    return self.getClassInstanceFromNodeForNode(p.get())
             else:
                 if len(intersection) == 1:
-                    return p
+                    return self.getClassInstanceFromNodeForNode(p.get())
         
         for node in r:
             p = Node(node)
             
             if p.get('public_key') != inboundNode.get('public_key'):
-                return p
+                return self.getClassInstanceFromNodeForNode(p.get())
         
     def getRelationshipData(self, relationship):
         pass
@@ -338,7 +338,12 @@ class YadaServer(Node):
         self.addManagedNode(packet)
         node = Node(self.matchFriend(Node(packet)))
         return self.respondWithRelationship(node)
-
+    
+    def handlePromotionRequest(self, packet, public_key):
+        managedNodeRelationship = self.publicKeyLookup(public_key)
+        managedNode = self.chooseRelationshipNode(managedNodeRelationship, Node(packet), impersonate=True)
+        managedNode.addPromotionRequest(packet)
+        
     def forceJoinNodes(self, sourceNode, destNode):
         
         newFriendRequest = Node({}, sourceNode.get('data/identity'), sourceNode.getFriendPublicKeysDict())
