@@ -226,8 +226,12 @@ class YadaServer(Node):
             return "node is now managed by this node manager"
 
     def chooseRelationshipNode(self, relationship, inboundNode, impersonate = False):
+        
         r = relationship
         
+        if len(r) == 1:
+            return self.getClassInstanceFromNodeForNode(Node(r[0]).get())
+                
         #this or clause is only for the case where yada server is in the friendship and 
         #the managed node only has yada server as a friend
             
