@@ -228,18 +228,28 @@ class YadaServer(Node):
     def chooseRelationshipNode(self, relationship, inboundNode, impersonate = False):
         r = relationship
         
-        for idx, node in enumerate(r):
-            p = Node(node)
-            #this or clause is only for the case where yada server is in the friendship and 
-            #the managed node only has yada server as a friend
-            if p.get('public_key') == self.get('public_key'):
-                if impersonate == False:
-                    return self
+        #this or clause is only for the case where yada server is in the friendship and 
+        #the managed node only has yada server as a friend
+            
+        if Node(r[0]).get('public_key') == self.get('public_key'):
+            server = r[0]
+            managedNode = r[1]
+        else:
+            server = r[1]
+            managedNode = r[0]
+        
+        if len(Node(managedNode).get('data/friends')) == 1:
+            if len(inboundNode.get('data/friends')) == 1:
+                if impersonate:
+                    return self.getClassInstanceFromNodeForNode(Node(managedNode).get())
                 else:
-                    if r[0]['public_key'] != self.get('public_key'):
-                        return self.getClassInstanceFromNodeForNode(Node(r[0]).get())
-                    else:
-                        return self.getClassInstanceFromNodeForNode(Node(r[1]).get())
+                    return self.getClassInstanceFromNodeForNode(Node(server).get())
+            else:
+                if impersonate:
+                    return self.getClassInstanceFromNodeForNode(Node(server).get())
+                else:
+                    return self.getClassInstanceFromNodeForNode(Node(managedNode).get())
+                        
         
         for node in r:
             p = Node(node)

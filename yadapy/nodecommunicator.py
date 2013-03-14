@@ -184,21 +184,22 @@ class NodeCommunicator(object):
         
         data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(sourceNodeCopy.get())))
         
-        self.node.add('data/friends', selectedFriend.get())
-        self.node.save()
+        self.node.addFriend(selectedFriend.get())
         
         return self._doRequest(destNode, destNode, data, status="ROUTED_FRIEND_REQUEST")
         
     def updateRelationship(self, destNode):
         destNodeCopyNode = Node(copy.deepcopy(destNode.get()))
-        sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
+        
+        sourceNodeCopy = self.node.get()
+        
         if self.impersonate:
             dictToSend = destNode.respondWithRelationship(destNode)
         else:
             dictToSend = self.node.respondWithRelationship(destNodeCopyNode)
+        
         data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(dictToSend)))
-        sourceNodeCopy.set('public_key', destNode.get('public_key'))
-        sourceNodeCopy.set('private_key', destNode.get('private_key'))
+        
         self._doRequest(sourceNodeCopy, destNode, data, method="GET")
 
     def grantPromotion(self, destNode):
@@ -260,6 +261,7 @@ class NodeCommunicator(object):
             
             #updating at the median node
             self.node.handleRoutedFriendRequest(decrypted)
+            self.node.add('data/routed_friend_requests', decrypted, True)
             
             #updating the destination
             requestedFriend = self.node.getFriend(decrypted['routed_public_key'])
