@@ -17,8 +17,13 @@ from yadapy.manager import YadaServer as Manager
 class YadaServer(Manager, Node):
     conn = None
     host = 'localhost'
-    port = 27021
-    def __init__(self, *args, **kwargs):
+    port = 27017
+    
+    def __init__(self):
+        self._data['modified'] = 0
+        self.setModifiedToNow()
+          
+    def _createServerNode(self, *args, **kwargs):
         
         if 'host' in kwargs:
             self.host = kwargs['host']
@@ -36,12 +41,7 @@ class YadaServer(Manager, Node):
             newIdentity = args[1]
         except:
             newIdentity = None
-        
-        if not self.conn:
-            self.conn = Connection(self.host, self.port)
-            self.db = self.conn.yadaserver
-            self.col = self.db.identities
-        
+                
         if type(identityData) == type(u'') or type(identityData) == type(''):
             kwargs['identityData'] = self.getManagedNode(identityData)
         elif type(newIdentity) == type({}):
@@ -133,57 +133,20 @@ class YadaServer(Manager, Node):
     
     def addServerFriend(self, friend):
         self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.friends': friend}})
-
-    def publicKeyLookup(self, public_key):
-        return [x for x in self.col.find({
-                                "data.friends" : {
-                                                  "$elemMatch" : {
-                                                                  "public_key" : public_key
-                                                                  }
-                                                  }
-                    })]
         
     def getFriend(self, public_key):
-        friend = self.db.command(
-            {
-                "aggregate" : "identities", "pipeline" : [
-                    {
-                        "$match" : {
-                            "public_key" : self.get('public_key')
-                        }
-                    },
-                    {
-                        "$project" : {
-                            "_id" : 0,
-                            "friend" : "$data.friends",
-                            "data" : 0,
-                            "public_key" : 0,
-                            "private_key" : 0,
-                            "modified":0
-                        }
-                    },
-                    {
-                                "$match" : {
-                                    "friend" : {"$not" : { "$size" : 0 }}
-                                    
-                        }
-                    },
-                    {
-                        "$unwind" : "$friend"
-                    },
-                    {
-                        "$match" : {
-                            "friend.public_key" : public_key
-                        }
-                    },
-                ]
-            })
+        friend = self.getFriendQuery(public_key)
             
-        if friend['result']:
-            return friend['result'][0]['friend']
+        if friend:
+            return friend[0]['friend']
         else:
-            return super(YadaServer, self).getFriend(public_key)
-        
+            try:
+                friend = Node({}, {'name': 'temp'})
+                friend.get().update(self.publicKeyLookup(public_key)[0])
+                return friend.getFriendQuery(public_key)[0]['friend']
+            except:
+                return []
+
     def getFriendPublicKeyList(self):
         return self.db.command(
         {
@@ -301,3 +264,78 @@ class YadaServer(Manager, Node):
             sourceNode.add('data/friends', newIndexerFriendRequest.get())
             sourceNode.save()
             
+    def chooseRelationshipNode(self, relationship, inboundNode, impersonate = False):
+        
+        r = relationship
+        
+        node = Node({}, {'name': 'node'})
+        
+        if r.count() == 1:
+            node.get().update(r[0])
+            return node
+                
+        #this or clause is only for the case where yada server is in the friendship and 
+        #the managed node only has yada server as a friend
+        testNode = Node({}, {'name': 'test node'})
+        testNode.get().update(r[0])
+        if testNode.get('public_key') == self.get('public_key'):
+            server = r[0]
+            managedNode = r[1]
+        else:
+            server = r[1]
+            managedNode = r[0]
+        
+        testNode = Node({}, {'name': 'test node'})
+        testNode.get().update(managedNode)
+        if len(testNode.getFriendPublicKeyList()) == 1:
+            if len(inboundNode.get('data/friends')) == 1:
+                if impersonate:
+                    node.get().update(managedNode)
+                else:
+                    node.get().update(server)
+            else:
+                if impersonate:
+                    node.get().update(server)
+                else:
+                    node.get().update(managedNode)
+                    
+            return node
+        
+        for partner in r:
+            node = Node({}, {'name': 'test node'})
+            node.get().update(partner)
+            intersection = node.matchedFriendsPublicKeys(inboundNode)
+            
+            if impersonate:
+                if len(intersection) > 1:
+                    return node
+            else:
+                if len(intersection) == 1:
+                    return node
+        
+        for pertner in r:
+            node.get().update(pertner)
+            
+            if node.get('public_key') != inboundNode.get('public_key'):
+                return node
+            
+    def updateFromNode(self, inboundNode, impersonate = False):
+        managedNode = self.getManagedNode(inboundNode['public_key'])
+        relationship = self.publicKeyLookup(inboundNode['public_key'])
+        node = None
+        if managedNode:
+            self.syncManagedNode(managedNode, inboundNode)
+        else:
+            node = self.chooseRelationshipNode(relationship, Node(inboundNode), impersonate)
+        
+        if node:
+            if isinstance(node, YadaServer):
+                super(YadaServer, node).updateFromNode(inboundNode)
+            else:
+                if impersonate:
+                    node.sync(inboundNode, is_self=False, permission_object=inboundNode['permissions'])
+                    node.save()
+                else:
+                    node.updateFromNode(inboundNode)
+        else:
+            super(YadaServer, self).updateFromNode(inboundNode)

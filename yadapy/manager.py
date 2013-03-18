@@ -118,13 +118,23 @@ class YadaServer(Node):
     
     def publicKeyLookup(self, public_key):
         nodes = []
-        for node in self.get('data/managed_nodes'):
-            for friend in node['data']['friends']:
+        try:
+            for node in self.get('data/managed_nodes'):
+                for friend in node['data']['friends']:
+                    if public_key == friend['public_key']:
+                        nodes.append(node)
+        except:
+            pass
+        
+        try:
+            for friend in self.get('data/friends'):
                 if public_key == friend['public_key']:
-                    nodes.append(node)
-        for friend in self.get('data/friends'):
-            if public_key == friend['public_key']:
-                nodes.append(self.get())
+                    nodes.append(self.get())
+        except:
+            pass
+        
+        if not nodes:
+            nodes = super(YadaServer, self).publicKeyLookup(public_key)
         return nodes
     
     def getServerData(self):
@@ -355,7 +365,7 @@ class YadaServer(Node):
     
     def handlePromotionRequest(self, packet, public_key):
         managedNodeRelationship = self.publicKeyLookup(public_key)
-        managedNode = self.chooseRelationshipNode(managedNodeRelationship, Node(packet), impersonate=True)
+        managedNode = self.chooseRelationshipNode(managedNodeRelationship, Node(packet))
         managedNode.addPromotionRequest(packet)
         
     def forceJoinNodes(self, sourceNode, destNode):
@@ -391,12 +401,13 @@ class YadaServer(Node):
     def respondWithRelationship(self, inboundNode, impersonate=False):
         inbound = inboundNode.get()
         managedNode = self.getManagedNode(inbound['public_key'])
-        managedNodeRelationship = self.publicKeyLookup(inbound['public_key'])
+        relationship = self.publicKeyLookup(inbound['public_key'])
+        
         node = None
         if managedNode:
             self.syncManagedNode(managedNode, inboundNode)
-        elif managedNodeRelationship:
-            node = self.chooseRelationshipNode(managedNodeRelationship, inboundNode, impersonate)
+        else:
+            node = self.chooseRelationshipNode(relationship, inboundNode, impersonate)
         
         if node and not isinstance(node, YadaServer):
             node = self.getClassInstanceFromNodeForNode(node.get())

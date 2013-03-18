@@ -886,8 +886,10 @@ class Node(object):
         
         m = self.getClassInstanceFromNode()
         
+        if not hasattr(self, 'kwargs'):
+            self.kwargs = {}
         self.kwargs['identityData'] = identity
-        
+            
         try:
             node = m.manager.YadaServer(**self.kwargs)
         except:

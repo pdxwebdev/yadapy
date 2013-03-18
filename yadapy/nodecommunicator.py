@@ -215,9 +215,9 @@ class NodeCommunicator(object):
         packetData = b64decode(packet['data'])
         friend = self.node.getFriend(packet['public_key'])
         if not friend and packet.get('status', None) not in ['FRIEND_REQUEST', "REGISTER_REQUEST"]:
-            raise BaseException("No identity found for packet.")
-        else:
-            node = friend
+            node = self.node.getManagedNode(packet['public_key'])
+            if not node:
+                raise BaseException("No identity found for packet.")
         
         if packet.get('status', None) in ['FRIEND_REQUEST', "REGISTER_REQUEST"]:
             response = self.node.handleFriendRequest(json.loads(packetData))
@@ -261,7 +261,6 @@ class NodeCommunicator(object):
             
             #updating at the median node
             self.node.handleRoutedFriendRequest(decrypted)
-            self.node.add('data/routed_friend_requests', decrypted, True)
             
             #updating the destination
             requestedFriend = self.node.getFriend(decrypted['routed_public_key'])
@@ -279,7 +278,7 @@ class NodeCommunicator(object):
             
         elif packet.get('status', None) == 'MANAGE_REQUEST':
             
-            data = decrypt(node['private_key'], node['private_key'], b64encode(packetData))
+            data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             responseData = self.node.handleManageRequest(json.loads(data))
             responseData = Node(responseData)
             return \
