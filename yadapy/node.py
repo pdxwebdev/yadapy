@@ -888,6 +888,13 @@ class Node(object):
         
         if not hasattr(self, 'kwargs'):
             self.kwargs = {}
+        
+        if 'friends' not in identity['data']:
+            identity['data']['friends'] = []
+        
+        if 'messages' not in identity['data']:
+            identity['data']['messages'] = []
+            
         self.kwargs['identityData'] = identity
             
         try:

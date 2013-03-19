@@ -114,7 +114,10 @@ class Node(BaseNode):
         
     def addPromotionRequest(self, packet):
         self.pushItem('promotion_requests', packet)
-    
+        
+    def addIPAddress(self, ipAddress):
+        self.pushItem('data.identity.ip_address', ipAddress)
+        
     def pushItem(self, path, item):
         try:
             
@@ -132,9 +135,6 @@ class Node(BaseNode):
             return "save ok"
         except:
             raise
-        
-    def addIPAddress(self, ipAddress):
-        self.pushItem('data.identity.ip_address', ipAddress)
     
     def setFriendData(self, friend, data):
         self.setFriendAttribute(friend, 'data', data)
@@ -146,7 +146,7 @@ class Node(BaseNode):
         self.col.update({"data.friends": {"$elemMatch": {"public_key": friend.get('public_key')}}}, {"$set": {"data.friends.$.%s" % path: data}})
     
     def publicKeyLookup(self, public_key):
-        result = self.col.find({"data.friends.public_key" : public_key}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1, 'data.messages': [], 'data.friends': []})
+        result = self.col.find({"data.friends.public_key" : public_key}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1})
         
         if result.count() > 0:
             return result
