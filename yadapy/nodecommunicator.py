@@ -81,7 +81,7 @@ class NodeCommunicator(object):
     def addManager(self, host):
         
         #add the new manager's host address to my ip addresses
-        self.node.add('data/identity/ip_address', self.node.createIPAddress(host))
+        self.node.addIPAddress(self.node.createIPAddress(host))
         
         #save the manager friend to the node
         friendPublicKey = unicode(uuid4())
@@ -91,19 +91,17 @@ class NodeCommunicator(object):
         managerFriendNode.set('private_key', friendPrivateKey)
         managerFriendNode.add('data/identity/ip_address', self.node.createIPAddress(host))
         
+        self.node.addFriend(managerFriendNode.get())
         self.node.add('data/friends', managerFriendNode.get())
-        self.node.save()
-        
+                
         #build the friend request
         meToSend = Node(copy.deepcopy(self.node.get()))
-        meToSend.set('public_key', friendPublicKey)
-        meToSend.set('private_key', friendPrivateKey)
-        
-        managerFriendNode.add('data/friends', meToSend.get())
+        meToSend = self.node.getClassInstanceFromNodeForNode(meToSend.get())
+        meToSend = self.node.respondWithRelationship(copy.deepcopy(managerFriendNode))
         
         responses = []
         #send the friend request to the manager
-        response = self._doRequest(meToSend, managerFriendNode, json.dumps(meToSend.get()), status="FRIEND_REQUEST")
+        response = self._doRequest(meToSend, managerFriendNode, json.dumps(meToSend), status="FRIEND_REQUEST")
         responses.extend(response)
         
         #simply send my entire object to manager
@@ -116,6 +114,7 @@ class NodeCommunicator(object):
                 self.handlePacket(json.loads(response))
             except:
                 logging.debug("failed to handle packet")
+                raise
     
     def sendMessage(self, pub_keys, subject, message, thread_id=None, guid=None):
         self.node.addMessage(self.node.sendMessage(pub_keys, subject, message, thread_id, guid))

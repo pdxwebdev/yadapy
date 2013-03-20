@@ -32,85 +32,36 @@ class Node(BaseNode):
             
         super(Node, self).__init__(*args, **kwargs)
     
-    def matchFriend(self, node):
-        friend = self.db.command(
-            {
-                "aggregate" : "identities", "pipeline" : [
-                    {
-                    "$match" : {
-                        "public_key" : self.get('public_key')
-                        }
-                    },
-                    {
-                    "$match" : {
-                        "data.friends" : {"$not" : { "$size" : 0 }}
-                        }
-                    },
-                    {
-                    "$unwind" : "$data.friends"
-                    },
-                    {
-                    "$match" : {
-                        "data.friends.public_key" : {"$in" : node.getFriendPublicKeysArray()}
-                        }
-                    },
-                    {
-                    "$project" : {
-                        "public_key" : "$data.friends.public_key"
-                        }
-                    },
-                ]
-            })
-        if friend['result']:
-            return self.getFriend(friend['result'][0]['public_key'])
+    def matchFriend(self, friend):
+        keys = self.db.friends.find({"public_key": self.get('public_key'), "friend_public_key" : {"$in": friend.getFriendPublicKeysArray()}}, {'friend_public_key': 1})
+        if keys.count() > 0:
+            return self.getFriend(keys[0]['friend_public_key'])
         else:
             return None
     
     def matchedFriendsPublicKeys(self, friend):
-        keys = self.db.command(
-            {
-                "aggregate" : "identities", "pipeline" : [
-                    {
-                    "$match" : {
-                        "public_key" : self.get('public_key')
-                        }
-                    },
-                    {
-                    "$match" : {
-                        "data.friends" : {"$not" : { "$size" : 0 }}
-                        }
-                    },
-                    {
-                    "$unwind" : "$data.friends"
-                    },
-                    {
-                    "$match" : {
-                        "data.friends.public_key" : {"$in" : friend.getFriendPublicKeysArray()}
-                        }
-                    },
-                    {
-                    "$project" : {
-                        "public_key" : "$data.friends.public_key"
-                        }
-                    },
-                ]
-            })
-        if keys['result']:
-            return keys['result']
+        
+        keys = self.db.friends.find({"public_key": self.get('public_key'), "friend_public_key" : {"$in": friend.getFriendPublicKeysArray()}}, {'friend_public_key': 1})
+            
+        if keys.count() > 0:
+            return keys
         else:
             return None
         
     def addFriend(self, friend):
-        self.pushItem('data.friends', friend)
-    
+        self.db.friends.insert({'public_key': self.get('public_key'), 'friend_public_key': friend['public_key'], 'friend': friend})
+        
     def addMessage(self, message):
-        self.pushItem('data.messages', message)
+        #self.pushItem('data.messages', message)
+        for public_key in message['public_key']:
+            self.db.messages.insert({'public_key': self.get('public_key'), 'friend_public_key': public_key, 'message': message})
         
     def addFriendRequest(self, packet):
         self.pushItem('friend_requests', packet)
         
     def addRoutedFriendRequest(self, packet):
-        self.pushItem('data.routed_friend_requests', packet)
+        #self.pushItem('data.routed_friend_requests', packet)
+        self.db.routed_friend_requests.insert({'public_key': self.get('public_key'), 'routed_public_key': packet['routed_public_key'], 'routed_friend_request': packet})
         
     def addPromotionRequest(self, packet):
         self.pushItem('promotion_requests', packet)
@@ -130,6 +81,11 @@ class Node(BaseNode):
             else:
                 self.col.insert(self.get())
                 del self._data['_id']
+                result = self.col.find({'public_key':self.get('public_key')}, {'_id':1})
+                if type(result[0]['_id']) == type(''):
+                    id = ObjectId(result[0]['_id'])
+                else:
+                    id = result[0]['_id']
             status = self.col.update({'_id':id}, {'$push' : {path: item}})
             status = self.col.update({'_id':id}, {'$set' : {'modified': self.setModifiedToNow()}})
             return "save ok"
@@ -146,51 +102,20 @@ class Node(BaseNode):
         self.col.update({"data.friends": {"$elemMatch": {"public_key": friend.get('public_key')}}}, {"$set": {"data.friends.$.%s" % path: data}})
     
     def publicKeyLookup(self, public_key):
-        result = self.col.find({"data.friends.public_key" : public_key}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1})
+        friends = self.db.friends.find({"friend_public_key" : public_key}, {'public_key': 1})
         
-        if result.count() > 0:
-            return result
-        else:
-            return self.col.find({"public_key" : public_key}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1, 'data.messages': [], 'data.friends': []})
+        if friends.count() > 0:
+            identities = self.col.find({"public_key" : {"$in": [friend['public_key'] for friend in friends]}}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1})
+            if identities.count() > 0:
+                return identities
+            
+        return self.col.find({"public_key" : public_key}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1})
                 
     def getFriend(self, public_key):
-        friend = self.db.command(
-            {
-                "aggregate" : "identities", "pipeline" : [
-                    {
-                        "$match" : {
-                            "public_key" : self.get('public_key')
-                        }
-                    },
-                    {
-                        "$project" : {
-                            "_id" : 0,
-                            "friend" : "$data.friends",
-                            "data" : 0,
-                            "public_key" : 0,
-                            "private_key" : 0,
-                            "modified":0
-                        }
-                    },
-                    {
-                                "$match" : {
-                                    "friend" : {"$not" : { "$size" : 0 }}
-                                    
-                        }
-                    },
-                    {
-                        "$unwind" : "$friend"
-                    },
-                    {
-                        "$match" : {
-                            "friend.public_key" : public_key
-                        }
-                    },
-                ]
-            })
+        friend = self.db.friends.find({'public_key': self.get('public_key'), 'friend_public_key': public_key}, {'friend': 1})
             
-        if friend['result']:
-            return friend['result'][0]['friend']
+        if friend.count() > 0:
+            return friend[0]['friend']
         else:
             return super(Node, self).getFriend(public_key)
         
@@ -349,70 +274,20 @@ class Node(BaseNode):
         return ret
     
     def getMessagesForFriend(self, public_key):
-        friend = self.db.command(
-            {
-                "aggregate" : "identities", "pipeline" : [
-                    {
-                        "$match" : {
-                            "public_key" : self.get('public_key')
-                        }
-                    },
-                    {
-                                "$match" : {
-                                    "data.messages" : {"$not" : { "$size" : 0 }}
-                                    
-                        }
-                    },
-                    {
-                        "$unwind" : "$data.messages"
-                    },
-                    {
-                        "$match" : {
-                            "data.messages.public_key" : public_key
-                        }
-                    },
-                    {
-                        "$project" : {
-                                "message": "$data.messages"
-                        }
-                    },
-                ]
-            })
+        messages = self.db.messages.find({'public_key': self.get('public_key'), 'friend_public_key': public_key})
             
-        if friend['result']:
-            return friend['result']
+        if messages.count() > 0:
+            return [message['message'] for message in messages]
         else:
             return []
 
     def getRoutedFriendRequestsForFriend(self, public_key):
-        friend = self.db.command(
-            {
-                "aggregate" : "identities", "pipeline" : [
-                    {
-                        "$match" : {
-                            "public_key" : self.get('public_key')
-                        }
-                    },
-                    {
-                        "$match" : {
-                            "data.routed_friend_requests" : {"$not" : { "$size" : 0 }}     
-                        }
-                    },
-                    {
-                        "$unwind" : "$data.routed_friend_requests"
-                    },
-                    {
-                        "$match" : {
-                            "data.routed_friend_requests.routed_public_key" : public_key
-                        }
-                    },
-                    {
-                        "$project" : {
-                                "routed_friend_request": "$data.routed_friend_requests"
-                        }
-                    },
-                ]
-            })
+        requests = self.db.routed_friend_requests.find({'public_key': self.get('public_key'), 'routed_public_key': public_key})
+            
+        if requests.count() > 0:
+            return [request['routed_friend_request'] for request in requests]
+        else:
+            return []
             
         if friend['result']:
             return friend['result']
@@ -477,10 +352,11 @@ class Node(BaseNode):
         selfNode.add('data/friends', bogus2.get())
         selfNode.add('data/friends', bogus3.get())
         selfNode.add('data/friends', bogus4.get())
-        selfNode.add('data/friends', friend5)
+        if friend5:
+            selfNode.add('data/friends', friend5)
         
-        selfNode.set('data/messages', [message['message'] for message in self.getMessagesForFriend(friendNode.get('public_key'))])
-        selfNode.set('data/routed_friend_requests', [routed_friend_request['routed_friend_request'] for routed_friend_request in self.getRoutedFriendRequestsForFriend(friendNode.get('public_key'))])
+        selfNode.set('data/messages', self.getMessagesForFriend(friendNode.get('public_key')))
+        selfNode.set('data/routed_friend_requests', self.getRoutedFriendRequestsForFriend(friendNode.get('public_key')))
         
         friendNode.get().update({"data" : selfNode.get('data')})
         friendNode.preventInfiniteNesting(friendNode.get())
@@ -533,9 +409,9 @@ class Node(BaseNode):
                     node._data['data']['friends'] = tempList
                     node._data['modified'] = node._data['modified']
                     
-                    self.setFriendData(node, node.get('data'))
+                    self.db.friends.update({'public_key': self.get('public_key'), "friend_public_key": node.get('public_key')}, {'$set': {"friend.data" : node.get('data'), "friend.modified": node.get('modified')}})
                 else:
-                    pass
+                    raise BaseException("Friend not updated. Old node newer than inbound node.")
         elif self.get('public_key') == node.get('public_key'):
             self.sync(node.get())
             self.save()

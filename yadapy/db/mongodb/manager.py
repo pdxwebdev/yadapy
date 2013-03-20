@@ -135,9 +135,9 @@ class YadaServer(Manager, Node):
         self.col.update({'public_key':self.get('public_key')}, {'$push' : {'data.friends': friend}})
         
     def getFriend(self, public_key):
-        friend = self.getFriendQuery(public_key)
+        friend = self.db.friends.find({'public_key': self.get('public_key'), 'friend_public_key': public_key}, {'friend': 1})
             
-        if friend:
+        if friend.count() > 0:
             return friend[0]['friend']
         else:
             try:
@@ -307,10 +307,10 @@ class YadaServer(Manager, Node):
             intersection = node.matchedFriendsPublicKeys(inboundNode)
             
             if impersonate:
-                if len(intersection) > 1:
+                if intersection.count() > 1:
                     return node
             else:
-                if len(intersection) == 1:
+                if intersection.count() == 1:
                     return node
         
         for pertner in r:
