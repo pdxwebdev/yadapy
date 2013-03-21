@@ -143,7 +143,7 @@ class YadaServer(Manager, Node):
             try:
                 friend = Node({}, {'name': 'temp'})
                 friend.get().update(self.publicKeyLookup(public_key)[0])
-                return friend.getFriendQuery(public_key)[0]['friend']
+                return self.db.friends.find({'public_key': friend.get('public_key'), 'friend_public_key': public_key}, {'friend': 1})[0]['friend']
             except:
                 return []
 
@@ -287,7 +287,7 @@ class YadaServer(Manager, Node):
         
         testNode = Node({}, {'name': 'test node'})
         testNode.get().update(managedNode)
-        if len(testNode.getFriendPublicKeyList()) == 1:
+        if testNode.getFriendPublicKeyList().count() == 1:
             if len(inboundNode.get('data/friends')) == 1:
                 if impersonate:
                     node.get().update(managedNode)

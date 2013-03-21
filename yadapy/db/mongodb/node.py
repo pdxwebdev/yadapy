@@ -64,8 +64,9 @@ class Node(BaseNode):
         self.db.routed_friend_requests.insert({'public_key': self.get('public_key'), 'routed_public_key': packet['routed_public_key'], 'routed_friend_request': packet})
         
     def addPromotionRequest(self, packet):
-        self.pushItem('promotion_requests', packet)
-        
+        #self.pushItem('promotion_requests', packet)
+        self.db.promotion_requests.insert({'public_key': self.get('public_key'), 'promotion_request': packet})
+         
     def addIPAddress(self, ipAddress):
         self.pushItem('data.identity.ip_address', ipAddress)
         
@@ -118,6 +119,15 @@ class Node(BaseNode):
             return friend[0]['friend']
         else:
             return super(Node, self).getFriend(public_key)
+        
+    def getFriends(self, limit=5):
+        friends = self.db.friends.find({'public_key': self.get('public_key')}, {'friend': 1}).limit(limit)
+        
+        if friends.count() > 0:
+            friendList = [friend['friend'] for friend in friends]
+            return friendList
+        else:
+            return super(Node, self).get('data/friends')
         
     def getFriendQuery(self, public_key):
         return self.db.command(
@@ -194,33 +204,12 @@ class Node(BaseNode):
             return friend['result'][0]['friend']
         else:
             return None
-        
+    
+    def getPromotionRequests(self):
+        return self.db.promotion_requests.find({"public_key" : self.get('public_key')}, {"promotion_request" : 1})
+    
     def getFriendPublicKeyList(self):
-        return self.db.command(
-        {
-            "aggregate" : "identities", "pipeline" : [
-            {
-                "$match" : {
-                    "public_key" : self.get('public_key')
-                }
-            },
-            {
-                        "$match" : {
-                            "data.friends" : {"$not" : { "$size" : 0 }}
-                            
-                }
-            },
-            {
-            "$unwind" : "$data.friends"
-            },
-            {
-                "$project" : {
-                    "public_key" : "$data.friends.public_key",
-                    "_id" : 0
-                }
-            }
-            ]
-        })['result']
+        return self.db.friends.find({"public_key" : self.get('public_key')}, {"friend_public_key" : 1})
     
     def getFriendTopLevelMeta(self, public_key):
         return self.db.command(
@@ -340,21 +329,19 @@ class Node(BaseNode):
         returns dictionary
         """
         #TODO: apply permissions to dictionary for this relationship
-        bogus1 = Node({}, {'name': 'bogus 1'})
-        bogus2 = Node({}, {'name': 'bogus 2'})
-        bogus3 = Node({}, {'name': 'bogus 3'})
-        bogus4 = Node({}, {'name': 'bogus 4'})
+        
+        selfNode = Node({}, self.get('data/identity'))
+        
+        friendList = self.getFriends(5)
+        if friendList:
+            [selfNode.add('data/friends', friend) for friend in friendList]
         
         friend5 = self.getFriend(friendNode.get('public_key'))
         
-        selfNode = Node({}, self.get('data/identity'))
-        selfNode.add('data/friends', bogus1.get())
-        selfNode.add('data/friends', bogus2.get())
-        selfNode.add('data/friends', bogus3.get())
-        selfNode.add('data/friends', bogus4.get())
-        if friend5:
+        pubKeyList = [key['public_key'] for key in selfNode.get('data/friends')]
+        if not friend5['public_key'] in pubKeyList:
             selfNode.add('data/friends', friend5)
-        
+                        
         selfNode.set('data/messages', self.getMessagesForFriend(friendNode.get('public_key')))
         selfNode.set('data/routed_friend_requests', self.getRoutedFriendRequestsForFriend(friendNode.get('public_key')))
         

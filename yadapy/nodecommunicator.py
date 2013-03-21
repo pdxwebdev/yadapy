@@ -82,6 +82,7 @@ class NodeCommunicator(object):
         
         #add the new manager's host address to my ip addresses
         self.node.addIPAddress(self.node.createIPAddress(host))
+        self.node.add('data/identity/ip_address', self.node.createIPAddress(host))
         
         #save the manager friend to the node
         friendPublicKey = unicode(uuid4())
@@ -166,7 +167,9 @@ class NodeCommunicator(object):
         newFriend = Node({}, {'name':'Just created for the new keys'})
         
         selectedFriend = Node({}, {"name" : "new friend"})
+                
         sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
+        sourceNodeCopy.add('data/friends', selectedFriend.get())
         sourceNodeCopy.set('routed_public_key', destinationPublicKey, True)
 
         selectedFriend.set('routed_public_key', destinationPublicKey, True)
@@ -175,6 +178,10 @@ class NodeCommunicator(object):
         selectedFriend.setModifiedToNow()
         selectedFriend.set('source_indexer_key', destNode.get('public_key'), True)
         
+        self.node.addFriend(selectedFriend.get())
+        self.node.add('data/friends', selectedFriend.get())
+        self.updateRelationship(destNode)
+        
         sourceNodeCopy.set('public_key', newFriend.get('public_key'))
         sourceNodeCopy.set('private_key', newFriend.get('private_key'))
         
@@ -182,8 +189,6 @@ class NodeCommunicator(object):
         sourceNodeCopy.replaceIdentityOfFriendsWithPubKeys()
         
         data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(sourceNodeCopy.get())))
-        
-        self.node.addFriend(selectedFriend.get())
         
         return self._doRequest(destNode, destNode, data, status="ROUTED_FRIEND_REQUEST")
         
@@ -216,6 +221,7 @@ class NodeCommunicator(object):
         if not friend and packet.get('status', None) not in ['FRIEND_REQUEST', "REGISTER_REQUEST"]:
             node = self.node.getManagedNode(packet['public_key'])
             if not node:
+                friend = self.node.getFriend(packet['public_key'])
                 raise BaseException("No identity found for packet.")
         
         if packet.get('status', None) in ['FRIEND_REQUEST', "REGISTER_REQUEST"]:
