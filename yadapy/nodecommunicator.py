@@ -92,7 +92,6 @@ class NodeCommunicator(object):
         managerFriendNode.set('private_key', friendPrivateKey)
         managerFriendNode.add('data/identity/ip_address', self.node.createIPAddress(host))
         
-        self.node.addFriend(managerFriendNode.get())
         self.node.add('data/friends', managerFriendNode.get())
                 
         #build the friend request

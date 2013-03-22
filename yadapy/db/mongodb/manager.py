@@ -65,6 +65,9 @@ class YadaServer(Manager, Node):
     def addManagedNode(self, data):
         try:
             node = Node(data)
+            for friend in node.get('data/friends'):
+                node.addFriend(friend)
+            node.set('data/friends', [])
             self.col.insert(node.get())
             return "ok"
         except:
