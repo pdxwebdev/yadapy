@@ -359,8 +359,8 @@ class YadaServer(Node):
         return self.respondWithRelationship(friendRequest)
     
     def handleManageRequest(self, packet):
-        self.addManagedNode(packet)
         node = Node(self.matchFriend(Node(packet)))
+        self.addManagedNode(packet)
         return self.respondWithRelationship(node)
     
     def handlePromotionRequest(self, packet, public_key):
