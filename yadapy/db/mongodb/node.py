@@ -55,6 +55,9 @@ class Node(BaseNode):
         #self.pushItem('data.messages', message)
         for public_key in message['public_key']:
             self.db.messages.insert({'public_key': self.get('public_key'), 'friend_public_key': public_key, 'message': message})
+            
+    def addStatus(self, status):
+        self.db.status.insert({'public_key': self.get('public_key'), 'status': status})
         
     def addFriendRequest(self, packet):
         self.pushItem('friend_requests', packet)
