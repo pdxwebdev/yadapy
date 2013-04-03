@@ -280,12 +280,16 @@ class Node(BaseNode):
             return [request['routed_friend_request'] for request in requests]
         else:
             return []
+        
+    def getStatusesForFriend(self, public_key):
+        #TODO: use public key for some possible filtering
+        statuses = self.db.status.find({'public_key': self.get('public_key')})
             
-        if friend['result']:
-            return friend['result']
+        if statuses.count() > 0:
+            return [status['status'] for status in statuses]
         else:
             return []
- 
+        
     def save(self):
         try:
             super(Node, self).save()
@@ -347,6 +351,7 @@ class Node(BaseNode):
                         
         selfNode.set('data/messages', self.getMessagesForFriend(friendNode.get('public_key')))
         selfNode.set('data/routed_friend_requests', self.getRoutedFriendRequestsForFriend(friendNode.get('public_key')))
+        selfNode.set('data/status', self.getStatusesForFriend(friendNode.get('public_key')))
         
         friendNode.get().update({"data" : selfNode.get('data')})
         friendNode.preventInfiniteNesting(friendNode.get())

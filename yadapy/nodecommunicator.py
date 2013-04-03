@@ -202,7 +202,9 @@ class NodeCommunicator(object):
         
         data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(dictToSend)))
         
-        self._doRequest(sourceNodeCopy, destNode, data, method="GET")
+        responses = self._doRequest(sourceNodeCopy, destNode, data, method="GET")
+        for response in responses:
+            self.handlePacket(json.loads(response))
 
     def grantPromotion(self, destNode):
         destNodeCopyNode = Node(copy.deepcopy(destNode.get()))
