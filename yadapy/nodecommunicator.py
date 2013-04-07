@@ -41,8 +41,6 @@ class NodeCommunicator(object):
         return responses
     
     def _internetRequest(self, host, port, dataToSend):
-        s = requests.session()
-        s.config['keep_alive'] = False
         response = requests.post("http://" + host + ":" + str(port) + "/", data={'data': dataToSend})
         return response.content
         
