@@ -174,6 +174,7 @@ class NodeCommunicator(object):
         selectedFriend.set('private_key', newFriend.get('private_key'))
         selectedFriend.setModifiedToNow()
         selectedFriend.set('source_indexer_key', destNode.get('public_key'), True)
+        selectedFriend.set('data/identity/ip_address', destNode.get('data/identity/ip_address'), True)
         
         self.node.addFriend(selectedFriend.get())
         self.node.add('data/friends', selectedFriend.get())
