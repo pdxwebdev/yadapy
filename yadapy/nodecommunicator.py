@@ -159,11 +159,11 @@ class NodeCommunicator(object):
         except:
             print "Friend does not auto approve friend requests. There was no response from friend request."
 
-    def routeRequestThroughNode(self, destNode, destinationPublicKey, name='new friend'):
+    def routeRequestThroughNode(self, destNode, destinationPublicKey, name='new friend', avatar=''):
         
         newFriend = Node({}, {'name':'Just created for the new keys'})
         
-        selectedFriend = Node({}, {"name" : name})
+        selectedFriend = Node({}, {"name" : name, 'avatar': avatar})
                 
         sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
         sourceNodeCopy.add('data/friends', selectedFriend.get())
