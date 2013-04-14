@@ -124,7 +124,7 @@ class Node(BaseNode):
             return super(Node, self).getFriend(public_key)
         
     def getFriends(self, limit=5):
-        friends = self.db.friends.find({'public_key': self.get('public_key')}, {'friend': 1}).limit(limit)
+        friends = self.db.friends.find({'public_key': self.get('public_key')}, {'friend': 1})
         
         if friends.count() > 0:
             friendList = [friend['friend'] for friend in friends]
