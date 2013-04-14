@@ -339,7 +339,7 @@ class Node(BaseNode):
         
         selfNode = Node({}, self.get('data/identity'))
         
-        friendList = self.getFriends(5)
+        friendList = self.getFriends(25)
         if friendList:
             [selfNode.add('data/friends', friend) for friend in friendList]
         
@@ -399,6 +399,8 @@ class Node(BaseNode):
                                     tempDict['data']['identity'] = {}
                                     tempDict['data']['identity']['name'] = x['data']['identity']['name']
                                     tempDict['data']['identity']['ip_address'] = x['data']['identity']['ip_address']
+                                    if 'avatar' in x['data']['identity']:
+                                        tempDict['data']['identity']['avatar'] = x['data']['identity']['avatar']
                         tempList.append(tempDict)
                         
                     node._data['data']['friends'] = tempList

@@ -370,6 +370,8 @@ class Node(object):
                                     tempDict['data']['identity'] = {}
                                     tempDict['data']['identity']['name'] = x['data']['identity']['name']
                                     tempDict['data']['identity']['ip_address'] = x['data']['identity']['ip_address']
+                                    if 'avatar' in x['data']['identity']:
+                                        tempDict['data']['identity']['avatar'] = x['data']['identity']['avatar']
                         tempList.append(tempDict)
                     friend._data['data']['friends'] = tempList
                     friend._data['modified'] = node._data['modified']
@@ -446,6 +448,8 @@ class Node(object):
                             tempDict['data']['identity'] = {}
                             tempDict['data']['identity']['name'] = friend['data']['identity']['name']
                             tempDict['data']['identity']['ip_address'] = friend['data']['identity']['ip_address']
+                            if 'avatar' in friend['data']['identity']:
+                                tempDict['data']['identity']['avatar'] = friend['data']['identity']['avatar']
                         except:
                             continue
             tempList.append(tempDict)
