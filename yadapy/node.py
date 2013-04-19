@@ -110,7 +110,7 @@ class Node(object):
                 entity = entity[el]
             return entity
         except KeyError:
-            logging.critical("Path '%s' is invalid for this identity" % path)
+            logging.debug("Path '%s' is invalid for this identity" % path)
             raise
         except:
             raise
