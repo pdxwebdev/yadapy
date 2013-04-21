@@ -38,6 +38,13 @@ class Node(BaseNode):
             return self.getFriend(keys[0]['friend_public_key'])
         else:
             return None
+        
+    def matchAnyFriend(self, friend):
+        keys = self.db.friends.find({"friend_public_key" : {"$in": friend.getFriendPublicKeysArray()}}, {'friend_public_key': 1})
+        if keys.count() > 0:
+            return self.getFriend(keys[0]['friend_public_key'])
+        else:
+            return None
     
     def matchedFriendsPublicKeys(self, friend):
         
