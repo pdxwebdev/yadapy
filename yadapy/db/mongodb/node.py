@@ -399,7 +399,8 @@ class Node(BaseNode):
                                     tempDict['data']['identity'] = {}
                                     tempDict['data']['identity']['name'] = x['data']['identity']['name']
                                     tempDict['data']['identity']['ip_address'] = x['data']['identity']['ip_address']
-                                    tempDict['data']['status'] = x['data']['status'][:10]
+                                    if 'status' in x['data']:
+                                        tempDict['data']['status'] = x['data']['status'][:10]
                                     if 'avatar' in x['data']['identity']:
                                         tempDict['data']['identity']['avatar'] = x['data']['identity']['avatar']
                         tempList.append(tempDict)
