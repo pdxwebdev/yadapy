@@ -399,6 +399,13 @@ class Node(BaseNode):
                     for x in node._data['data']['friends']:
                         tempDict = {} 
                         tempDict['public_key'] = x['public_key']
+            
+                        if x.get('source_indexer_key', None):
+                            tempDict['source_indexer_key'] = x['source_indexer_key']
+                        
+                        if x.get('routed_public_key', None):
+                            tempDict['routed_public_key'] = x['routed_public_key']
+                            
                         if 'data' in x:
                             if 'identity' in x['data']:
                                 if 'name' in x['data']['identity']:

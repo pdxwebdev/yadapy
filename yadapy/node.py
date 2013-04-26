@@ -440,6 +440,13 @@ class Node(object):
             self._data['data']['friends'][i] = {'public_key' : friend['public_key']}
             tempDict = {} 
             tempDict['public_key'] = friend['public_key']
+            
+            if friend.get('source_indexer_key', None):
+                tempDict['source_indexer_key'] = friend['source_indexer_key']
+            
+            if friend.get('routed_public_key', None):
+                tempDict['routed_public_key'] = friend['routed_public_key']
+                
             if 'data' in friend:
                 if 'identity' in friend['data']:
                     if 'name' in friend['data']['identity']:
