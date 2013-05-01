@@ -131,13 +131,36 @@ class Node(BaseNode):
             return super(Node, self).getFriend(public_key)
         
     def getFriends(self, limit=5):
-        friends = self.db.friends.find({'public_key': self.get('public_key')}, {'friend': 1}).sort('friend.data.status.timestamp', -1).limit(limit)
+        friends = self.db.friends.find(
+            {
+                'public_key': self.get('public_key'),
+                'friend_public_key': {
+                    '$not': {
+                        '$in': self.getRoutedPublicKeysAndSourceIndexerKeys()
+                    }
+                }
+            }, 
+            {
+                'friend': 1
+            }
+        ).sort('friend.data.status.timestamp', -1).limit(limit)
         
         if friends.count() > 0:
             friendList = [friend['friend'] for friend in friends]
             return friendList
         else:
             return super(Node, self).get('data/friends')
+        
+    def getIndexerFriends(self):
+        indexerFriends = self.db.friends.find(
+            {
+                'public_key': self.get('public_key'), 
+                'friend_public_key': {
+                    '$in': self.getRoutedPublicKeysAndSourceIndexerKeys()
+                }
+            }
+        )
+        return [friend['friend'] for friend in indexerFriends]
         
     def getFriendQuery(self, public_key):
         return self.db.command(
@@ -296,6 +319,18 @@ class Node(BaseNode):
             return [status['status'] for status in statuses]
         else:
             return []
+
+    def getRoutedPublicKeysAndSourceIndexerKeys(self):
+        routedPublicKeysAndSourceIndexerKeys = self.db.friends.find({'public_key': self.get('public_key'), 'friend.routed_public_key': {'$exists': True}, 'friend.source_indexer_key': {'$exists': True}}, {'friend.routed_public_key': 1, 'friend.source_indexer_key': 1, '_id': 0})
+            
+        if routedPublicKeysAndSourceIndexerKeys.count() > 0:
+            friends = [routedPublicKeyAndSourceIndexerKey['friend'] for routedPublicKeyAndSourceIndexerKey in routedPublicKeysAndSourceIndexerKeys]
+            keys = []
+            keys.extend([friend['routed_public_key'] for friend in friends])
+            keys.extend([friend['source_indexer_key'] for friend in friends])
+            return keys
+        else:
+            return []
         
     def save(self):
         try:
@@ -346,7 +381,11 @@ class Node(BaseNode):
         
         selfNode = Node({}, self.get('data/identity'))
         
-        friendList = self.getFriends(25)
+        indexerList = self.getIndexerFriends()
+        if indexerList:
+            [selfNode.add('data/friends', indexer) for indexer in indexerList]
+            
+        friendList = self.getFriends(15)
         if friendList:
             [selfNode.add('data/friends', friend) for friend in friendList]
         
@@ -355,7 +394,7 @@ class Node(BaseNode):
         pubKeyList = [key['public_key'] for key in selfNode.get('data/friends')]
         if not friend5['public_key'] in pubKeyList:
             selfNode.add('data/friends', friend5)
-                        
+
         selfNode.set('data/messages', self.getMessagesForFriend(friendNode.get('public_key')))
         selfNode.set('data/routed_friend_requests', self.getRoutedFriendRequestsForFriend(friendNode.get('public_key')))
         selfNode.set('data/status', self.getStatusesForFriend(friendNode.get('public_key')))
