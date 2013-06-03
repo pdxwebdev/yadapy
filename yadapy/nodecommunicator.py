@@ -273,6 +273,14 @@ class NodeCommunicator(object):
             
             #updating the destination
             requestedFriend = self.node.getFriend(decrypted['routed_public_key'])
+            if not requestedFriend:
+                requestedFriend = self.node.getFriendBySourceIndexerKey(decrypted['routed_public_key'])
+                if not requestedFriend:
+                    return \
+                        {
+                            "status" : "404"
+                        }  
+                
             requestedFriendNode = self.node.getClassInstanceFromNodeForNode(requestedFriend)
             self.updateRelationship(requestedFriendNode)
             

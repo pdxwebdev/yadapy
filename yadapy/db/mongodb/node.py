@@ -116,11 +116,11 @@ class Node(BaseNode):
         friends = self.db.friends.find({"friend_public_key" : public_key}, {'public_key': 1})
         
         if friends.count() > 0:
-            identities = self.col.find({"public_key" : {"$in": [friend['public_key'] for friend in friends]}}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1})
+            identities = self.col.find({"public_key" : {"$in": [friend['public_key'] for friend in friends]}}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1, 'data.messages': 1, 'data.status': 1})
             if identities.count() > 0:
                 return identities
             
-        return self.col.find({"public_key" : public_key}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1})
+        return self.col.find({"public_key" : public_key}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1, 'data.messages': 1, 'data.status': 1})
                 
     def getFriend(self, public_key):
         friend = self.db.friends.find({'public_key': self.get('public_key'), 'friend_public_key': public_key}, {'friend': 1})
@@ -145,6 +145,14 @@ class Node(BaseNode):
             return friendList
         else:
             return super(Node, self).get('data/friends')
+        
+    def getFriendBySourceIndexerKey(self, public_key):
+        friend = self.db.friends.find({'public_key': self.get('public_key'), 'friend.data.friends.source_indexer_key': public_key}, {'friend': 1})
+            
+        if friend.count() > 0:
+            return friend[0]['friend']
+        else:
+            return []
         
     def getIndexerFriends(self):
         indexerFriends = self.db.friends.find(
@@ -469,6 +477,15 @@ class Node(BaseNode):
                             
                 if not 'modified' in friend.get() or float(friend.get('modified')) < float(node.get('modified')):
                     #we're going to directly set this element because we want to retain the modified time
+                    
+                    selfInFriend = {}
+                    if node and 'data' in node.get() and 'friends' in node.get('data'):
+                        for f in node.get('data/friends'):
+                            if f['public_key'] == node.get('public_key'):
+                                selfInFriend = f
+                                break
+                            
+                    self.sync(selfInFriend)
                     
                     if "web_token" in node.get():
                         self.setFriendWebToken(node, node.get('web_token'))

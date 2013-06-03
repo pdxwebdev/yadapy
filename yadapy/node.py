@@ -184,6 +184,7 @@ class Node(object):
                 array.append(assignment)
             
         self.set(path, array, create)
+        self.setModifiedToNow()
 
     def delKey(self, path="", assignment=""):
         """
@@ -400,7 +401,7 @@ class Node(object):
         self.set('modified', self.newTimeStamp(), force=True)
                 
     def stripIdentityAndFriendsForProtocolV1(self, node=None):
-        self.replaceIdentityOfFriendsWithPubKeys()
+        self.replaceIdentityOfFriendsWithPubKeys(node)
         if node:
             self.stripIdentityOfIrrelevantMessages(node)
             self.stripIdentityOfIrrelevantFriendRequests(node)
@@ -434,7 +435,7 @@ class Node(object):
                 messageList.append(message)
         self.set('data/messages', messageList)
         
-    def replaceIdentityOfFriendsWithPubKeys(self):
+    def replaceIdentityOfFriendsWithPubKeys(self, node = None):
         tempList = []
         for i, friend in enumerate(self.get('data/friends')):
             self._data['data']['friends'][i] = {'public_key' : friend['public_key']}
@@ -459,6 +460,13 @@ class Node(object):
                                 tempDict['data']['status'] = friend['data']['status'][:10]
                             if 'avatar' in friend['data']['identity']:
                                 tempDict['data']['identity']['avatar'] = friend['data']['identity']['avatar']
+                            
+                            try:
+                                if node and node.get('public_key') == friend['public_key']:
+                                    tempDict['data']['messages'] = friend['data']['messages']
+                                    tempDict['data']['status'] = friend['data']['status']
+                            except:
+                                pass
                         except:
                             continue
             tempList.append(tempDict)
@@ -478,14 +486,19 @@ class Node(object):
 
     def preventInfiniteNesting(self, newFriendNode):
         node = Node(newFriendNode)
+        selfInFriend = self.getSelfInFriend(node)
+        if selfInFriend:
+            selfInFriend['data'] = {}
+        
+    def getSelfInFriend(self, node):
         #DELTE MYSELF FROM FRIEND TO AVOID ENDLESS LOOP
         i=0
         friend = node.getFriend(node.get('public_key'))
         if friend and 'data' in friend and 'friends' in friend['data']:
             for f in friend['data']['friends']:
                 if f['public_key'] == friend['public_key']:
-                    f['data'] = {}
-        
+                    return f
+
     def base64DecodeMessages(self):
         for index, message in enumerate(self.get('data/messages')):
             if 'message' in message:
@@ -695,10 +708,14 @@ class Node(object):
                                 if not is_self:
                                     if 'C' in permission_object_ref:
                                         newList.append(item)
+                                        if key == 'messages':
+                                            self.addMessage(item)
                                         if not key_name=='guid':
                                             self.updateStatus(internal,key,item[key_name], "new")
                                 else:
                                     newList.append(item)
+                                    if key == 'messages':
+                                        self.addMessage(item)
                                     if not key_name=='guid':
                                         self.updateStatus(internal,key,item[key_name], "new")
                         for item in newList:
