@@ -452,7 +452,7 @@ class Node(BaseNode):
         friendNode.setModifiedToNow()
         return friendNode.get()
     
-    def updateFromNode(self, inboundNode, impersonate=False):
+    def updateFromNode(self, inboundNode, impersonate=False, preserve_key=None):
         """
         inboundNode is an Node instance of a friend of self and used to update the information
         for that friend in your friends list.
@@ -484,8 +484,10 @@ class Node(BaseNode):
                             if f['public_key'] == node.get('public_key'):
                                 selfInFriend = f
                                 break
-                            
-                    self.sync(selfInFriend)
+                    try:
+                        self.sync(selfInFriend, is_self = False, permission_object = node.get('permissions'))
+                    except:
+                        pass
                     
                     if "web_token" in node.get():
                         self.setFriendWebToken(node, node.get('web_token'))
@@ -512,6 +514,10 @@ class Node(BaseNode):
                                         tempDict['data']['status'] = x['data']['status'][:10]
                                     if 'avatar' in x['data']['identity']:
                                         tempDict['data']['identity']['avatar'] = x['data']['identity']['avatar']
+                                    
+                                    if x['public_key'] == preserve_key:
+                                        tempDict = x
+                                        
                         tempList.append(tempDict)
                         
                     node._data['data']['friends'] = tempList

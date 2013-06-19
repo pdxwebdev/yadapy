@@ -581,6 +581,7 @@ class MongoApi(object):
         node.set('data/friends', node.getFriends(), True)
         nodeComm = NodeCommunicator(node)
         serverNode = Node(public_key = Node._data['public_key'])
+        serverNodeComm = NodeCommunicator(serverNode)
         
         matchedFriend = serverNode.matchFriend(node)
         
@@ -595,10 +596,9 @@ class MongoApi(object):
         
         friendTest = Node.db.friends.find({'public_key': data['public_key'], 'friend.routed_public_key': decrypted['routed_public_key']})
         if friendTest.count() == 0:
-            nodeComm.routeRequestThroughNode(serverFriendNode, decrypted['routed_public_key'], decrypted.get('name', decrypted['routed_public_key']), decrypted.get('avatar', ''))
-            Node.db.friends.update({'public_key': data['public_key'], 'friend.routed_public_key': decrypted['routed_public_key']}, {"$set": {"friend.subscribed": "*"}})
-            friend = Node.db.friends.find({'public_key': data['public_key'], 'friend.routed_public_key': decrypted['routed_public_key']})
-            return {"status": "request sent", "friend": friend[0]['friend']}
+            friend = serverNodeComm.routeRequestForNode(node, decrypted['routed_public_key'], decrypted.get('name', decrypted['routed_public_key']), decrypted.get('avatar', ''))
+
+            return {"status": "request sent", "friend": friend}
         return {"status": "already friends"}
 
     def postMessage(self, data, decrypted):
@@ -715,6 +715,7 @@ def friendUpdater(data, decrypted):
         friend = friend['friend']
         friend['data']['friends'] = []
         friend['data']['messages'] = []
+        friend['modified'] = 0
         friendNode = Node(friend)
         try:
             nodeComm.updateRelationship(friendNode)

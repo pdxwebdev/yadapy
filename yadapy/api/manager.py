@@ -5,9 +5,9 @@ from pymongo import Connection
 from base64 import b64encode, b64decode
 from yadapy.db.mongodb.node import Node
 from yadapy.db.mongodb.manager import YadaServer
-from yadapy.nodecommunicator import NodeCommunicator
+from yadapy.managercommunicator import ManagerCommunicator
 from yadapy.db.mongodb.lib.jsonencoder import MongoEncoder
-from yadapy.api.node import MongoApi
+from node import MongoApi
 settings = __import__(os.getenv('DJANGO_SETTINGS_MODULE'), globals(), locals(), ['settings', 'prod'], -1)
 
 
@@ -20,7 +20,7 @@ class MongoApiManager(MongoApi):
     
         node = Node(public_key=data['public_key'])
         node.set('data/friends', node.getFriends(), True)
-        nodeComm = NodeCommunicator(node)
+        nodeComm = ManagerCommunicator(node)
         serverFriend = Node(node.getFriend(settings.node.matchFriend(node)['public_key']))
         friendTest = Node.db.friends.find({'public_key': data['public_key'], 'friend.routed_public_key': decrypted['routed_public_key']})
         if friendTest.count() == 0:

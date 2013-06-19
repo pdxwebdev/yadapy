@@ -159,35 +159,36 @@ class NodeCommunicator(object):
         except:
             print "Friend does not auto approve friend requests. There was no response from friend request."
 
-    def routeRequestThroughNode(self, destNode, destinationPublicKey, name='new friend', avatar=''):
+    def routeRequestForNode(self, destNode, destinationPublicKey, name='new friend', avatar=''):
         
         newFriend = Node({}, {'name':'Just created for the new keys'})
         
-        selectedFriend = Node({}, {"name" : name, 'avatar': avatar})
-                
-        sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
-        sourceNodeCopy.add('data/friends', selectedFriend.get())
-        sourceNodeCopy.set('routed_public_key', destinationPublicKey, True)
-
+        selectedFriend = Node(self.node.getFriend(destinationPublicKey))
         selectedFriend.set('routed_public_key', destinationPublicKey, True)
         selectedFriend.set('public_key', newFriend.get('public_key'))
         selectedFriend.set('private_key', newFriend.get('private_key'))
         selectedFriend.setModifiedToNow()
         selectedFriend.set('source_indexer_key', destNode.get('public_key'), True)
         
-        self.node.addFriend(selectedFriend.get())
-        self.node.add('data/friends', selectedFriend.get())
+        destNode.add('data/friends', selectedFriend.get())
+        
+        sourceNodeCopy = Node(copy.deepcopy(destNode.get()))
+        sourceNodeCopy.set('routed_public_key', destinationPublicKey, True)
+        sourceNodeCopy.set('source_indexer_key', destNode.get('public_key'), True)
+        
+        
+        data = b64decode(encrypt(destNode.get('private_key'), 
+                                 destNode.get('private_key'), 
+                                 json.dumps(sourceNodeCopy.get())))
+        
+        self.node.updateFromNode(destNode.get(), preserve_key=selectedFriend.get('public_key'))
         self.updateRelationship(destNode)
         
-        sourceNodeCopy.set('public_key', newFriend.get('public_key'))
-        sourceNodeCopy.set('private_key', newFriend.get('private_key'))
+        packet = self._buildPacket(destNode, destNode, data, status="ROUTED_FRIEND_REQUEST")
         
-        sourceNodeCopy.set('source_indexer_key', destNode.get('public_key'), True)
-        sourceNodeCopy.replaceIdentityOfFriendsWithPubKeys()
+        self.handlePacket(json.loads(packet))
         
-        data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(sourceNodeCopy.get())))
-        
-        return self._doRequest(destNode, destNode, data, status="ROUTED_FRIEND_REQUEST")
+        return selectedFriend.get()
         
     def updateRelationship(self, destNode):
         destNodeCopyNode = Node(copy.deepcopy(destNode.get()))

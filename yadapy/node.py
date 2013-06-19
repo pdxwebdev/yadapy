@@ -438,7 +438,7 @@ class Node(object):
     def replaceIdentityOfFriendsWithPubKeys(self, node = None):
         tempList = []
         for i, friend in enumerate(self.get('data/friends')):
-            self._data['data']['friends'][i] = {'public_key' : friend['public_key']}
+            
             tempDict = {} 
             tempDict['public_key'] = friend['public_key']
             
@@ -463,8 +463,7 @@ class Node(object):
                             
                             try:
                                 if node and node.get('public_key') == friend['public_key']:
-                                    tempDict['data']['messages'] = friend['data']['messages']
-                                    tempDict['data']['status'] = friend['data']['status']
+                                    tempDict = friend
                             except:
                                 pass
                         except:
@@ -601,6 +600,8 @@ class Node(object):
         
         returns void
         """
+        if 'friends' not in self.get('data'):
+            self._data['data']['friends'] = []
         self._updateTree(self.get(), inbound, is_self, permission_object)
         
 
@@ -710,12 +711,16 @@ class Node(object):
                                         newList.append(item)
                                         if key == 'messages':
                                             self.addMessage(item)
+                                        elif key == 'friends':
+                                            self.addFriend(item)
                                         if not key_name=='guid':
                                             self.updateStatus(internal,key,item[key_name], "new")
                                 else:
                                     newList.append(item)
                                     if key == 'messages':
                                         self.addMessage(item)
+                                    elif key == 'friends':
+                                        self.addFriend(item)
                                     if not key_name=='guid':
                                         self.updateStatus(internal,key,item[key_name], "new")
                         for item in newList:
