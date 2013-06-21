@@ -356,11 +356,11 @@ class YadaServer(Node):
         else:
             self.addFriend(copy.deepcopy(friendRequest.get()))
             logging.debug('added new friend to friends list')
-        return self.respondWithRelationship(friendRequest)
+        return super(YadaServer, self).respondWithRelationship(friendRequest)
     
     def handleManageRequest(self, packet):
         node = Node(self.matchFriend(Node(packet)))
-        self.addManagedNode(packet)
+        self.addManagedNode(packet, node)
         return self.respondWithRelationship(node)
     
     def handlePromotionRequest(self, packet, public_key):

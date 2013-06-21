@@ -20,11 +20,6 @@ class Node(BaseNode):
             self.host = kwargs['host'] 
         if 'port' in kwargs:
             self.port = kwargs['port']
-        
-        if not self.conn:
-            self.conn = Connection(self.host, self.port)
-            self.db = self.conn.yadaserver
-            self.col = self.db.identities
 
         if 'public_key' in kwargs:
             args = [x for x in args]
@@ -111,16 +106,6 @@ class Node(BaseNode):
 
     def setFriendAttribute(self, friend, path, data):
         self.col.update({"data.friends": {"$elemMatch": {"public_key": friend.get('public_key')}}}, {"$set": {"data.friends.$.%s" % path: data}})
-    
-    def publicKeyLookup(self, public_key):
-        friends = self.db.friends.find({"friend_public_key" : public_key}, {'public_key': 1})
-        
-        if friends.count() > 0:
-            identities = self.col.find({"public_key" : {"$in": [friend['public_key'] for friend in friends]}}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1, 'data.messages': 1, 'data.status': 1})
-            if identities.count() > 0:
-                return identities
-            
-        return self.col.find({"public_key" : public_key}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1, 'data.messages': 1, 'data.status': 1})
                 
     def getFriend(self, public_key):
         friend = self.db.friends.find({'public_key': self.get('public_key'), 'friend_public_key': public_key}, {'friend': 1})
@@ -329,6 +314,9 @@ class Node(BaseNode):
         ret['_id'] = str(ret['_id'])
         return ret
     
+    def getIdentity(self):
+        return self.db.identities.find({'public_key': self.get('public_key')}, {'data.identity': 1, "_id": 0})[0]['data']['identity']
+        
     def getMessagesForFriend(self, public_key):
         messages = self.db.messages.find({'public_key': self.get('public_key'), 'friend_public_key': public_key})
             
@@ -413,7 +401,7 @@ class Node(BaseNode):
         """
         #TODO: apply permissions to dictionary for this relationship
         
-        selfNode = Node({}, self.get('data/identity'))
+        selfNode = Node({}, self.getIdentity())
         
         indexerList = self.getIndexerFriends()
         if len(indexerList) > 1:

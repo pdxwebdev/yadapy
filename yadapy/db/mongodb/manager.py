@@ -62,12 +62,13 @@ class YadaServer(Manager, Node):
         else:
             return False
         
-    def addManagedNode(self, data):
+    def addManagedNode(self, data, friendNode):
         try:
             node = Node(data)
             for friend in node.get('data/friends'):
                 node.addFriend(friend)
             node.set('data/friends', [])
+            self.db.managed.insert({'managed_public_key': node.get('public_key'), 'friend_public_key': friendNode.get('public_key')})
             self.col.insert(node.get())
             return "ok"
         except:
@@ -149,7 +150,28 @@ class YadaServer(Manager, Node):
                 return self.db.friends.find({'public_key': friend.get('public_key'), 'friend_public_key': public_key}, {'friend': 1})[0]['friend']
             except:
                 return []
-
+            
+    def publicKeyLookup(self, public_key):
+        friends = self.db.friends.find({"friend_public_key" : public_key}, {'public_key': 1})
+        
+        if friends.count() > 0:
+            identities = self.col.find({
+                                        "public_key" : {"$in": [friend['public_key'] for friend in friends]}
+                                        }, 
+                                       { 
+                                        'public_key': 1, 
+                                        'private_key': 1, 
+                                        "_id": 0, 
+                                        'data.identity': 1, 
+                                        'data.messages': 1, 
+                                        'data.status': 1
+                                        }
+                                       )
+            if identities.count() > 0:
+                return identities
+            
+        return self.col.find({"public_key" : public_key}, {'public_key': 1, 'private_key': 1, "_id": 0, 'data.identity': 1, 'data.messages': 1, 'data.status': 1})
+    
     def getFriendPublicKeyList(self):
         return self.db.command(
         {
@@ -267,61 +289,38 @@ class YadaServer(Manager, Node):
             sourceNode.add('data/friends', newIndexerFriendRequest.get())
             sourceNode.save()
             
-    def chooseRelationshipNode(self, relationship, inboundNode, impersonate = False):
+    def chooseRelationshipNode(self, r, inboundNode, impersonate = False):
         
-        r = relationship
+        node0 = Node({}, {'name': '0'})
+        node1 = Node({}, {'name': '1'})
         
-        node = Node({}, {'name': 'node'})
+        result = self.db.managed.find({"friend_public_key" : {"$in": inboundNode.getFriendPublicKeysArray()}})
         
         if r.count() == 1:
-            node.get().update(r[0])
-            return node
-                
-        #this or clause is only for the case where yada server is in the friendship and 
-        #the managed node only has yada server as a friend
-        testNode = Node({}, {'name': 'test node'})
-        testNode.get().update(r[0])
-        if testNode.get('public_key') == self.get('public_key'):
-            server = r[0]
-            managedNode = r[1]
-        else:
-            server = r[1]
-            managedNode = r[0]
+            if result.count() == 0: #inbound is hosted here
+                node0.get().update(r[0]) #here we hard-coded to return node0, so we have to make sure the node we return is not the inbound
+                return node0
         
-        testNode = Node({}, {'name': 'test node'})
-        testNode.get().update(managedNode)
-        if testNode.getFriendPublicKeyList().count() == 1:
-            if len(inboundNode.get('data/friends')) == 1:
-                if impersonate:
-                    node.get().update(managedNode)
-                else:
-                    node.get().update(server)
-            else:
-                if impersonate:
-                    node.get().update(server)
-                else:
-                    node.get().update(managedNode)
+        if r.count() == 2:
+            node0.get().update(r[0])
+            node1.get().update(r[1])
+            
+            if result.count() == 1: #inbound is hosted here
+                if r[0]['public_key'] == self.get('public_key'): #is this node the server
+                    return node0 #we return the server because now we know inbound is not the server because result is not empty
+                elif r[1]['public_key'] == self.get('public_key'): #is this node the server
+                    return  node1 #we return the server because now we know inbound is not the server because result is not empty
+                elif r[0]['public_key'] == result[0]['managed_public_key']: #neither node is the server 
+                    return node1
+                elif r[1]['public_key'] == result[0]['managed_public_key']: #neither node is the server
+                    return node0
+            else: #inbound is not hosted here
+                if r[0]['public_key'] == self.get('public_key'): #is this node the server
+                    return node0 #we return the server because now we know inbound is not the server because result is not empty
+                elif r[1]['public_key'] == self.get('public_key'): #is this node the server
+                    return  node1 #we return the server because now we know inbound is not the server because result is not empty
+                #it is not possible to have 2 nodes hosted and have result be empty.
                     
-            return node
-        
-        for partner in r:
-            node = Node({}, {'name': 'test node'})
-            node.get().update(partner)
-            intersection = node.matchedFriendsPublicKeys(inboundNode)
-            
-            if impersonate:
-                if intersection.count() > 1:
-                    return node
-            else:
-                if intersection.count() == 1:
-                    return node
-        
-        for pertner in r:
-            node.get().update(pertner)
-            
-            if node.get('public_key') != inboundNode.get('public_key'):
-                return node
-            
     def updateFromNode(self, inboundNode, impersonate = False):
         managedNode = self.getManagedNode(inboundNode['public_key'])
         relationship = self.publicKeyLookup(inboundNode['public_key'])
