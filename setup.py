@@ -7,19 +7,17 @@ import os
 import sys
 
 setup(
-    name = "Yada Project",
-    packages=find_packages(exclude=['ez_setup', 'tests', 'tests.*']),
+    name = "yadapy",
+    packages=find_packages(exclude=['ez_setup', 'tests', 'tests.*', 'pymongo', 'pycrypto',]),
     version = '0.1',
     url = 'http://www.yadaproject.com/',
     author = 'Matthew Reynold Vogel',
     author_email = 'matt@yadaproject.com',
-    description = 'A high-level Python Web framework that encourages rapid development of distributed social networks.',
+    description = 'A framework for building distributed social networking applications and mobile-centric single sign-on.',
     download_url = 'https://github.com/pdxwebdev/yadapy/zipball/master',
     classifiers = [
         'Environment :: Web Environment',
-        'Framework :: yadapy',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
@@ -30,4 +28,5 @@ setup(
         'Topic :: Software Development :: Libraries :: Application Frameworks',
         'Topic :: Software Development :: Libraries :: Python Modules',
    ],
+   repository = 'https://testpypi.python.org/pypi',
 )
