@@ -56,12 +56,14 @@ class Node(BaseNode):
             friendRequestPublicKeys = decrypted['friendRequestPublicKeys']
             connection = Connection('localhost',27021)
             db = connection.yadaserver
+            """
             friend = self.cursor.execute("SELECT count(*) FROM friend_requests WHERE read"
                                           "public_keym" :"$friend.public_key",
                                           "request_public_keym" : "$friend.data.routed_friend_requests.public_key",
                                           "routed_public_keym" : "$friend.data.routed_friend_requests.routed_public_key"
                                         )
-            #this is a heck because aggregation framework wont support matching the public_key with routed_public_key
+            """
+            #this is a hack because aggregation framework wont support matching the public_key with routed_public_key
             for i, r in enumerate(friend['result']):
                 if 'routed_public_keym' in r and r['routed_public_keym']==r['public_keym'] and not r['request_public_keym'] in friendRequestPublicKeys:
                     friend_requestCount+=1
