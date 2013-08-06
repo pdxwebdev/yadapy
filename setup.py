@@ -9,7 +9,7 @@ import sys
 setup(
     name = "yadapy",
     packages=find_packages(exclude=['ez_setup', 'tests', 'tests.*', 'pymongo', 'pycrypto',]),
-    version = '0.1.0.1',
+    version = '0.1.0.2',
     url = 'http://www.yadaproject.com/',
     author = 'Matthew Reynold Vogel',
     author_email = 'matt@yadaproject.com',
