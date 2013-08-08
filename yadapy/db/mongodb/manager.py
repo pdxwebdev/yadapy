@@ -297,7 +297,7 @@ class YadaServer(Manager, Node):
         result = self.db.managed.find({"friend_public_key" : {"$in": inboundNode.getFriendPublicKeysArray()}})
         
         if r.count() == 1:
-            if result.count() > 0: #inbound is hosted here
+            if result.count() == 0: #inbound is not hosted here
                 node0.get().update(r[0]) #here we hard-coded to return node0, so we have to make sure the node we return is not the inbound
                 return node0
         
