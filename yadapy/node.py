@@ -573,13 +573,14 @@ class Node(object):
     
     
     def sendMessage(self, pub_keys, subject, message, thread_id=None, guid=None):
-        """
-        Creates either a new message thread or replies to an existing thread if @thread_id is given.
+        """Creates either a new message thread or replies to an existing thread if @thread_id is given.
         
-        @pub_keys list A list of public_keys to send to
-        @subject string Just like an email subject
-        @message string The body of the message, just like email
-        @thread_id string The thread_id to allow aggregation of a topic
+        :param pub_keys: list A list of public_keys to send to
+        :type pub_keys: list
+        
+        :subject string Just like an email subject
+        :message string The body of the message, just like email
+        :thread_id string The thread_id to allow aggregation of a topic
         
         returns a new message object that can be inserted into data/messages
         """
