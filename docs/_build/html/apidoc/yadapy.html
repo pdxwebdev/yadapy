@@ -1,0 +1,719 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>yadapy Package &mdash; yadapy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="yadapy 0.1 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">yadapy 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="yadapy-package">
+<h1>yadapy Package<a class="headerlink" href="#yadapy-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-yadapy.manager">
+<span id="manager-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">manager</span></tt> Module<a class="headerlink" href="#module-yadapy.manager" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yadapy.manager.YadaServer">
+<em class="property">class </em><tt class="descclassname">yadapy.manager.</tt><tt class="descname">YadaServer</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yadapy.node.Node" title="yadapy.node.Node"><tt class="xref py py-class docutils literal"><span class="pre">yadapy.node.Node</span></tt></a></p>
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.addManagedNode">
+<tt class="descname">addManagedNode</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.addManagedNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.chooseRelationshipNode">
+<tt class="descname">chooseRelationshipNode</tt><big>(</big><em>relationship</em>, <em>inboundNode</em>, <em>impersonate=False</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.chooseRelationshipNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.consumePacket">
+<tt class="descname">consumePacket</tt><big>(</big><em>responseDecoded</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.consumePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.forceJoinNodes">
+<tt class="descname">forceJoinNodes</tt><big>(</big><em>sourceNode</em>, <em>destNode</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.forceJoinNodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.getFriend">
+<tt class="descname">getFriend</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.getFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.getFriendRequestsFromIndexer">
+<tt class="descname">getFriendRequestsFromIndexer</tt><big>(</big><em>node</em>, <em>indexer</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.getFriendRequestsFromIndexer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="yadapy.manager.YadaServer.getInformationFromIdentity">
+<em class="property">static </em><tt class="descname">getInformationFromIdentity</tt><big>(</big><em>data</em>, <em>profile</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.getInformationFromIdentity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.getManagedNode">
+<tt class="descname">getManagedNode</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.getManagedNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.getRelationshipData">
+<tt class="descname">getRelationshipData</tt><big>(</big><em>relationship</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.getRelationshipData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.getServerData">
+<tt class="descname">getServerData</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.getServerData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.handleFriendRequest">
+<tt class="descname">handleFriendRequest</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.handleFriendRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.handleManageRequest">
+<tt class="descname">handleManageRequest</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.handleManageRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.handlePromotionRequest">
+<tt class="descname">handlePromotionRequest</tt><big>(</big><em>packet</em>, <em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.handlePromotionRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.handleRoutedMessage">
+<tt class="descname">handleRoutedMessage</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.handleRoutedMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.hostedUserUpdate">
+<tt class="descname">hostedUserUpdate</tt><big>(</big><em>jsonDict</em>, <em>request=None</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.hostedUserUpdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.loadInboundJson">
+<tt class="descname">loadInboundJson</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.loadInboundJson" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.newIdentity">
+<tt class="descname">newIdentity</tt><big>(</big><em>identity</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.newIdentity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.publicKeyLookup">
+<tt class="descname">publicKeyLookup</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.publicKeyLookup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.queryIndexer">
+<tt class="descname">queryIndexer</tt><big>(</big><em>dataToSend</em>, <em>indexer</em>, <em>user</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.queryIndexer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.respondWithRelationship">
+<tt class="descname">respondWithRelationship</tt><big>(</big><em>inboundNode</em>, <em>impersonate=False</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.respondWithRelationship" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.stripIdentityAndFriendsForProtocolV1">
+<tt class="descname">stripIdentityAndFriendsForProtocolV1</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.stripIdentityAndFriendsForProtocolV1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.stripManagedNodes">
+<tt class="descname">stripManagedNodes</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.stripManagedNodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.syncManagedNode">
+<tt class="descname">syncManagedNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.syncManagedNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.updateFriendInIdentity">
+<tt class="descname">updateFriendInIdentity</tt><big>(</big><em>inbound</em>, <em>p</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.updateFriendInIdentity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.updateFromNode">
+<tt class="descname">updateFromNode</tt><big>(</big><em>inboundNode</em>, <em>impersonate=False</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.updateFromNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.manager.YadaServer.validIdentity">
+<tt class="descname">validIdentity</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#yadapy.manager.YadaServer.validIdentity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-yadapy.managercommunicator">
+<span id="managercommunicator-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">managercommunicator</span></tt> Module<a class="headerlink" href="#module-yadapy.managercommunicator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yadapy.managercommunicator.ManagerCommunicator">
+<em class="property">class </em><tt class="descclassname">yadapy.managercommunicator.</tt><tt class="descname">ManagerCommunicator</tt><big>(</big><em>node</em>, <em>manager=None</em><big>)</big><a class="headerlink" href="#yadapy.managercommunicator.ManagerCommunicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yadapy.nodecommunicator.NodeCommunicator" title="yadapy.nodecommunicator.NodeCommunicator"><tt class="xref py py-class docutils literal"><span class="pre">yadapy.nodecommunicator.NodeCommunicator</span></tt></a></p>
+<dl class="attribute">
+<dt id="yadapy.managercommunicator.ManagerCommunicator.impersonate">
+<tt class="descname">impersonate</tt><em class="property"> = False</em><a class="headerlink" href="#yadapy.managercommunicator.ManagerCommunicator.impersonate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.managercommunicator.ManagerCommunicator.routeRequestThroughNode">
+<tt class="descname">routeRequestThroughNode</tt><big>(</big><em>destNode</em>, <em>destinationPublicKey</em>, <em>name='new friend'</em>, <em>avatar=''</em><big>)</big><a class="headerlink" href="#yadapy.managercommunicator.ManagerCommunicator.routeRequestThroughNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-yadapy.node">
+<span id="node-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">node</span></tt> Module<a class="headerlink" href="#module-yadapy.node" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="yadapy.node.InvalidIdentity">
+<em class="property">exception </em><tt class="descclassname">yadapy.node.</tt><tt class="descname">InvalidIdentity</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#yadapy.node.InvalidIdentity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yadapy.node.Node">
+<em class="property">class </em><tt class="descclassname">yadapy.node.</tt><tt class="descname">Node</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#yadapy.node.Node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="yadapy.node.Node.add">
+<tt class="descname">add</tt><big>(</big><em>path=''</em>, <em>assignment=''</em>, <em>create=False</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;path string Takes a key path separated by forward slashes / to find an entity of the identity
+Second parameter is the value or expression being assigned</p>
+<p>Example:
+id.add(&#8220;data/messages&#8221;,[{..message object..}]) #would append a message</p>
+<blockquote>
+<div>#to the messages list</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.addFriend">
+<tt class="descname">addFriend</tt><big>(</big><em>friend</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.addFriend" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds a friend to the data/friends element. also validates the friend is a valid identity</p>
+<p>returns void</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.addFriendRequest">
+<tt class="descname">addFriendRequest</tt><big>(</big><em>friendRequest</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.addFriendRequest" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds a friend to the friend_requests element. also validates the friend request is a valid identity</p>
+<p>returns void</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.addIPAddress">
+<tt class="descname">addIPAddress</tt><big>(</big><em>host</em>, <em>port='80'</em>, <em>protocol='4'</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.addIPAddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an IP address object to the data/identity/ip_address element.
+This object is used by your friends to contact you.</p>
+<p>returns void</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.addMessage">
+<tt class="descname">addMessage</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.addMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>adds a friend to the data/messages element.</p>
+<p>returns void</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.addPromotionRequest">
+<tt class="descname">addPromotionRequest</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.addPromotionRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.addRoutedFriendRequest">
+<tt class="descname">addRoutedFriendRequest</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.addRoutedFriendRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.base64DecodeMessages">
+<tt class="descname">base64DecodeMessages</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.base64DecodeMessages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.base64EncodeMessages">
+<tt class="descname">base64EncodeMessages</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.base64EncodeMessages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.createIPAddress">
+<tt class="descname">createIPAddress</tt><big>(</big><em>host</em>, <em>port='80'</em>, <em>protocol='4'</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.createIPAddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>generates a new IP Address object
+&#64;host string Can be an IP address or a host name.
+&#64;port string Can be any string port number
+&#64;protocol is the version of IP being used. 4 or 6</p>
+<p>returns dictionary</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.dedupIP">
+<tt class="descname">dedupIP</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.dedupIP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.delKey">
+<tt class="descname">delKey</tt><big>(</big><em>path=''</em>, <em>assignment=''</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.delKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a key path separated by forward slashes / to find an entity of the identity
+Second parameter is the value or expression being assigned</p>
+<p>Example:
+id.add(&#8220;status&#8221;) #would delete the status key</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.get">
+<tt class="descname">get</tt><big>(</big><em>path=''</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a key path separated by forward slashes / to find an entity of the identity</p>
+<p>Example:
+id.get(&#8220;data/friends&#8221;) #would return the friends list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.getClassInstanceFromNode">
+<tt class="descname">getClassInstanceFromNode</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.getClassInstanceFromNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.getClassInstanceFromNodeForNode">
+<tt class="descname">getClassInstanceFromNodeForNode</tt><big>(</big><em>identity</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.getClassInstanceFromNodeForNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.getData">
+<tt class="descname">getData</tt><big>(</big><em>path=''</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.getData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.getFriend">
+<tt class="descname">getFriend</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.getFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.getFriendPublicKeyList">
+<tt class="descname">getFriendPublicKeyList</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.getFriendPublicKeyList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.getFriendPublicKeysArray">
+<tt class="descname">getFriendPublicKeysArray</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.getFriendPublicKeysArray" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.getFriendPublicKeysDict">
+<tt class="descname">getFriendPublicKeysDict</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.getFriendPublicKeysDict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.getFriendTopLevelMeta">
+<tt class="descname">getFriendTopLevelMeta</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.getFriendTopLevelMeta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.getIpAddressArray">
+<tt class="descname">getIpAddressArray</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.getIpAddressArray" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.getSelfInFriend">
+<tt class="descname">getSelfInFriend</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.getSelfInFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.handleFriendRequest">
+<tt class="descname">handleFriendRequest</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.handleFriendRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.handlePromotionRequest">
+<tt class="descname">handlePromotionRequest</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.handlePromotionRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.handleRoutedFriendRequest">
+<tt class="descname">handleRoutedFriendRequest</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.handleRoutedFriendRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.handleRoutedMessage">
+<tt class="descname">handleRoutedMessage</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.handleRoutedMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yadapy.node.Node.identityData">
+<tt class="descname">identityData</tt><em class="property"> = {}</em><a class="headerlink" href="#yadapy.node.Node.identityData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.matchFriend">
+<tt class="descname">matchFriend</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.matchFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.my_import">
+<tt class="descname">my_import</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.my_import" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.newIdentity">
+<tt class="descname">newIdentity</tt><big>(</big><em>identity</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.newIdentity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.newTimeStamp">
+<tt class="descname">newTimeStamp</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.newTimeStamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.newUuid">
+<tt class="descname">newUuid</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.newUuid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.preventInfiniteNesting">
+<tt class="descname">preventInfiniteNesting</tt><big>(</big><em>newFriendNode</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.preventInfiniteNesting" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.replaceIdentityOfFriendsWithPubKeys">
+<tt class="descname">replaceIdentityOfFriendsWithPubKeys</tt><big>(</big><em>node=None</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.replaceIdentityOfFriendsWithPubKeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.replaceIdentityOfFriendsWithPubKeysKeepPrivateKeys">
+<tt class="descname">replaceIdentityOfFriendsWithPubKeysKeepPrivateKeys</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.replaceIdentityOfFriendsWithPubKeysKeepPrivateKeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.respondWithRelationship">
+<tt class="descname">respondWithRelationship</tt><big>(</big><em>friendNode</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.respondWithRelationship" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method will return a dictionary prepared to be encrypted, encoded and sent</p>
+<p>&#64;friendNode Node instance This is used for the public and private key information</p>
+<p>returns dictionary</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.save">
+<tt class="descname">save</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a place holder method to indicate that subclasses with persistent storage 
+should override this method</p>
+<p>returns void</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.searchForNode">
+<tt class="descname">searchForNode</tt><big>(</big><em>searchNode</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.searchForNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>tries to find the relationship of self with the friend of your friend.
+Because even though you have the mutual friend node gotten from your friend&#8217;s friend list,
+that node will not have the correct public key.
+So we need to return the corresponding friend in your list</p>
+<p>returns none or Node instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.sendMessage">
+<tt class="descname">sendMessage</tt><big>(</big><em>pub_keys</em>, <em>subject</em>, <em>message</em>, <em>thread_id=None</em>, <em>guid=None</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.sendMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates either a new message thread or replies to an existing thread if &#64;thread_id is given.</p>
+<p>&#64;pub_keys list A list of public_keys to send to
+&#64;subject string Just like an email subject
+&#64;message string The body of the message, just like email
+&#64;thread_id string The thread_id to allow aggregation of a topic</p>
+<p>returns a new message object that can be inserted into data/messages</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.set">
+<tt class="descname">set</tt><big>(</big><em>path=''</em>, <em>assignment=''</em>, <em>create=False</em>, <em>force=False</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a key path separated by forward slashes / to find an entity of the identity
+Second parameter is the value or expression being assigned</p>
+<p>Example:
+id.set(&#8220;data/identity/name&#8221;,&#8221;Matt&#8221;) #would return the friends list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.setData">
+<tt class="descname">setData</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.setData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.setModifiedToNow">
+<tt class="descname">setModifiedToNow</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.setModifiedToNow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.stripFriendIdentityForFriend">
+<tt class="descname">stripFriendIdentityForFriend</tt><big>(</big><em>friend={}</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.stripFriendIdentityForFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.stripIdentityAndFriendsForFriend">
+<tt class="descname">stripIdentityAndFriendsForFriend</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.stripIdentityAndFriendsForFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.stripIdentityAndFriendsForProtocolV1">
+<tt class="descname">stripIdentityAndFriendsForProtocolV1</tt><big>(</big><em>node=None</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.stripIdentityAndFriendsForProtocolV1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.stripIdentityAndFriendsForWebGUI">
+<tt class="descname">stripIdentityAndFriendsForWebGUI</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.node.Node.stripIdentityAndFriendsForWebGUI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.stripIdentityOfIrrelevantFriendRequests">
+<tt class="descname">stripIdentityOfIrrelevantFriendRequests</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.stripIdentityOfIrrelevantFriendRequests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.stripIdentityOfIrrelevantMessages">
+<tt class="descname">stripIdentityOfIrrelevantMessages</tt><big>(</big><em>friend</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.stripIdentityOfIrrelevantMessages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.sync">
+<tt class="descname">sync</tt><big>(</big><em>inbound</em>, <em>is_self=True</em>, <em>permission_object={}</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.sync" title="Permalink to this definition">¶</a></dt>
+<dd><p>This kicks off the _updateTree method which will synchronize the two identity objects
+&#64;inbound dictionary Is the object to synchronize against
+&#64;is_self bool This is necessary because a friend has the ability to impersonate you.
+&#64;permission_object dictionary This object should match the index structure of</p>
+<p>returns void</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.updateFromNode">
+<tt class="descname">updateFromNode</tt><big>(</big><em>inboundNode</em>, <em>impersonate=False</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.updateFromNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>inboundNode is an Node instance of a friend of self and used to update the information
+for that friend in your friends list.</p>
+<p>returns void</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="yadapy.node.Node.updatePair">
+<em class="property">static </em><tt class="descname">updatePair</tt><big>(</big><em>key</em>, <em>internal</em>, <em>internalRef</em>, <em>inbound</em>, <em>inboundRef</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.updatePair" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will handle assigning a value to a key in a list or dictionary
+while in the updateTree method.</p>
+<p>returns void</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.updateStatus">
+<tt class="descname">updateStatus</tt><big>(</big><em>jsonData</em>, <em>arrayKey</em>, <em>elementKey</em>, <em>newOrUpdate</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.updateStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method will attempt to update your status automatically based on activity
+during the sync process.</p>
+<p>returns void</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.node.Node.validIdentity">
+<tt class="descname">validIdentity</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#yadapy.node.Node.validIdentity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-yadapy.nodecommunicator">
+<span id="nodecommunicator-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">nodecommunicator</span></tt> Module<a class="headerlink" href="#module-yadapy.nodecommunicator" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="yadapy.nodecommunicator.GetOutOfLoop">
+<em class="property">exception </em><tt class="descclassname">yadapy.nodecommunicator.</tt><tt class="descname">GetOutOfLoop</tt><a class="headerlink" href="#yadapy.nodecommunicator.GetOutOfLoop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="yadapy.nodecommunicator.NodeCommunicator">
+<em class="property">class </em><tt class="descclassname">yadapy.nodecommunicator.</tt><tt class="descname">NodeCommunicator</tt><big>(</big><em>node</em>, <em>manager=None</em><big>)</big><a class="headerlink" href="#yadapy.nodecommunicator.NodeCommunicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="yadapy.nodecommunicator.NodeCommunicator.addManager">
+<tt class="descname">addManager</tt><big>(</big><em>host</em><big>)</big><a class="headerlink" href="#yadapy.nodecommunicator.NodeCommunicator.addManager" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.nodecommunicator.NodeCommunicator.grantPromotion">
+<tt class="descname">grantPromotion</tt><big>(</big><em>destNode</em><big>)</big><a class="headerlink" href="#yadapy.nodecommunicator.NodeCommunicator.grantPromotion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.nodecommunicator.NodeCommunicator.handlePacket">
+<tt class="descname">handlePacket</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.nodecommunicator.NodeCommunicator.handlePacket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yadapy.nodecommunicator.NodeCommunicator.impersonate">
+<tt class="descname">impersonate</tt><em class="property"> = False</em><a class="headerlink" href="#yadapy.nodecommunicator.NodeCommunicator.impersonate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.nodecommunicator.NodeCommunicator.newTimeStamp">
+<tt class="descname">newTimeStamp</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.nodecommunicator.NodeCommunicator.newTimeStamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.nodecommunicator.NodeCommunicator.requestFriend">
+<tt class="descname">requestFriend</tt><big>(</big><em>host</em><big>)</big><a class="headerlink" href="#yadapy.nodecommunicator.NodeCommunicator.requestFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.nodecommunicator.NodeCommunicator.routeRequestForNode">
+<tt class="descname">routeRequestForNode</tt><big>(</big><em>destNode</em>, <em>destinationPublicKey</em>, <em>name='new friend'</em>, <em>avatar=''</em><big>)</big><a class="headerlink" href="#yadapy.nodecommunicator.NodeCommunicator.routeRequestForNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.nodecommunicator.NodeCommunicator.sendMessage">
+<tt class="descname">sendMessage</tt><big>(</big><em>pub_keys</em>, <em>subject</em>, <em>message</em>, <em>thread_id=None</em>, <em>guid=None</em><big>)</big><a class="headerlink" href="#yadapy.nodecommunicator.NodeCommunicator.sendMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.nodecommunicator.NodeCommunicator.syncManager">
+<tt class="descname">syncManager</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.nodecommunicator.NodeCommunicator.syncManager" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.nodecommunicator.NodeCommunicator.updateRelationship">
+<tt class="descname">updateRelationship</tt><big>(</big><em>destNode</em><big>)</big><a class="headerlink" href="#yadapy.nodecommunicator.NodeCommunicator.updateRelationship" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="yadapy.api.html">api Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="yadapy.api.html#manager-module"><tt class="docutils literal"><span class="pre">manager</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yadapy.api.html#node-module"><tt class="docutils literal"><span class="pre">node</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="yadapy.db.html">db Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="yadapy.db.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="yadapy.db.mongodb.html">mongodb Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="yadapy.db.mongodb.html#module-yadapy.db.mongodb.manager"><tt class="docutils literal"><span class="pre">manager</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="yadapy.db.mongodb.html#module-yadapy.db.mongodb.node"><tt class="docutils literal"><span class="pre">node</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="yadapy.db.mongodb.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="yadapy.db.mongodb.lib.html">lib Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="yadapy.db.mongodb.lib.html#module-yadapy.db.mongodb.lib.jsonencoder"><tt class="docutils literal"><span class="pre">jsonencoder</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="yadapy.db.sqlite.html">sqlite Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="yadapy.db.sqlite.html#nodesqlite-module"><tt class="docutils literal"><span class="pre">nodesqlite</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="yadapy.db.sqlite.html#yadasqliteserver-module"><tt class="docutils literal"><span class="pre">yadasqliteserver</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="yadapy.lib.html">lib Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="yadapy.lib.html#module-yadapy.lib.crypt"><tt class="docutils literal"><span class="pre">crypt</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">yadapy Package</a><ul>
+<li><a class="reference internal" href="#module-yadapy.manager"><tt class="docutils literal"><span class="pre">manager</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-yadapy.managercommunicator"><tt class="docutils literal"><span class="pre">managercommunicator</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-yadapy.node"><tt class="docutils literal"><span class="pre">node</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-yadapy.nodecommunicator"><tt class="docutils literal"><span class="pre">nodecommunicator</span></tt> Module</a></li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/apidoc/yadapy.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">yadapy 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Matthew Reynold Vogel.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

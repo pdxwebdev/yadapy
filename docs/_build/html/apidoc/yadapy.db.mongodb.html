@@ -1,0 +1,438 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>mongodb Package &mdash; yadapy 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="yadapy 0.1 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">yadapy 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="mongodb-package">
+<h1>mongodb Package<a class="headerlink" href="#mongodb-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-yadapy.db.mongodb.manager">
+<span id="manager-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">manager</span></tt> Module<a class="headerlink" href="#module-yadapy.db.mongodb.manager" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yadapy.db.mongodb.manager.YadaServer">
+<em class="property">class </em><tt class="descclassname">yadapy.db.mongodb.manager.</tt><tt class="descname">YadaServer</tt><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="yadapy.html#yadapy.manager.YadaServer" title="yadapy.manager.YadaServer"><tt class="xref py py-class docutils literal"><span class="pre">yadapy.manager.YadaServer</span></tt></a>, <a class="reference internal" href="#yadapy.db.mongodb.node.Node" title="yadapy.db.mongodb.node.Node"><tt class="xref py py-class docutils literal"><span class="pre">yadapy.db.mongodb.node.Node</span></tt></a></p>
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.addFriendForProfile">
+<tt class="descname">addFriendForProfile</tt><big>(</big><em>friend</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.addFriendForProfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.addManagedNode">
+<tt class="descname">addManagedNode</tt><big>(</big><em>data</em>, <em>friendNode</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.addManagedNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.addMessageForProfile">
+<tt class="descname">addMessageForProfile</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.addMessageForProfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.addServerFriend">
+<tt class="descname">addServerFriend</tt><big>(</big><em>friend</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.addServerFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.addServerMessage">
+<tt class="descname">addServerMessage</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.addServerMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.chooseRelationshipNode">
+<tt class="descname">chooseRelationshipNode</tt><big>(</big><em>r</em>, <em>inboundNode</em>, <em>impersonate=False</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.chooseRelationshipNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yadapy.db.mongodb.manager.YadaServer.conn">
+<tt class="descname">conn</tt><em class="property"> = None</em><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.conn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.forceJoinNodes">
+<tt class="descname">forceJoinNodes</tt><big>(</big><em>sourceNode</em>, <em>destNode</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.forceJoinNodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.getFriend">
+<tt class="descname">getFriend</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.getFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.getFriendPublicKeyList">
+<tt class="descname">getFriendPublicKeyList</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.getFriendPublicKeyList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.getFriendTopLevelMeta">
+<tt class="descname">getFriendTopLevelMeta</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.getFriendTopLevelMeta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.getManagedNode">
+<tt class="descname">getManagedNode</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.getManagedNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.getProfileIdentity">
+<tt class="descname">getProfileIdentity</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.getProfileIdentity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.getServerData">
+<tt class="descname">getServerData</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.getServerData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.getServerFriendsPublicKeysList">
+<tt class="descname">getServerFriendsPublicKeysList</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.getServerFriendsPublicKeysList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.getServerIdentity">
+<tt class="descname">getServerIdentity</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.getServerIdentity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yadapy.db.mongodb.manager.YadaServer.host">
+<tt class="descname">host</tt><em class="property"> = 'localhost'</em><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.host" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yadapy.db.mongodb.manager.YadaServer.port">
+<tt class="descname">port</tt><em class="property"> = 27017</em><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.port" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.publicKeyLookup">
+<tt class="descname">publicKeyLookup</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.publicKeyLookup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.syncManagedNode">
+<tt class="descname">syncManagedNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.syncManagedNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.updateFromNode">
+<tt class="descname">updateFromNode</tt><big>(</big><em>inboundNode</em>, <em>impersonate=False</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.updateFromNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.manager.YadaServer.updateManagedNode">
+<tt class="descname">updateManagedNode</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.manager.YadaServer.updateManagedNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-yadapy.db.mongodb.node">
+<span id="node-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">node</span></tt> Module<a class="headerlink" href="#module-yadapy.db.mongodb.node" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yadapy.db.mongodb.node.Node">
+<em class="property">class </em><tt class="descclassname">yadapy.db.mongodb.node.</tt><tt class="descname">Node</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="yadapy.html#yadapy.node.Node" title="yadapy.node.Node"><tt class="xref py py-class docutils literal"><span class="pre">yadapy.node.Node</span></tt></a></p>
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.addFriend">
+<tt class="descname">addFriend</tt><big>(</big><em>friend</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.addFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.addFriendRequest">
+<tt class="descname">addFriendRequest</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.addFriendRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.addIPAddress">
+<tt class="descname">addIPAddress</tt><big>(</big><em>ipAddress</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.addIPAddress" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.addMessage">
+<tt class="descname">addMessage</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.addMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.addPromotionRequest">
+<tt class="descname">addPromotionRequest</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.addPromotionRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.addRoutedFriendRequest">
+<tt class="descname">addRoutedFriendRequest</tt><big>(</big><em>packet</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.addRoutedFriendRequest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.addStatus">
+<tt class="descname">addStatus</tt><big>(</big><em>status</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.addStatus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yadapy.db.mongodb.node.Node.conn">
+<tt class="descname">conn</tt><em class="property"> = None</em><a class="headerlink" href="#yadapy.db.mongodb.node.Node.conn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getFriend">
+<tt class="descname">getFriend</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getFriendBySourceIndexerKey">
+<tt class="descname">getFriendBySourceIndexerKey</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getFriendBySourceIndexerKey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getFriendPublicKeyList">
+<tt class="descname">getFriendPublicKeyList</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getFriendPublicKeyList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getFriendQuery">
+<tt class="descname">getFriendQuery</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getFriendQuery" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getFriendTopLevelMeta">
+<tt class="descname">getFriendTopLevelMeta</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getFriendTopLevelMeta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getFriends">
+<tt class="descname">getFriends</tt><big>(</big><em>limit=5</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getFriends" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getFriendsRoutedThroughIndexers">
+<tt class="descname">getFriendsRoutedThroughIndexers</tt><big>(</big><em>indexerList</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getFriendsRoutedThroughIndexers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getIdentity">
+<tt class="descname">getIdentity</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getIdentity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getIndexerFriends">
+<tt class="descname">getIndexerFriends</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getIndexerFriends" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getIpList">
+<tt class="descname">getIpList</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getIpList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getMessagesForFriend">
+<tt class="descname">getMessagesForFriend</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getMessagesForFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getProfileIdentity">
+<tt class="descname">getProfileIdentity</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getProfileIdentity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getPromotionRequests">
+<tt class="descname">getPromotionRequests</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getPromotionRequests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getRoutedFriendRequests">
+<tt class="descname">getRoutedFriendRequests</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getRoutedFriendRequests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getRoutedFriendRequestsForFriend">
+<tt class="descname">getRoutedFriendRequestsForFriend</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getRoutedFriendRequestsForFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getRoutedPublicKeysAndSourceIndexerKeys">
+<tt class="descname">getRoutedPublicKeysAndSourceIndexerKeys</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getRoutedPublicKeysAndSourceIndexerKeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.getStatusesForFriend">
+<tt class="descname">getStatusesForFriend</tt><big>(</big><em>public_key</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.getStatusesForFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yadapy.db.mongodb.node.Node.host">
+<tt class="descname">host</tt><em class="property"> = 'localhost'</em><a class="headerlink" href="#yadapy.db.mongodb.node.Node.host" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.matchAnyFriend">
+<tt class="descname">matchAnyFriend</tt><big>(</big><em>friend</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.matchAnyFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.matchFriend">
+<tt class="descname">matchFriend</tt><big>(</big><em>friend</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.matchFriend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.matchedFriendsPublicKeys">
+<tt class="descname">matchedFriendsPublicKeys</tt><big>(</big><em>friend</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.matchedFriendsPublicKeys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yadapy.db.mongodb.node.Node.port">
+<tt class="descname">port</tt><em class="property"> = 27021</em><a class="headerlink" href="#yadapy.db.mongodb.node.Node.port" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.pushItem">
+<tt class="descname">pushItem</tt><big>(</big><em>path</em>, <em>item</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.pushItem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.respondWithRelationship">
+<tt class="descname">respondWithRelationship</tt><big>(</big><em>friendNode</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.respondWithRelationship" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method will return a dictionary prepared to be encrypted, encoded and sent</p>
+<p>&#64;friendNode Node instance This is used for the public and private key information</p>
+<p>returns dictionary</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.save">
+<tt class="descname">save</tt><big>(</big><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.setFriendAttribute">
+<tt class="descname">setFriendAttribute</tt><big>(</big><em>friend</em>, <em>path</em>, <em>data</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.setFriendAttribute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.setFriendData">
+<tt class="descname">setFriendData</tt><big>(</big><em>friend</em>, <em>data</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.setFriendData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.setFriendWebToken">
+<tt class="descname">setFriendWebToken</tt><big>(</big><em>friend</em>, <em>data</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.setFriendWebToken" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yadapy.db.mongodb.node.Node.updateFromNode">
+<tt class="descname">updateFromNode</tt><big>(</big><em>inboundNode</em>, <em>impersonate=False</em>, <em>preserve_key=None</em><big>)</big><a class="headerlink" href="#yadapy.db.mongodb.node.Node.updateFromNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>inboundNode is an Node instance of a friend of self and used to update the information
+for that friend in your friends list.</p>
+<p>returns void</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="yadapy.db.mongodb.lib.html">lib Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="yadapy.db.mongodb.lib.html#module-yadapy.db.mongodb.lib.jsonencoder"><tt class="docutils literal"><span class="pre">jsonencoder</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">mongodb Package</a><ul>
+<li><a class="reference internal" href="#module-yadapy.db.mongodb.manager"><tt class="docutils literal"><span class="pre">manager</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-yadapy.db.mongodb.node"><tt class="docutils literal"><span class="pre">node</span></tt> Module</a></li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/apidoc/yadapy.db.mongodb.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">yadapy 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Matthew Reynold Vogel.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
