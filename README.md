@@ -1,5 +1,10 @@
 yadapy
 ======
+Pull Requests Very Welcome
+---
+
+This is an open project that welcomes any and all contributors, for example:
+http://spencermoran.me/2013/08/13/open-source-on-github-your-first-contribution/
 
 Quick start instructions: 
 https://github.com/pdxwebdev/yadapy/wiki/Quick-Start-Instructions
