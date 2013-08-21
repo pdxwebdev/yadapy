@@ -7,10 +7,10 @@ yadapy, Yada protocol for Python
 ==================================
 
 Contents:
+	yadapy
 
 .. toctree::
    :maxdepth: 2
-
 
 Indices and tables
 ==================
@@ -19,6 +19,5 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. automodule:: yadapy
+.. autoclass:: yadapy
 	:members:
-	:undoc-members:
