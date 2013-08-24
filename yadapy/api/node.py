@@ -594,8 +594,12 @@ class MongoApi(object):
         
         serverFriendNode = Node(serverFriend)
         
-        friendTest = Node.db.friends.find({'public_key': data['public_key'], 'friend.routed_public_key': decrypted['routed_public_key']})
-        if friendTest.count() == 0:
+        friendTest = Node.db.routed_friend_requests.find({
+            'public_key': serverNode.get('public_key'), 
+            'routed_public_key': decrypted['routed_public_key'],
+            'routed_friend_request.source_indexer_key': serverFriend['public_key']
+        })
+        if friendTest.count() == 0 and matchedFriend['public_key'] != decrypted['routed_public_key']:
             friend = serverNodeComm.routeRequestForNode(node, decrypted['routed_public_key'], decrypted.get('name', decrypted['routed_public_key']), decrypted.get('avatar', ''))
 
             return {"status": "request sent", "friend": friend}
