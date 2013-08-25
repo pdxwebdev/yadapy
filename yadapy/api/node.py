@@ -730,6 +730,7 @@ def getMutualFriends(data, selectedFriend):
     stfs = [x for x in selectedFriend['data']['friends']]
     for stf in stfs:
         if 'routed_public_key' in stf and 'source_indexer_key' in stf:
+            key_to_use = ''
             for stfTest in stfs:
                 if stfTest['public_key'] == stf['routed_public_key']:
                     key_to_use = stf['source_indexer_key']
@@ -739,24 +740,25 @@ def getMutualFriends(data, selectedFriend):
                     key_to_use = stf['routed_public_key']
                     field_to_use = 'routed_public_key'
                     break
-                    
-            #check if mutual friend
-            mft = Node.db.friends.find({
-                                        "public_key" : data['public_key'], 
-                                        "friend.data.friends.public_key" : key_to_use
-                                        })
-            if mft.count():
-                #filter out the indexer result if present
-                for mftres in mft:
-                    mft2 = Node.db.friends.find({
-                                                "public_key" : data['public_key'],
-                                                "$or": [
-                                                    {"friend.routed_public_key": mftres['friend']['public_key']},
-                                                    {"friend.source_indexer_key": mftres['friend']['public_key']}
-                                                ]})
-                    if not mft2.count():
-                        #is mutual friend
-                        stf.update(mftres['friend'])
-            else:
-                #not mutual, apply correct routed_public_key
-                stf['routed_public_key'] = key_to_use
+                
+            if key_to_use:
+                #check if mutual friend
+                mft = Node.db.friends.find({
+                                            "public_key" : data['public_key'], 
+                                            "friend.data.friends.public_key" : key_to_use
+                                            })
+                if mft.count():
+                    #filter out the indexer result if present
+                    for mftres in mft:
+                        mft2 = Node.db.friends.find({
+                                                    "public_key" : data['public_key'],
+                                                    "$or": [
+                                                        {"friend.routed_public_key": mftres['friend']['public_key']},
+                                                        {"friend.source_indexer_key": mftres['friend']['public_key']}
+                                                    ]})
+                        if not mft2.count():
+                            #is mutual friend
+                            stf.update(mftres['friend'])
+                else:
+                    #not mutual, apply correct routed_public_key
+                    stf['routed_public_key'] = key_to_use
