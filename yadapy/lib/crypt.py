@@ -27,9 +27,8 @@ def decrypt(key, iv, data):
     #encoded = EncodeAES(cipher, data)
     #print('Encrypted string:', encoded)
     decoded = DecodeAES(cipher, data)
-    logging.debug('Decrypted string: data')
     
-    return decoded
+    return decoded[:decoded.rfind('}')+1]
 
 def encrypt( key, iv, data):
     # the block size for the cipher object; must be 16, 24, or 32 for AES

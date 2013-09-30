@@ -62,12 +62,26 @@ class NodeCommunicator(object):
         for hostElement in hostNode.get('data/identity/ip_address'):
             host = hostElement['address']
             port = None
-            if len(host.split(':')) > 1:
-                port = int(host.split(':')[1])
-                host = host.split(':')[0]
-            elif 'port' in hostElement:
+            if 'port' in hostElement:
                 try:
                     port = int(hostElement['port'])
+                except:
+                    pass
+            elif len(host.split(':')) == 2:
+                try:
+                    port = int(host.split(':')[1])
+                    host = host.split(':')[0]
+                except:
+                    pass
+                try:
+                    port = int(host.split(':')[2])
+                    host = host.split(':')[1]
+                except:
+                    pass
+            elif len(host.split(':')) == 3:
+                try:
+                    port = int(host.split(':')[2])
+                    host = host.split(':')[1]
                 except:
                     pass
                 
@@ -296,7 +310,10 @@ class NodeCommunicator(object):
             
         elif packet.get('status', None) == 'MANAGE_REQUEST':
             
-            data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
+            try:
+                data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
+            except:
+                data = packetData
             responseData = self.node.handleManageRequest(json.loads(data))
             responseData = Node(responseData)
             return \
