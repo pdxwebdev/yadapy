@@ -403,6 +403,7 @@ class MongoApi(object):
         friendUpdater(data, decrypted)
             
         for friend in friends:
+            #we are excluding yada project status updates with this next line
             statusFriendTest = Node.db.friends.find({'public_key': YadaServer._data['public_key'], 'friend_public_key': friend['friend']['public_key']})
             if statusFriendTest.count() == 0:
                 friend = friend['friend']
@@ -413,6 +414,7 @@ class MongoApi(object):
             
         friends = Node.db.friends.find({"public_key" : data['public_key']}, {'friend': 1})
         for friend in friends:
+            #we are excluding yada project status updates with this next line
             statusFriendTest = Node.db.friends.find({'public_key': YadaServer._data['public_key'], 'friend_public_key': friend['friend']['public_key']})
             if statusFriendTest.count() == 0:
                 friend = friend['friend']

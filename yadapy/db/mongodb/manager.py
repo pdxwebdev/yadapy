@@ -338,5 +338,3 @@ class YadaServer(Manager, Node):
                     node.sync(inboundNode, is_self=False, permission_object=inboundNode['permissions'])
                 else:
                     node.updateFromNode(inboundNode)
-        else:
-            super(YadaServer, self).updateFromNode(inboundNode)

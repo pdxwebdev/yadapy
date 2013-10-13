@@ -412,5 +412,3 @@ class YadaServer(Node):
         if node and not isinstance(node, YadaServer):
             node = self.getClassInstanceFromNodeForNode(node.get())
             return node.respondWithRelationship(inboundNode)
-        else:
-            return super(YadaServer, self).respondWithRelationship(inboundNode)
