@@ -645,8 +645,8 @@ class MongoApi(object):
         if friend.count():
             return {'status': 'already friends'}
 
-        if 'routed_public_key' in decrypted:
-            friend = Node.db.friends.find({"public_key" : data['public_key'], "friend.routed_public_key" : decrypted['routed_public_key']}, {'friend': 1})
+        if 'source_indexer_key' in decrypted:
+            friend = Node.db.friends.find({"public_key" : data['public_key'], "friend.source_indexer_key" : decrypted['source_indexer_key']}, {'friend': 1})
             if friend.count():
                 return {'status': 'already friends'}
         
