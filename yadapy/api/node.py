@@ -654,6 +654,14 @@ class MongoApi(object):
         node.addFriend(friend.get())
         nodeComm = NodeCommunicator(node)
         nodeComm.updateRelationship(friend)
+        
+        try:
+            if 'routed_friend_request' in decrypted:
+                sourceIndexer = Node(node.getFriend(decrypted['routed_friend_request']))
+                nodeComm.updateRelationship(sourceIndexer)
+        except:
+            pass
+        
         return {}
     
     def postFriendAndPromote(self, data, decrypted):
