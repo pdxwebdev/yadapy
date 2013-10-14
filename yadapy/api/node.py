@@ -602,7 +602,7 @@ class MongoApi(object):
             'routed_friend_request.source_indexer_key': serverFriend['public_key']
         })
         
-        if friendTest.count() == 0 and matchedFriend['public_key'] != decrypted['routed_public_key']:
+        if friendTest.count() == 0 and matchedFriend['public_key'] != decrypted['routed_public_key'] and decrypted['routed_public_key'] not in node.getRoutedPublicKeysAndSourceIndexerKeys():
             friend = serverNodeComm.routeRequestForNode(node, decrypted['routed_public_key'], decrypted.get('name', decrypted['routed_public_key']), decrypted.get('avatar', ''))
 
             return {"status": "request sent", "friend": friend}
