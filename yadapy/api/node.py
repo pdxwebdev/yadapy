@@ -641,16 +641,14 @@ class MongoApi(object):
         if 'private_key' not in decrypted:
             decrypted['private_key'] = ''
             
-        if 'routed_public_key' not in decrypted:
-            decrypted['routed_public_key'] = ''
-            
         friend = Node.db.friends.find({"public_key" : data['public_key'], "friend_public_key" : decrypted['public_key']}, {'friend': 1})
         if friend.count():
             return {'status': 'already friends'}
-        
-        friend = Node.db.friends.find({"public_key" : data['public_key'], "friend.routed_public_key" : decrypted['routed_public_key']}, {'friend': 1})
-        if friend.count():
-            return {'status': 'already friends'}
+
+        if 'routed_public_key' in decrypted:
+            friend = Node.db.friends.find({"public_key" : data['public_key'], "friend.routed_public_key" : decrypted['routed_public_key']}, {'friend': 1})
+            if friend.count():
+                return {'status': 'already friends'}
         
         friend = Node(decrypted)
         node.addFriend(friend.get())
