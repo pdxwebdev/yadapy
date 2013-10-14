@@ -353,7 +353,7 @@ class Node(BaseNode):
             keys.extend([friend['source_indexer_key'] for friend in friends])
             return keys
         else:
-            return []
+            return super(Node, self).getRoutedPublicKeysAndSourceIndexerKeys()
         
     def save(self):
         try:

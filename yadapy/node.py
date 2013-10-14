@@ -391,6 +391,16 @@ class Node(object):
         else:
             return None
 
+    def getRoutedPublicKeysAndSourceIndexerKeys(self):
+        keys = []
+        if 'data' in self.get():
+            for fr in self.get('data/friends'):
+                if 'routed_public_key' in fr:
+                    keys.append(fr['routed_public_key'])
+                if 'source_indexer_key' in fr:
+                    keys.append(fr['source_indexer_key'])
+        return keys
+        
     def getFriendPublicKeysArray(self):
         return [x['public_key'] for x in self.get('data/friends')]
     

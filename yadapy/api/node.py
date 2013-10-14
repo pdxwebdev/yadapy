@@ -601,7 +601,8 @@ class MongoApi(object):
             'routed_public_key': decrypted['routed_public_key'],
             'routed_friend_request.source_indexer_key': serverFriend['public_key']
         })
-        if friendTest.count() == 0 and matchedFriend['public_key'] != decrypted['routed_public_key']:
+        
+        if friendTest.count() == 0 and matchedFriend['public_key'] != decrypted['routed_public_key'] and decrypted['routed_public_key'] not in node.getRoutedPublicKeysAndSourceIndexerKeys():
             friend = serverNodeComm.routeRequestForNode(node, decrypted['routed_public_key'], decrypted.get('name', decrypted['routed_public_key']), decrypted.get('avatar', ''))
 
             return {"status": "request sent", "friend": friend}
@@ -627,17 +628,30 @@ class MongoApi(object):
     
     def postFriend(self, data, decrypted):
         node = Node(public_key = data['public_key'])
+        
         if 'messages' not in decrypted['data']:
             decrypted['data']['messages'] = []
+            
         if 'friends' not in decrypted['data']:
             decrypted['data']['friends'] = []
+            
         if 'public_key' not in decrypted:
-            decrypted['public_key'] = []
+            decrypted['public_key'] = ''
+            
         if 'private_key' not in decrypted:
-            decrypted['private_key'] = []
+            decrypted['private_key'] = ''
+            
+        if 'routed_public_key' not in decrypted:
+            decrypted['routed_public_key'] = ''
+            
         friend = Node.db.friends.find({"public_key" : data['public_key'], "friend_public_key" : decrypted['public_key']}, {'friend': 1})
         if friend.count():
             return {'status': 'already friends'}
+        
+        friend = Node.db.friends.find({"public_key" : data['public_key'], "friend.routed_public_key" : decrypted['routed_public_key']}, {'friend': 1})
+        if friend.count():
+            return {'status': 'already friends'}
+        
         friend = Node(decrypted)
         node.addFriend(friend.get())
         nodeComm = NodeCommunicator(node)
