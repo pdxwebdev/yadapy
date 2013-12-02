@@ -577,6 +577,45 @@ class MongoApi(object):
         node = Node(public_key=data['public_key'])
         return {'identity':node.get('data/identity'), 'requestType':'getIdentity'}
     
+    def getTag(self, data, decrypted):
+        if 'tag' in decrypted and decrypted['tag'][0] == '#':
+            yadaServer = YadaServer()
+            res = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name": decrypted['tag']})
+            if res.count():
+                return {'tag': res[0]['friend'], 'requestType':'getTag'}
+            else:
+                return {'tag': [], 'requestType':'getTag'}
+        else:
+            return []
+
+    def postTag(self, data, decrypted):
+        if 'tag' in decrypted and decrypted['tag'][0] == '#':
+            yadaServer = YadaServer()
+           
+            res = self.getTag(data, decrypted)
+            if 'tag' in res and len(res['tag']) > 0:
+                return {"status" : "already added"}
+            
+            node = Node({}, {"name": decrypted['tag'], "avatar": decrypted['avatar']})
+            
+            newFriend = Node({}, {"name": decrypted['tag'], "avatar": decrypted['avatar']})
+            
+            yadaServer.addFriend(newFriend.get())
+            
+            newFriend.set('data/identity/name', 'yada server')
+            
+            node.addFriend(newFriend.get())
+            
+            newFriendForSelf = Node({}, {"name": decrypted['tag'], "avatar": decrypted['avatar']})
+            
+            node.save()
+            
+            self.postFriend(data, newFriendForSelf.get())
+            
+            return {"status" : "true"}
+        else:
+            return {"status" : "false"}
+    
     def postRoutedFriendRequest(self, data, decrypted):
     
         node = Node(data)
@@ -621,7 +660,14 @@ class MongoApi(object):
     
     
     def postStatus(self, data, decrypted):
+        yadaServer = YadaServer()
         data = Node(public_key = data['public_key'])
+        if 'tags' in decrypted:
+            res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : decrypted['tags']}})
+            newTagList = []
+            for tag in res:
+                newTagList.append({'name': tag['friend']['data']['identity']['name'], 'public_key': tag['public_key'], 'avatar': tag['friend']['data']['identity']['avatar']})
+            decrypted['tags'] = newTagList
         data.addStatus(decrypted)
         return {}
         
