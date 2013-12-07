@@ -600,9 +600,11 @@ class MongoApi(object):
             
             newFriend = Node({}, {"name": decrypted['tag'], "avatar": decrypted['avatar']})
             
+            output = copy.deepcopy(newFriend.get())
+            
             yadaServer.addFriend(newFriend.get())
             
-            newFriend.set('data/identity/name', 'yada server')
+            newFriend.set('data/identity/name', 'yada server', force=True)
             
             node.addFriend(newFriend.get())
             
@@ -612,7 +614,7 @@ class MongoApi(object):
             
             self.postFriend(data, newFriendForSelf.get())
             
-            return {"status" : "true"}
+            return {"requestType": "postTag", "tag": output}
         else:
             return {"status" : "false"}
     
@@ -662,7 +664,7 @@ class MongoApi(object):
     def postStatus(self, data, decrypted):
         yadaServer = YadaServer()
         data = Node(public_key = data['public_key'])
-        if 'tags' in decrypted:
+        if 'tags' in decrypted and decrypted['tags']:
             res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : decrypted['tags']}})
             newTagList = []
             for tag in res:
