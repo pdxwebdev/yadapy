@@ -597,7 +597,7 @@ class MongoApi(object):
                 return {"status" : "already added"}
             
             node = Node({}, {"name": decrypted['tag'], "avatar": decrypted['avatar']})
-            node.add('data/identity/ip_address', node.createIPAddress('staging.yadaproject.com', '80', '4'))
+            node.add('data/identity/ip_address', node.createIPAddress('yadaproject.com', '80', '4'))
 
             newFriend = Node({}, {"name": decrypted['tag'], "avatar": decrypted['avatar']})
             newFriend.set('data', copy.deepcopy(node.get('data')), force=True)
