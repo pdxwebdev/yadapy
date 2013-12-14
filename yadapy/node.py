@@ -289,6 +289,48 @@ class Node(object):
                 return friend
         return None
     
+    def getFriends(self):
+        return self.get('data/friends')
+    
+    def isMutual(self, node):
+        #to determine if an external node is already your friend
+    
+        if isinstance(node, Node):
+            node = node.get()
+            
+        directFriend = self.getFriend(node['public_key'])
+        if directFriend:
+            return directFriend
+        
+        tempNode = Node(copy.deepcopy(self.get()))
+        
+        tempNode.set('data/friends', self.getFriends(), True)
+        
+        friend1Keys = set(self.getRPandSIKeys(tempNode.get()))
+        
+        friend2Keys = set(self.getRPandSIKeys(node) + [x['public_key'] for x in node['data']['friends']])
+        
+        intersection = friend1Keys & friend2Keys
+        
+        nodeFriendsIndexed = {}
+        if intersection:
+            for friend in self.getFriends():
+                for stf in friend['data']['friends']:
+                    if stf['public_key'] in intersection:
+                        return Node(friend)
+        else:
+            return false
+    
+    
+    def getRPandSIKeys(self, friend):
+        keys = []
+        for fr in friend['data']['friends']:
+            if 'routed_public_key' in fr:
+                keys.append(fr['routed_public_key'])
+            if 'source_indexer_key' in fr:
+                keys.append(fr['source_indexer_key'])
+        return keys
+    
     def addFriend(self, friend):
         """
         adds a friend to the data/friends element. also validates the friend is a valid identity

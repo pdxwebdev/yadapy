@@ -709,31 +709,38 @@ class MongoApi(object):
             for tag in res:
                 tagFriendNode = Node(tag['friend'])
                                 
-                mutualNode = data.matchFriend(tagFriendNode)
-                newFriend = Node({}, {'name': tag['friend']['data']['identity']['name']})
-                newFriend.set('data', copy.deepcopy(tagFriendNode.get('data')), force=True)
+                mutualNode = data.isMutual(tagFriendNode)
+                if not mutualNode:
+                    newFriend = Node({}, {'name': tag['friend']['data']['identity']['name']})
+                    newFriend.set('data', copy.deepcopy(tagFriendNode.get('data')), force=True)
+                    
+                    identity = {'name': data.get('data/identity/name')}
+                    try:
+                        identity.update({'avatar': data.get('data/identity/avatar')})
+                    except:
+                        pass
+                    getRoutedPublicKeysAndSourceIndexerKeys
+                    me = Node({}, identity)
+                    me.set('public_key', newFriend.get('public_key'))
+                    me.set('private_key', newFriend.get('private_key'))
+                    
+                    newFriend.addFriend(me.get())
+                    
+                    data.addFriend(newFriend.get())
+                    
+                    tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
+                        
+                    tagNode.addFriend(me.get())
+                    
+                    nodeComm = NodeCommunicator(data)
+                    
+                    nodeComm.updateRelationship(newFriend)
                 
-                identity = {'name': data.get('data/identity/name')}
-                try:
-                    identity.update({'avatar': data.get('data/identity/avatar')})
-                except:
-                    pass
-                
-                me = Node({}, identity)
-                me.set('public_key', newFriend.get('public_key'))
-                me.set('private_key', newFriend.get('private_key'))
-                
-                newFriend.addFriend(me.get())
-                
-                data.addFriend(newFriend.get())
-                
-                tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
-                
-                tagNode.addFriend(me.get())
-                
-                nodeComm = NodeCommunicator(data)
-                
-                nodeComm.updateRelationship(newFriend)
+                else:
+                    
+                    nodeComm = NodeCommunicator(data)
+                    
+                    nodeComm.updateRelationship(mutualNode)
                 
                 nodeComm = NodeCommunicator(yadaServer)
                 
