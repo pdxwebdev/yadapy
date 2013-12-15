@@ -708,6 +708,8 @@ class MongoApi(object):
             res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : tags}})
             for tag in res:
                 tagFriendNode = Node(tag['friend'])
+                    
+                tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
                                 
                 mutualNode = data.isMutual(tagFriendNode)
                 if not mutualNode:
@@ -719,7 +721,7 @@ class MongoApi(object):
                         identity.update({'avatar': data.get('data/identity/avatar')})
                     except:
                         pass
-                    getRoutedPublicKeysAndSourceIndexerKeys
+                    
                     me = Node({}, identity)
                     me.set('public_key', newFriend.get('public_key'))
                     me.set('private_key', newFriend.get('private_key'))
@@ -727,8 +729,6 @@ class MongoApi(object):
                     newFriend.addFriend(me.get())
                     
                     data.addFriend(newFriend.get())
-                    
-                    tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
                         
                     tagNode.addFriend(me.get())
                     
@@ -742,9 +742,11 @@ class MongoApi(object):
                     
                     nodeComm.updateRelationship(mutualNode)
                 
-                nodeComm = NodeCommunicator(yadaServer)
+                tagServerFriend = tagNode.getFriend(tagFriendNode['public_key'])
                 
-                nodeComm.updateRelationship(tagFriendNode)
+                nodeComm2 = NodeCommunicator(tagFriendNode)
+                
+                nodeComm2.updateRelationship(tagServerFriend)
                 
         return {}
         
