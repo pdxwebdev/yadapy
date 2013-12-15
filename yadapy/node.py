@@ -319,7 +319,7 @@ class Node(object):
                     if stf['public_key'] in intersection:
                         return Node(friend)
         else:
-            return false
+            return False
     
     
     def getRPandSIKeys(self, friend):
