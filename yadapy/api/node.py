@@ -597,7 +597,7 @@ class MongoApi(object):
                 return {"status" : "already added"}
             
             node = Node({}, {"name": decrypted['tag'], "avatar": decrypted['avatar']})
-            node.add('data/identity/ip_address', node.createIPAddress('yadaproject.com', '80', '4'))
+            node.add('data/identity/ip_address', node.createIPAddress(Node.defaultHost, '80', '4'))
 
             newFriend = Node({}, {"name": decrypted['tag'], "avatar": decrypted['avatar']})
             newFriend.set('data', copy.deepcopy(node.get('data')), force=True)
@@ -710,6 +710,8 @@ class MongoApi(object):
                 tagFriendNode = Node(tag['friend'])
                     
                 tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
+                
+                friendsAdded = []
                                 
                 mutualNode = data.isMutual(tagFriendNode)
                 if not mutualNode:
@@ -735,6 +737,8 @@ class MongoApi(object):
                     nodeComm = NodeCommunicator(data)
                     
                     nodeComm.updateRelationship(newFriend)
+                    
+                    friendsAdded.append(newFriend.get())
                 
                 else:
                     
@@ -742,13 +746,13 @@ class MongoApi(object):
                     
                     nodeComm.updateRelationship(mutualNode)
                 
-                tagServerFriend = tagNode.getFriend(tagFriendNode['public_key'])
+                tagServerFriend = Node(tagNode.getFriend(tagFriendNode.get('public_key')))
                 
-                nodeComm2 = NodeCommunicator(tagFriendNode)
+                nodeComm2 = NodeCommunicator(tagNode)
                 
                 nodeComm2.updateRelationship(tagServerFriend)
                 
-        return {}
+        return {"requestType": "postStatus", "friendsAdded":friendsAdded}
         
     
     def postFriend(self, data, decrypted):
