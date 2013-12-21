@@ -164,8 +164,16 @@ class MongoApi(object):
         
         friendUpdater(data, decrypted)
         
-        query = {'public_key': data['public_key'], 'friend.subscribed': '*'}
+        query = {'public_key': data['public_key']}
         
+        tagList = []
+        [tagList.extend(tag['status']['tags']) for tag in Node.db.status.find(query, {'_id': 0, "status.tags": 1})]
+        tagList = [tag['public_key'] for tag in tagList]
+        
+        
+        if tagList:
+            query['friend_public_key'] = {"$in": tagList}
+            
         statusList = Node.db.friends.find(query, {'_id': 0, 
                                                   'friend.public_key': 1, 
                                                   'friend.modified': 1,
@@ -696,6 +704,7 @@ class MongoApi(object):
         data = Node(public_key = data['public_key'])
         tags = decrypted['tags']
         newTagList = []
+        friendsAdded = []
         
         matchedFriend = yadaServer.matchFriend(data)
                 
@@ -706,8 +715,6 @@ class MongoApi(object):
                     
                 tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
                 
-                friendsAdded = []
-                                
                 mutualNode = data.isMutual(tagFriendNode)
                 if not mutualNode:
                     newFriend = Node({}, {'name': tag['friend']['data']['identity']['name']})
@@ -771,7 +778,7 @@ class MongoApi(object):
             
         data.addStatus(decrypted)
                 
-        return {"requestType": "postStatus", "friendsAdded":friendsAdded}
+        return {"requestType": "postStatus", "friendsAdded": friendsAdded}
         
     
     def postFriend(self, data, decrypted):
