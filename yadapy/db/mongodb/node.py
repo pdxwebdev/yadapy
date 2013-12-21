@@ -132,6 +132,23 @@ class Node(BaseNode):
         else:
             return super(Node, self).get('data/friends')
         
+    def getFriendsWhoTaggedMe(self, limit=5):
+        friends = self.db.friends.find(
+            {
+                'public_key': self.get('public_key'),
+                'friend.data.status.tags.public_key' : {"$in": [pf['friend_public_key'] for pf in self.getFriendPublicKeyList()]}
+            }, 
+            {
+                'friend': 1
+            }
+        ).sort('friend.data.status.timestamp', -1).limit(limit)
+        
+        if friends.count() > 0:
+            friendList = [friend['friend'] for friend in friends]
+            return friendList
+        else:
+            return super(Node, self).get('data/friends')
+        
     def getFriendBySourceIndexerKey(self, public_key):
         friend = self.db.friends.find({'public_key': self.get('public_key'), 'friend.data.friends.source_indexer_key': public_key}, {'friend': 1})
             
@@ -413,7 +430,7 @@ class Node(BaseNode):
         
         pubKeyList = [key['public_key'] for key in selfNode.get('data/friends')]
         
-        friendList = self.getFriends(15)
+        friendList = self.getFriendsWhoTaggedMe(15)
         if friendList:
             for friend in friendList:
                 if not friend['public_key'] in pubKeyList:

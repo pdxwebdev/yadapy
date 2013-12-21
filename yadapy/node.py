@@ -308,7 +308,7 @@ class Node(object):
         
         friend1Keys = set(self.getRPandSIKeys(tempNode.get()))
         
-        friend2Keys = set(self.getRPandSIKeys(node) + [x['public_key'] for x in node['data']['friends']])
+        friend2Keys = set(self.getRPandSIKeys(node))
         
         intersection = friend1Keys & friend2Keys
         
@@ -316,7 +316,9 @@ class Node(object):
         if intersection:
             for friend in self.getFriends():
                 for stf in friend['data']['friends']:
-                    if stf['public_key'] in intersection:
+                    if 'routed_public_key' in stf and stf['routed_public_key'] in intersection:
+                        return Node(friend)
+                    elif 'source_indexer_key' in stf and stf['source_indexer_key'] in intersection:
                         return Node(friend)
         else:
             return False

@@ -695,14 +695,7 @@ class MongoApi(object):
         yadaServer = YadaServer()
         data = Node(public_key = data['public_key'])
         tags = decrypted['tags']
-        if 'tags' in decrypted and decrypted['tags']:
-            res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : tags}})
-            newTagList = []
-            for tag in res:
-                newTagList.append({'name': tag['friend']['data']['identity']['name'], 'public_key': tag['public_key'], 'avatar': tag['friend']['data']['identity']['avatar']})
-            decrypted['tags'] = newTagList
-            
-        data.addStatus(decrypted)
+        newTagList = []
         
         if 'tags' in decrypted and decrypted['tags']:
             res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : tags}})
@@ -739,18 +732,36 @@ class MongoApi(object):
                     nodeComm.updateRelationship(newFriend)
                     
                     friendsAdded.append(newFriend.get())
+                    
+                    newTagList.append({
+                       'name': newFriend.get('data/identity/name'), 
+                       'public_key': newFriend.get('public_key'), 
+                       'avatar': newFriend.get('data/identity/avatar')
+                    })
                 
                 else:
                     
                     nodeComm = NodeCommunicator(data)
                     
                     nodeComm.updateRelationship(mutualNode)
+                    
+                    newTagList.append({
+                       'name': mutualNode.get('data/identity/name'), 
+                       'public_key': mutualNode.get('public_key'), 
+                       'avatar': mutualNode.get('data/identity/avatar')
+                    })
                 
                 tagServerFriend = Node(tagNode.getFriend(tagFriendNode.get('public_key')))
                 
                 nodeComm2 = NodeCommunicator(tagNode)
                 
                 nodeComm2.updateRelationship(tagServerFriend)
+                
+                
+                
+        decrypted['tags'] = newTagList
+            
+        data.addStatus(decrypted)
                 
         return {"requestType": "postStatus", "friendsAdded":friendsAdded}
         
