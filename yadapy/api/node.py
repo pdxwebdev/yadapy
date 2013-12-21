@@ -602,8 +602,6 @@ class MongoApi(object):
             newFriend = Node({}, {"name": decrypted['tag'], "avatar": decrypted['avatar']})
             newFriend.set('data', copy.deepcopy(node.get('data')), force=True)
             
-            output = copy.deepcopy(newFriend.get())
-            
             newFriend.set('data/identity/name', 'yada server', force=True)
             
             node.add('data/friends', newFriend.get())
@@ -635,6 +633,8 @@ class MongoApi(object):
             newFriendForSelf.set('data', copy.deepcopy(data.get('data')), True)
             node.add('data/friends', newFriendForSelf.get())
             node.addFriend(newFriendForSelf.get())
+            
+            output = copy.deepcopy(newFriendForSelf.get())
             
             newFriendForSelf.set('data', copy.deepcopy(node.get('data')), True)
             self.postFriend(data, newFriendForSelf.get())
@@ -697,6 +697,8 @@ class MongoApi(object):
         tags = decrypted['tags']
         newTagList = []
         
+        matchedFriend = yadaServer.matchFriend(data)
+                
         if 'tags' in decrypted and decrypted['tags']:
             res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : tags}})
             for tag in res:
@@ -709,7 +711,9 @@ class MongoApi(object):
                 mutualNode = data.isMutual(tagFriendNode)
                 if not mutualNode:
                     newFriend = Node({}, {'name': tag['friend']['data']['identity']['name']})
-                    newFriend.set('data', copy.deepcopy(tagFriendNode.get('data')), force=True)
+                    newFriend.set('data', copy.deepcopy(tagFriendNode.get('data')), True)
+                    newFriend.set('source_indexer_key', tagFriendNode.get('public_key'), True)
+                    newFriend.set('routed_public_key', matchedFriend.get('public_key'), True)
                     
                     identity = {'name': data.get('data/identity/name')}
                     try:
@@ -735,7 +739,9 @@ class MongoApi(object):
                     
                     newTagList.append({
                        'name': newFriend.get('data/identity/name'), 
-                       'public_key': newFriend.get('public_key'), 
+                       'public_key': newFriend.get('public_key'),
+                       'source_indexer_key': newFriend.get('source_indexer_key'),                       
+                       'routed_public_key': newFriend.get('routed_public_key'),
                        'avatar': newFriend.get('data/identity/avatar')
                     })
                 
@@ -747,7 +753,9 @@ class MongoApi(object):
                     
                     newTagList.append({
                        'name': mutualNode.get('data/identity/name'), 
-                       'public_key': mutualNode.get('public_key'), 
+                       'public_key': mutualNode.get('public_key'),                       
+                       'source_indexer_key': mutualNode.get('source_indexer_key'),
+                       'routed_public_key': mutualNode.get('routed_public_key'),
                        'avatar': mutualNode.get('data/identity/avatar')
                     })
                 

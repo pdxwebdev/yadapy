@@ -1,5 +1,5 @@
 *.py[co]
-
+docs/_build
 # Packages
 *.egg
 *.egg-info
