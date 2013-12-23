@@ -732,7 +732,7 @@ class MongoApi(object):
                     me.set('public_key', newFriend.get('public_key'))
                     me.set('private_key', newFriend.get('private_key'))
                     
-                    newFriend.addFriend(me.get())
+                    newFriend.add('data/friends', me.get(), create=True)
                     
                     data.addFriend(newFriend.get())
                         
