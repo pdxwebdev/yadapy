@@ -141,7 +141,7 @@ class Node(BaseNode):
             {
                 'friend': 1
             }
-        ).limit(limit).sort('friend.data.status.timestamp', -1)
+        ).hint([("public_key",1), ("friend.data.status.tags.public_key",1)]).limit(limit).sort('friend.data.status.timestamp', -1)
         
         if friends.count() > 0:
             friendList = [friend['friend'] for friend in friends]
