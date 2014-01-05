@@ -144,17 +144,17 @@ class Node(BaseNode):
                     },
                     {
                         "$match" : {
-                            "friend.status" : {"$not" : { "$size" : 0 }}
+                            "friend.data.status" : {"$not" : { "$size" : 0 }}
                         }
                     },
                     {
                         "$match" : {
-                            "friend.status.tags" : {"$not" : { "$size" : 0 }}
+                            "friend.data.status.tags" : {"$not" : { "$size" : 0 }}
                         }
                     },
                     {
                         "$match" : {
-                            "friend.status.tags.public_key" : { "$in" : friendPublicKeys }
+                            "friend.data.status.tags.public_key" : { "$in" : friendPublicKeys }
                         }
                     },
                     {
