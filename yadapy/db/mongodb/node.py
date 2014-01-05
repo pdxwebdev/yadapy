@@ -141,7 +141,7 @@ class Node(BaseNode):
             {
                 'friend': 1
             }
-        ).sort('friend.data.status.timestamp', -1).limit(limit)
+        ).limit(limit)
         
         if friends.count() > 0:
             friendList = [friend['friend'] for friend in friends]
