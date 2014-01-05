@@ -738,10 +738,6 @@ class MongoApi(object):
                         
                     tagNode.addFriend(me.get())
                     
-                    nodeComm = NodeCommunicator(data)
-                    
-                    nodeComm.updateRelationship(newFriend)
-                    
                     friendsAdded.append(newFriend.get())
                     
                     newTagList.append({
@@ -754,10 +750,6 @@ class MongoApi(object):
                 
                 else:
                     
-                    nodeComm = NodeCommunicator(data)
-                    
-                    nodeComm.updateRelationship(mutualNode)
-                    
                     newTagList.append({
                        'name': mutualNode.get('data/identity/name'), 
                        'public_key': mutualNode.get('public_key'),                       
@@ -766,17 +758,29 @@ class MongoApi(object):
                        'avatar': mutualNode.get('data/identity/avatar')
                     })
                 
-                tagServerFriend = Node(tagNode.getFriend(tagFriendNode.get('public_key')))
                 
-                nodeComm2 = NodeCommunicator(tagNode)
+            status = decrypted.copy()
+            status['tags'] = newTagList
+        
+        data.addStatus(status)
+        
+        if 'tags' in decrypted and decrypted['tags']:
+            for tag in status['tags']:
+                nodeComm = NodeCommunicator(data)
+                try:
+                    nodeComm.updateRelationship(Node(data.getFriend(tag['public_key'])))
+                except Exception as ex:
+                    raise ex
                 
-                nodeComm2.updateRelationship(tagServerFriend)
-                
-                
-                
-        decrypted['tags'] = newTagList
-            
-        data.addStatus(decrypted)
+            for tag in decrypted['tags']:
+                res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : tags}})
+                for tag in res:
+                    tagFriendNode = Node(tag['friend'])
+                    nodeComm2 = NodeCommunicator(tagNode)
+                    try:
+                        nodeComm2.updateRelationship(Node(tagNode.getFriend(tagFriendNode.get('public_key'))))
+                    except Exception as ex:
+                        raise ex
                 
         return {"requestType": "postStatus", "friendsAdded": friendsAdded}
         
