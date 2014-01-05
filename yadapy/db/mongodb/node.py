@@ -133,39 +133,18 @@ class Node(BaseNode):
             return super(Node, self).get('data/friends')
         
     def getFriendsWhoTaggedMe(self, limit=5):
-        friendPublicKeys = [pf['friend_public_key'] for pf in self.getFriendPublicKeyList()]
-        friends = self.db.command(
+        friends = self.db.friends.find(
             {
-                "aggregate" : "friends", "pipeline" : [
-                    {
-                        "$match" : {
-                            "public_key" : self.get('public_key')
-                        }
-                    },
-                    {
-                        "$match" : {
-                            "friend.data.status" : {"$not" : { "$size" : 0 }}
-                        }
-                    },
-                    {
-                        "$match" : {
-                            "friend.data.status.tags" : {"$not" : { "$size" : 0 }}
-                        }
-                    },
-                    {
-                        "$match" : {
-                            "friend.data.status.tags.public_key" : { "$in" : friendPublicKeys }
-                        }
-                    },
-                    {
-                        "$limit" : limit
-                    },
-                ]
+                'public_key': self.get('public_key'),
+                'friend.data.status.tags.public_key' : {"$in": [pf['friend_public_key'] for pf in self.getFriendPublicKeyList()]}
+            }, 
+            {
+                'friend': 1
             }
-        )
+        ).limit(limit).sort('friend.data.status.timestamp', -1)
         
-        if len(friends['result']) > 0:
-            friendList = [friend['friend'] for friend in friends['result']]
+        if friends.count() > 0:
+            friendList = [friend['friend'] for friend in friends]
             return friendList
         else:
             return super(Node, self).get('data/friends')
