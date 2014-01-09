@@ -775,6 +775,7 @@ class MongoApi(object):
             for tag in decrypted['tags']:
                 res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : tags}})
                 for tag in res:
+                    tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
                     tagFriendNode = Node(tag['friend'])
                     nodeComm2 = NodeCommunicator(tagNode)
                     try:
