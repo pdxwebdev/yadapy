@@ -586,11 +586,49 @@ class MongoApi(object):
         return {'identity':node.get('data/identity'), 'requestType':'getIdentity'}
     
     def getTag(self, data, decrypted):
+        yadaServer = YadaServer()
+        data = Node(public_key = data['public_key'])
+        newTagList = []
+        friendsAdded = []
+        
+        matchedFriend = yadaServer.matchFriend(data)
+                
         if 'tag' in decrypted and decrypted['tag'][0] == '#':
             yadaServer = YadaServer()
             res = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name": decrypted['tag']})
             if res.count():
-                return {'tag': res[0]['friend'], 'requestType':'getTag'}
+                tag = res[0]
+                tagFriendNode = Node(tag['friend'])
+                    
+                tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
+                
+                mutualNode = data.isMutual(tagFriendNode)
+                if not mutualNode:
+                    newFriend = Node({}, {'name': tag['friend']['data']['identity']['name']})
+                    newFriend.set('data', copy.deepcopy(tagFriendNode.get('data')), True)
+                    newFriend.set('source_indexer_key', tagFriendNode.get('public_key'), True)
+                    newFriend.set('routed_public_key', matchedFriend.get('public_key'), True)
+                    
+                    identity = {'name': data.get('data/identity/name')}
+                    try:
+                        identity.update({'avatar': data.get('data/identity/avatar')})
+                    except:
+                        pass
+                    
+                    me = Node({}, identity)
+                    me.set('public_key', newFriend.get('public_key'))
+                    me.set('private_key', newFriend.get('private_key'))
+                    
+                    newFriend.add('data/friends', me.get(), create=True)
+                    
+                    data.addFriend(newFriend.get())
+                        
+                    tagNode.addFriend(me.get())
+                    
+                    friendsAdded.append(newFriend.get())
+
+                    return {'tag': newFriend.get(), 'requestType':'getTag', 'new': True}
+                return {'tag': mutualNode.get(), 'requestType':'getTag'}
             else:
                 return {'tag': [], 'requestType':'getTag'}
         else:
