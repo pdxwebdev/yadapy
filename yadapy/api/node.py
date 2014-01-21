@@ -595,16 +595,16 @@ class MongoApi(object):
                 
         if 'tag' in decrypted and decrypted['tag'][0] == '#':
             yadaServer = YadaServer()
-            res = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name": decrypted['tag']})
+            res = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name": decrypted['tag'].lower()})
             if res.count():
                 tag = res[0]
                 tagFriendNode = Node(tag['friend'])
                     
-                tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
+                tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name'].lower()})[0])
                 
                 mutualNode = data.isMutual(tagFriendNode)
                 if not mutualNode:
-                    newFriend = Node({}, {'name': tag['friend']['data']['identity']['name']})
+                    newFriend = Node({}, {'name': tag['friend']['data']['identity']['name'].lower()})
                     newFriend.set('data', copy.deepcopy(tagFriendNode.get('data')), True)
                     newFriend.set('source_indexer_key', tagFriendNode.get('public_key'), True)
                     newFriend.set('routed_public_key', matchedFriend.get('public_key'), True)
@@ -642,10 +642,10 @@ class MongoApi(object):
             if 'tag' in res and len(res['tag']) > 0:
                 return {"status" : "already added"}
             
-            node = Node({}, {"name": decrypted['tag'], "avatar": decrypted['avatar']})
+            node = Node({}, {"name": decrypted['tag'].lower(), "avatar": decrypted['avatar']})
             node.add('data/identity/ip_address', node.createIPAddress(Node.defaultHost, '80', '4'))
 
-            newFriend = Node({}, {"name": decrypted['tag'], "avatar": decrypted['avatar']})
+            newFriend = Node({}, {"name": decrypted['tag'].lower(), "avatar": decrypted['avatar']})
             newFriend.set('data', copy.deepcopy(node.get('data')), force=True)
             
             newFriend.set('data/identity/name', 'yada server', force=True)
@@ -662,7 +662,7 @@ class MongoApi(object):
             
             node.addFriend(newFriend.get())
             
-            newFriendForSelf = Node({}, {"name": decrypted['tag'], "avatar": decrypted['avatar']})
+            newFriendForSelf = Node({}, {"name": decrypted['tag'].lower(), "avatar": decrypted['avatar']})
             newFriendForSelf.set('source_indexer_key', newFriend.get('public_key'), True)
             
             
