@@ -686,10 +686,10 @@ class MongoApi(object):
             
             newFriendForSelf.set('data', copy.deepcopy(data.get('data')), True)
             node.add('data/friends', newFriendForSelf.get())
-            newFriendForSelf.set('data', copy.deepcopy(data.get('data')), True)
-            node.add('data/friends', newFriendForSelf.get())
             node.addFriend(newFriendForSelf.get())
             
+            newFriendForSelf.set('data/identity/name', decrypted['tag'].lower(), True)
+            newFriendForSelf.set('data/identity/avatar', decrypted['avatar'], True)
             output = copy.deepcopy(newFriendForSelf.get())
             
             newFriendForSelf.set('data', copy.deepcopy(node.get('data')), True)
