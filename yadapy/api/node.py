@@ -627,6 +627,16 @@ class MongoApi(object):
                     
                     friendsAdded.append(newFriend.get())
 
+                    res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : decrypted['tag']})
+                    for tag in res:
+                        tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
+                        tagFriendNode = Node(tag['friend'])
+                        nodeComm2 = NodeCommunicator(tagNode)
+                        try:
+                            nodeComm2.updateRelationship(Node(tagNode.getFriend(tagFriendNode.get('public_key'))))
+                        except Exception as ex:
+                            raise ex
+
                     return {'tag': newFriend.get(), 'requestType':'getTag', 'new': True}
                 return {'tag': mutualNode.get(), 'requestType':'getTag'}
             else:
@@ -687,6 +697,17 @@ class MongoApi(object):
             
             nodeComm = NodeCommunicator(selfNode)
             nodeComm.updateRelationship(newFriendForSelf)
+                
+
+            res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : decrypted['tag']})
+            for tag in res:
+                tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
+                tagFriendNode = Node(tag['friend'])
+                nodeComm2 = NodeCommunicator(tagNode)
+                try:
+                    nodeComm2.updateRelationship(Node(tagNode.getFriend(tagFriendNode.get('public_key'))))
+                except Exception as ex:
+                    raise ex
             
             return {"requestType": "postTag", "tag": output}
         else:
