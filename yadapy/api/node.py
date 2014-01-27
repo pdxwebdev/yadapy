@@ -792,6 +792,8 @@ class MongoApi(object):
                     me = Node({}, identity)
                     me.set('public_key', newFriend.get('public_key'))
                     me.set('private_key', newFriend.get('private_key'))
+                    me.set('source_indexer_key', matchedFriend.get('public_key'), True)
+                    me.set('routed_public_key', tagFriendNode.get('public_key'), True)
                     
                     newFriend.add('data/friends', me.get(), create=True)
                     
