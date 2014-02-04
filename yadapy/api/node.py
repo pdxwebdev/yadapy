@@ -1,4 +1,4 @@
-import json, logging, os, copy
+import json, logging, os, copy, re
 from uuid import uuid4
 from yadapy.lib.crypt import decrypt, encrypt
 from pymongo import Connection
@@ -638,9 +638,24 @@ class MongoApi(object):
                             nodeComm2.updateRelationship(Node(tagNode.getFriend(tagFriendNode.get('public_key'))))
                         except Exception as ex:
                             raise ex
-
-                    return {'tag': newFriend.get(), 'requestType':'getTag', 'new': True}
-                return {'tag': mutualNode.get(), 'requestType':'getTag'}
+                    if tag['friend']['data']['identity']['name'].lower() == '#latest':
+                        yadaServer = YadaServer()
+                        regx = re.compile("#.*", re.IGNORECASE)
+                        searchQuery = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name" : regx}, {"_id":0})
+                        results = [friend['friend'] for friend in searchQuery]
+                        newFriend.add('data/friends', results)
+                        return {'tag': newFriend.get(), 'requestType':'getTag', 'new': True}
+                    else:
+                        return {'tag': newFriend.get(), 'requestType':'getTag', 'new': True}
+                if tag['friend']['data']['identity']['name'].lower() == '#latest':
+                    yadaServer = YadaServer()
+                    regx = re.compile("#.*", re.IGNORECASE)
+                    searchQuery = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name" : regx}, {"_id":0})
+                    results = [friend['friend'] for friend in searchQuery]
+                    mutualNode.add('data/friends', results)
+                    return {'tag': mutualNode.get(), 'requestType':'getTag'}
+                else:
+                    return {'tag': mutualNode.get(), 'requestType':'getTag'}
             else:
                 return {'tag': [], 'requestType':'getTag'}
         else:
