@@ -585,6 +585,13 @@ class MongoApi(object):
         node = Node(public_key=data['public_key'])
         return {'identity':node.get('data/identity'), 'requestType':'getIdentity'}
     
+    def getLatestTags(self, data, decrypted):
+        yadaServer = YadaServer()
+        regx = re.compile("#.*", re.IGNORECASE)
+        searchQuery = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name" : regx}, {"_id":0})
+        results = [friend['friend'] for friend in searchQuery]
+        return {'tags': results, 'requestType':'getLatestTags', 'new': True}
+    
     def getTag(self, data, decrypted):
         yadaServer = YadaServer()
         data = Node(public_key = data['public_key'])
@@ -638,24 +645,8 @@ class MongoApi(object):
                             nodeComm2.updateRelationship(Node(tagNode.getFriend(tagFriendNode.get('public_key'))))
                         except Exception as ex:
                             raise ex
-                    if tag['friend']['data']['identity']['name'].lower() == '#latest':
-                        yadaServer = YadaServer()
-                        regx = re.compile("#.*", re.IGNORECASE)
-                        searchQuery = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name" : regx}, {"_id":0})
-                        results = [friend['friend'] for friend in searchQuery]
-                        newFriend.add('data/friends', results)
-                        return {'tag': newFriend.get(), 'requestType':'getTag', 'new': True}
-                    else:
-                        return {'tag': newFriend.get(), 'requestType':'getTag', 'new': True}
-                if tag['friend']['data']['identity']['name'].lower() == '#latest':
-                    yadaServer = YadaServer()
-                    regx = re.compile("#.*", re.IGNORECASE)
-                    searchQuery = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name" : regx}, {"_id":0})
-                    results = [friend['friend'] for friend in searchQuery]
-                    mutualNode.add('data/friends', results)
-                    return {'tag': mutualNode.get(), 'requestType':'getTag'}
-                else:
-                    return {'tag': mutualNode.get(), 'requestType':'getTag'}
+                    return {'tag': newFriend.get(), 'requestType':'getTag', 'new': True}
+                return {'tag': mutualNode.get(), 'requestType':'getTag'}
             else:
                 return {'tag': [], 'requestType':'getTag'}
         else:
