@@ -317,9 +317,11 @@ class Node(object):
             for friend in self.getFriends():
                 for stf in friend['data']['friends']:
                     if 'routed_public_key' in stf and stf['routed_public_key'] in intersection:
-                        return Node(friend)
+                        if not self.getFriend(stf['routed_public_key']):
+                            return Node(friend)
                     elif 'source_indexer_key' in stf and stf['source_indexer_key'] in intersection:
-                        return Node(friend)
+                        if not self.getFriend(stf['source_indexer_key']):
+                            return Node(friend)
         else:
             return False
     

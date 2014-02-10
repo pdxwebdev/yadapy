@@ -131,7 +131,7 @@ class Node(BaseNode):
             return friendList
         else:
             return super(Node, self).get('data/friends')
-        
+
     def getFriendsWhoTaggedMe(self, limit=5):
         friends = self.db.friends.find(
             {
@@ -408,7 +408,41 @@ class Node(BaseNode):
                     },
                 ]
             })['result'][0]['ip_address']
-
+            
+    def isMutual(self, externalNode):
+        #to determine if an external node is already your friend
+    
+        if isinstance(externalNode, Node):
+            externalNode = externalNode.get()
+            
+        directFriend = self.getFriend(externalNode['public_key'])
+        if directFriend:
+            return directFriend
+        
+        
+        friend2Keys = self.getRPandSIKeys(externalNode)
+        
+        useKeys = []
+        for friend in externalNode['data']['friends']:
+            if friend['public_key'] in friend2Keys:
+                useKeys.append(friend['public_key'])
+        
+        friends = self.db.friends.find(
+            {
+                'public_key': self.get('public_key'),
+                '$or' : [
+                         {'friend.data.friends.routed_public_key': {'$in': useKeys}},
+                         {'friend.data.friends.source_indexer_key': {'$in': useKeys}}
+                ],
+                
+            }, 
+            {
+                '_id': 0,
+                'friend': 1
+            }
+        )
+        return Node(friends[0]['friend']) if friends.count() else False
+        
     def respondWithRelationship(self, friendNode):
         """
         This method will return a dictionary prepared to be encrypted, encoded and sent

@@ -598,16 +598,16 @@ class MongoApi(object):
         tags = decrypted['tags']
         newTagList = []
         friendsAdded = []
+        notFound = []
         
         matchedFriend = yadaServer.matchFriend(data)
 
         if 'tags' in decrypted and decrypted['tags']:
             newFriends = []
             outTags = []
-            res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : tags}})
             yadaServer = YadaServer()
-            for tag in res:
-                res = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name": tag['friend']['data']['identity']['name'].lower()})
+            for requestedTag in decrypted['tags']:
+                res = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name": requestedTag.lower()})
                 if res.count():
                     tag = res[0]
                     tagFriendNode = Node(tag['friend'])
@@ -654,22 +654,29 @@ class MongoApi(object):
                         outTags.append(newFriend.get())
                     else:
                         outTags.append(mutualNode.get())
-            return {'tags': outTags, 'requestType':'getTags', "friendsAdded": friendsAdded}
+                else:
+                    notFound.append(requestedTag)
+            return {'tags': outTags, 'requestType':'getTags', "friendsAdded": friendsAdded, 'notFound': notFound}
         else:
             return []
 
-    def postTag(self, data, decrypted):
-        if 'tag' in decrypted and decrypted['tag'][0] == '#':
-            yadaServer = YadaServer()
-           
-            res = self.getTag(data, decrypted)
-            if 'tag' in res and len(res['tag']) > 0:
-                return {"status" : "already added"}
-            
-            node = Node({}, {"name": decrypted['tag'].lower(), "avatar": decrypted['avatar']})
-            node.add('data/identity/ip_address', node.createIPAddress(Node.defaultHost, '80', '4'))
+    def postTags(self, data, decrypted):
 
-            newFriend = Node({}, {"name": decrypted['tag'].lower(), "avatar": decrypted['avatar']})
+        yadaServer = YadaServer()
+        alreadyAdded = []
+        
+        for tag in decrypted['tags']:
+            if Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name": tag['name'].lower()}).count():
+                alreadyAdded.append(tag['name'])
+                
+            res = self.getTags(data, {'tags': [tag['name']]})
+            if tag['name'] in res['tags']:
+                alreadyAdded.append(tag['name'])
+        
+            node = Node({}, {"name": tag['name'].lower(), "avatar": tag['avatar']})
+            node.add('data/identity/ip_address', node.createIPAddress(Node.defaultHost, '80', '4'))
+    
+            newFriend = Node({}, {"name": tag['name'].lower(), "avatar": tag['avatar']})
             newFriend.set('data', copy.deepcopy(node.get('data')), force=True)
             
             newFriend.set('data/identity/name', 'yada server', force=True)
@@ -686,7 +693,7 @@ class MongoApi(object):
             
             node.addFriend(newFriend.get())
             
-            newFriendForSelf = Node({}, {"name": decrypted['tag'].lower(), "avatar": decrypted['avatar']})
+            newFriendForSelf = Node({}, {"name": tag['name'].lower(), "avatar": tag['avatar']})
             newFriendForSelf.set('source_indexer_key', newFriend.get('public_key'), True)
             
             
@@ -702,8 +709,8 @@ class MongoApi(object):
             node.add('data/friends', newFriendForSelf.get())
             node.addFriend(newFriendForSelf.get())
             
-            newFriendForSelf.set('data/identity/name', decrypted['tag'].lower(), True)
-            newFriendForSelf.set('data/identity/avatar', decrypted['avatar'], True)
+            newFriendForSelf.set('data/identity/name', tag['name'].lower(), True)
+            newFriendForSelf.set('data/identity/avatar', tag['avatar'], True)
             output = copy.deepcopy(newFriendForSelf.get())
             
             newFriendForSelf.set('data', copy.deepcopy(node.get('data')), True)
@@ -712,8 +719,8 @@ class MongoApi(object):
             nodeComm = NodeCommunicator(selfNode)
             nodeComm.updateRelationship(newFriendForSelf)
                 
-
-            res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : decrypted['tag']})
+    
+            res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : tag['name'].lower()})
             for tag in res:
                 tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
                 tagFriendNode = Node(tag['friend'])
@@ -724,8 +731,6 @@ class MongoApi(object):
                     raise ex
             
             return {"requestType": "postTag", "tag": output}
-        else:
-            return {"status" : "false"}
     
     def postRoutedFriendRequest(self, data, decrypted):
     
