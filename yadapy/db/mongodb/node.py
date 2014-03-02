@@ -143,8 +143,24 @@ class Node(BaseNode):
             }
         ).hint([("public_key",1), ("friend.data.status.tags.public_key",1)]).limit(limit).sort('friend.data.status.timestamp', -1)
         
+        friendList = []
+        
+        for friend in friends:
+            friendList.append(friend['friend'])
+            for status in friend['friend']['data']['status']:
+                childStatusFriends = self.db.friends.find(
+                    {
+                        'public_key': self.get('public_key'),
+                        'friend.data.status.tags.share_id' : status['share_id']
+                    }, 
+                    {
+                        'friend': 1
+                    }
+                ).hint([("public_key",1), ("friend.data.status.tags.public_key",1)]).limit(limit).sort('friend.data.status.timestamp', -1)
+                for childStatusFriend in childStatusFriends:
+                    friendList.append(childStatusFriend['friend'])
+        
         if friends.count() > 0:
-            friendList = [friend['friend'] for friend in friends]
             return friendList
         else:
             return super(Node, self).get('data/friends')
@@ -318,6 +334,14 @@ class Node(BaseNode):
             ]
         })['result'][0]['friend'];
     
+    def getFriendByShareId(self, share_id):
+        friends = self.db.friends.find({"public_key": self.get("public_key"), "friend.data.status.share_id" : share_id}, {"friend_public_key" : 1})
+        
+        if friends.count() > 0:
+            return self.getFriend(friends[0]['friend_public_key'])
+        else:
+            return None
+    
     def getProfileIdentity(self, public_key):
         ret = self.db.command(
             {
@@ -409,7 +433,7 @@ class Node(BaseNode):
                 ]
             })['result'][0]['ip_address']
             
-    def isMutual(self, externalNode):
+    def isMutual(self, externalNode, notThisNode = None):
         #to determine if an external node is already your friend
     
         if isinstance(externalNode, Node):
@@ -419,29 +443,57 @@ class Node(BaseNode):
         if directFriend:
             return directFriend
         
-        
-        friend2Keys = self.getRPandSIKeys(externalNode)
-        
-        useKeys = []
-        for friend in externalNode['data']['friends']:
-            if friend['public_key'] in friend2Keys:
-                useKeys.append(friend['public_key'])
-        
-        friends = self.db.friends.find(
-            {
-                'public_key': self.get('public_key'),
-                '$or' : [
-                         {'friend.data.friends.routed_public_key': {'$in': useKeys}},
-                         {'friend.data.friends.source_indexer_key': {'$in': useKeys}}
-                ],
-                
-            }, 
-            {
-                '_id': 0,
-                'friend': 1
-            }
-        )
-        return Node(friends[0]['friend']) if friends.count() else False
+        try:
+            friend2Keys = self.getRPandSIKeys(externalNode)
+            
+            useKeys = []
+            for friend in externalNode['data']['friends']:
+                if friend['public_key'] in friend2Keys:
+                    useKeys.append(friend['public_key'])
+            
+            friends = self.db.friends.find(
+                {
+                    'public_key': self.get('public_key'),
+                    '$or' : [
+                             {'friend.data.friends.routed_public_key': {'$in': useKeys}},
+                             {'friend.data.friends.source_indexer_key': {'$in': useKeys}}
+                    ],
+                    
+                }, 
+                {
+                    '_id': 0,
+                    'friend': 1
+                }
+            )
+            if friends.count():
+                return Node(friends[0]['friend'])  
+        except:
+            if 'source_indexer_key' in externalNode and 'routed_public_key' in externalNode:
+                friends = self.db.friends.find(
+                    {
+                        'public_key': self.get('public_key'),
+                        'friend.data.friends.public_key': {'$in': [externalNode['routed_public_key'], externalNode['source_indexer_key']]}                    
+                    },
+                    {
+                        '_id': 0,
+                        'friend': 1
+                    }
+                )
+                if friends.count():
+                    if notThisNode:
+                        if friends[0]['friend']['public_key'] == notThisNode['public_key']:
+                            return Node(friends[1]['friend'])
+                        else:
+                            return Node(friends[0]['friend'])
+                    else:
+                        #without notThisNode, we cannot accurately determine the correct node 
+                        #if we are friends with two friends having friends with public_keys equal to source_indexer_key and routed_public_key
+                        return None
+                else:
+                    return None
+            
+            else:
+                return None
         
     def respondWithRelationship(self, friendNode):
         """

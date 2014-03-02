@@ -784,85 +784,174 @@ class MongoApi(object):
         newTagList = []
         friendsAdded = []
         
-        matchedFriend = yadaServer.matchFriend(data)
-                
+        dataServerFriend = yadaServer.matchFriend(data)
+        
         if 'tags' in decrypted and decrypted['tags']:
             res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : tags}})
             for tag in res:
-                tagFriendNode = Node(tag['friend'])
-                    
-                tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
-                
-                mutualNode = data.isMutual(tagFriendNode)
-                if not mutualNode:
-                    newFriend = Node({}, {'name': tag['friend']['data']['identity']['name']})
-                    newFriend.set('data', copy.deepcopy(tagFriendNode.get('data')), True)
-                    newFriend.set('source_indexer_key', tagFriendNode.get('public_key'), True)
-                    newFriend.set('routed_public_key', matchedFriend.get('public_key'), True)
-                    
-                    identity = {'name': data.get('data/identity/name')}
-                    try:
-                        identity.update({'avatar': data.get('data/identity/avatar')})
-                    except:
-                        pass
-                    
-                    me = Node({}, identity)
-                    me.set('public_key', newFriend.get('public_key'))
-                    me.set('private_key', newFriend.get('private_key'))
-                    me.set('source_indexer_key', matchedFriend.get('public_key'), True)
-                    me.set('routed_public_key', tagFriendNode.get('public_key'), True)
-                    
-                    newFriend.add('data/friends', me.get(), create=True)
-                    
-                    data.addFriend(newFriend.get())
-                        
-                    tagNode.addFriend(me.get())
-                    
-                    friendsAdded.append(newFriend.get())
-                    
-                    newTagList.append({
-                       'name': newFriend.get('data/identity/name'), 
-                       'public_key': newFriend.get('public_key'),
-                       'source_indexer_key': newFriend.get('source_indexer_key'),                       
-                       'routed_public_key': newFriend.get('routed_public_key'),
-                       'avatar': newFriend.get('data/identity/avatar')
-                    })
-                
-                else:
-                    
-                    newTagList.append({
-                       'name': mutualNode.get('data/identity/name'), 
-                       'public_key': mutualNode.get('public_key'),                       
-                       'source_indexer_key': mutualNode.get('source_indexer_key'),
-                       'routed_public_key': mutualNode.get('routed_public_key'),
-                       'avatar': mutualNode.get('data/identity/avatar')
-                    })
-                
-                
+                friend, new = addNewTagFriend(data, tag, dataServerFriend)
+                slimFriend = {
+                   'name': friend.get('data/identity/name'), 
+                   'public_key': friend.get('public_key'),                       
+                   'source_indexer_key': friend.get('source_indexer_key'),
+                   'routed_public_key': friend.get('routed_public_key'),
+                   'avatar': friend.get('data/identity/avatar')
+                }
+                if new:
+                    friendsAdded.append(friend.get())
+                newTagList.append(slimFriend)
+            
             status = decrypted.copy()
-            status['tags'] = newTagList
-        
-        data.addStatus(status)
-        
+            if res.count():
+                status['tags'] = newTagList
+                data.addStatus(status)                
+            else:
+                data.addStatus(status)  
+                for tag in decrypted['tags']:
+                    if 'share_id' in tag:
+                        statusRef = Node.db.status.find({'public_key': data.get('public_key'), 'data.status.share_id': tag['share_id']})
+                        if statusRef.count():
+                            pass
+                            #I did it, do nothing
+                        else:
+                            statusRef = Node.db.friends.find({'public_key': data.get('public_key'), 'friend.data.status.share_id': tag['share_id']})
+                            
+                        
+                        if statusRef.count():
+                            updateTagFriend(data, statusRef[0]['friend'], tag)
+                        else:
+                            #we are not friends with the originator of this status update. lets make friends.
+                            statusRef = Node.db.command(
+                                {
+                                    "aggregate" : "friends", "pipeline" : [
+                                        {
+                                            "$match" : {
+                                                "public_key" : data.get('public_key'),
+                                                 'friend.data.friends.data.status.share_id': tag['share_id']
+                                            }
+                                        },
+                                        {
+                                            "$match" : {
+                                                "friend.data.friends" : { "$not" : {"$size" : 0}}
+                                            }
+                                        },
+                                        {
+                                            "$unwind" : "$friend.data.friends"
+                                         },
+                                        {
+                                            "$match" : {
+                                                "friend.data.friends.data.status" : { "$not" : {"$size" : 0}}
+                                            }
+                                        },
+                                        {
+                                            "$match" : {
+                                                "friend.data.friends.data.status.share_id" : tag['share_id']
+                                            }
+                                        },
+                                        {
+                                            "$project" : {
+                                                          "_id": 0,
+                                                          "friend" : "$friend.data.friends",
+                                                        }
+                                        },
+                                    ]
+                                }
+                            )['result']
+                            for tagItem in statusRef:
+                                tagItem = tagItem['friend']
+                                friend, new = addNewTagFriend(data, tagItem, dataServerFriend)
+                                slimFriend = {
+                                   'name': friend.get('data/identity/name'), 
+                                   'public_key': friend.get('public_key'),                       
+                                   'source_indexer_key': friend.get('source_indexer_key'),
+                                   'routed_public_key': friend.get('routed_public_key'),
+                                }
+                                try:
+                                    slimFriend.update({'avatar': friend.get('data/identity/avatar')})
+                                except:
+                                    slimFriend.update({'avatar': ''})
+                                if new:
+                                    friendsAdded.append(friend.get())
+                                newTagList.append(slimFriend)
+                                updateTagFriend(data, friend, tag)
+                                
+                        parentShare = Node.db.command(
+                            {
+                                "aggregate" : "friends", "pipeline" : [
+                                    {
+                                        "$match" : {
+                                            "public_key" : data.get('public_key'),
+                                             'friend.data.friends.data.status.share_id': tag['share_id']
+                                        }
+                                    },
+                                    {
+                                        "$match" : {
+                                            "friend.data.friends" : { "$not" : {"$size" : 0}}
+                                        }
+                                    },
+                                    {
+                                        "$unwind" : "$friend.data.friends"
+                                     },
+                                    {
+                                        "$match" : {
+                                            "friend.data.friends.data.status" : { "$not" : {"$size" : 0}}
+                                        }
+                                    },
+                                    {
+                                        "$unwind" : "$friend.data.friends.data.status"
+                                     },
+                                    {
+                                        "$match" : {
+                                            "friend.data.friends.data.status.share_id" : tag['share_id']
+                                        }
+                                    },
+                                    {
+                                        "$project" : {
+                                                      "_id": 0,
+                                                      "status" : "$friend.data.friends.data.status",
+                                                    }
+                                    },
+                                ]
+                            }
+                        )['result']
+                        if parentShare and 'tags' in parentShare[0]['status']:
+                            for tagItem in parentShare[0]['status']['tags']:
+                                nodeComm = NodeCommunicator(data)
+                                if 'friend' in statusRef[0]:
+                                    statusRef = statusRef[0]['friend']
+                                tagFriend = data.isMutual(tagItem, statusRef)
+                                nodeComm.updateRelationship(Node(tagFriend))
+                                
+                                res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : [tagItem['name']]}})
+                                updateServerTag(res)
+                                
         if 'tags' in decrypted and decrypted['tags']:
             for tag in status['tags']:
                 nodeComm = NodeCommunicator(data)
                 try:
-                    nodeComm.updateRelationship(Node(data.getFriend(tag['public_key'])))
+                    if 'public_key' in tag:
+                        nodeComm.updateRelationship(Node(data.getFriend(tag['public_key'])))
+                    elif 'share_id' in tag:
+                        friend = data.getFriendByShareId(tag['share_id'])
+                        #the above may not always succeed, so we may not always have a friend for this share_id
+                        if friend:
+                            nodeComm.updateRelationship(Node(friend))
                 except Exception as ex:
                     raise ex
                 
-            for tag in decrypted['tags']:
-                res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : tags}})
-                for tag in res:
-                    tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
-                    tagFriendNode = Node(tag['friend'])
-                    nodeComm2 = NodeCommunicator(tagNode)
-                    try:
-                        nodeComm2.updateRelationship(Node(tagNode.getFriend(tagFriendNode.get('public_key'))))
-                    except Exception as ex:
-                        raise ex
-                
+            for tag in status['tags']:
+                res = []
+                if 'public_key' in tag:
+                    res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : tags}})
+                    updateServerTag(res)
+                elif 'share_id' in tag:
+                    friend = data.getFriendByShareId(tag['share_id'])
+                    #the above may not always succeed, so we may not always have a friend for this share_id
+                    if friend:
+                        res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : [friend['data']['identity']['name']]}})
+                        updateServerTag(res)
+               
+                    
         return {"requestType": "postStatus", "friendsAdded": friendsAdded}
         
     
@@ -934,6 +1023,65 @@ class MongoApi(object):
             Node.db.friends.update({'public_key': data['public_key'], 'friend_public_key': decrypted['public_key']}, {"$set": {"friend.subscribed": "*"}}, multi=True)
             
         return {}
+
+def updateTagFriend(data, statusOriginNode, tag):
+    if isinstance(statusOriginNode, Node):
+        statusOriginNode = statusOriginNode.get()
+    for statusItem in statusOriginNode['data']['status']:
+        if statusItem['share_id'] == tag['share_id'] and 'tags' in statusItem:
+            for nestedTagItem in statusItem['tags']:
+                myFriend = data.isMutual(nestedTagItem, statusOriginNode)
+                if myFriend:
+                    nodeComm = NodeCommunicator(data)
+                    nodeComm.updateRelationship(myFriend)
+                    
+def addNewTagFriend(data, tag, matchedFriend):
+    if 'friend' in tag:
+        tagFriendNode = Node(tag['friend'])
+        tag = tag['friend']
+    else:
+        tagFriendNode = tag
+        
+    tagNode = Node(Node.col.find({'data.identity.name': tag['data']['identity']['name']})[0])
+    mutualNode = data.isMutual(tagFriendNode)
+    if not mutualNode:
+        newFriend = Node({}, {'name': tag['data']['identity']['name']})
+        newFriend.set('data', copy.deepcopy(tagFriendNode.get('data')), True)
+        newFriend.set('source_indexer_key', tagFriendNode.get('public_key'), True)
+        newFriend.set('routed_public_key', matchedFriend.get('public_key'), True)
+        
+        identity = {'name': data.get('data/identity/name')}
+        try:
+            identity.update({'avatar': data.get('data/identity/avatar')})
+        except:
+            identity.update({'avatar': ''})
+        
+        me = Node({}, identity)
+        me.set('public_key', newFriend.get('public_key'))
+        me.set('private_key', newFriend.get('private_key'))
+        me.set('source_indexer_key', matchedFriend.get('public_key'), True)
+        me.set('routed_public_key', tagFriendNode.get('public_key'), True)
+        
+        newFriend.add('data/friends', me.get(), create=True)
+        newFriend.set('data/messages', [], True)
+        
+        data.addFriend(newFriend.get())
+            
+        tagNode.addFriend(me.get())
+        
+        return newFriend, True
+    else:
+        return mutualNode, False
+        
+def updateServerTag(tags):
+    for tag in tags:
+        tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
+        tagFriendNode = Node(tag['friend'])
+        nodeComm2 = NodeCommunicator(tagNode)
+        try:
+            nodeComm2.updateRelationship(Node(tagNode.getFriend(tagFriendNode.get('public_key'))))
+        except Exception as ex:
+            raise ex
 
 def gatherStatuses(friend, ignore):
     posts = []

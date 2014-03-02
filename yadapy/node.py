@@ -36,6 +36,7 @@ class Node(object):
             
         self.identityData = copy.deepcopy({
           "name" : "",
+          "avatar": "",
           "modified" : self.newTimeStamp(),
           "label" : "default",
           "location" : [
