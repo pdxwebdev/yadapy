@@ -441,7 +441,7 @@ class Node(BaseNode):
             
         directFriend = self.getFriend(externalNode['public_key'])
         if directFriend:
-            return directFriend
+            return Node(directFriend)
         
         try:
             friend2Keys = self.getRPandSIKeys(externalNode)

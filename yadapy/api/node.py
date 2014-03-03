@@ -920,7 +920,7 @@ class MongoApi(object):
                                 if 'friend' in statusRef[0]:
                                     statusRef = statusRef[0]['friend']
                                 tagFriend = data.isMutual(tagItem, statusRef)
-                                nodeComm.updateRelationship(Node(tagFriend))
+                                nodeComm.updateRelationship(tagFriend)
                                 
                                 res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : { '$in' : [tagItem['name']]}})
                                 updateServerTag(res)
