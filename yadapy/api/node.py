@@ -588,7 +588,7 @@ class MongoApi(object):
     def getLatestTags(self, data, decrypted):
         yadaServer = YadaServer()
         regx = re.compile("#.*", re.IGNORECASE)
-        searchQuery = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name" : regx}, {"_id":0})
+        searchQuery = Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name" : regx}, {"_id":0}).limit(25).sort('friend.data.friends.data.status.timestamp', -1)
         results = [friend['friend'] for friend in searchQuery]
         return {'tags': results, 'requestType':'getLatestTags', 'new': True}
     
