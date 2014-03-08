@@ -7,7 +7,6 @@ from yadapy.db.mongodb.node import Node
 from yadapy.db.mongodb.manager import YadaServer
 from yadapy.nodecommunicator import NodeCommunicator
 from yadapy.db.mongodb.lib.jsonencoder import MongoEncoder
-settings = __import__(os.getenv('DJANGO_SETTINGS_MODULE'), globals(), locals(), ['settings', 'prod'], -1)
 
 
 class MongoApi(object):
@@ -991,23 +990,6 @@ class MongoApi(object):
         except:
             pass
         
-        return {}
-    
-    def postFriendAndPromote(self, data, decrypted):
-        node = Node(public_key = data['public_key'])
-        if 'messages' not in decrypted['data']:
-            decrypted['data']['messages'] = []
-        if 'friends' not in decrypted['data']:
-            decrypted['data']['friends'] = []
-        if 'public_key' not in decrypted:
-            decrypted['public_key'] = []
-        if 'private_key' not in decrypted:
-            decrypted['private_key'] = []
-        friend = Node(decrypted)
-        node.addFriend(friend.get())
-        node.add('data/friends', decrypted)
-        nodeComm = NodeCommunicator(node, manager=settings.node)
-        nodeComm.grantPromotion(friend)
         return {}
     
     def postIdentity(self, data, decrypted):
