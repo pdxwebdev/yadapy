@@ -10,7 +10,7 @@ from yadapy.db.mongodb.lib.jsonencoder import MongoEncoder
 
 
 class MongoApi(object):
-    def __init__(self, nodeComm):
+    def __init__(self, nodeComm = None):
         self.nodeComm = nodeComm
     
     def getCounts(self, data, decrypted):
