@@ -663,6 +663,7 @@ class MongoApi(object):
 
         yadaServer = YadaServer()
         alreadyAdded = []
+        output = []
         
         for tag in decrypted['tags']:
             if Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name": tag['name'].lower()}).count():
@@ -710,7 +711,7 @@ class MongoApi(object):
             
             newFriendForSelf.set('data/identity/name', tag['name'].lower(), True)
             newFriendForSelf.set('data/identity/avatar', tag['avatar'], True)
-            output = copy.deepcopy(newFriendForSelf.get())
+            output.append(copy.deepcopy(newFriendForSelf.get()))
             
             newFriendForSelf.set('data', copy.deepcopy(node.get('data')), True)
             self.postFriend(data, newFriendForSelf.get())
@@ -729,7 +730,7 @@ class MongoApi(object):
                 except Exception as ex:
                     raise ex
             
-            return {"requestType": "postTag", "tag": output}
+        return {"requestType": "postTag", "tags": output, 'alreadyAdded': alreadyAdded}
     
     def postRoutedFriendRequest(self, data, decrypted):
     
