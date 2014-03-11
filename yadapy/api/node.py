@@ -665,6 +665,16 @@ class MongoApi(object):
         alreadyAdded = []
         output = []
         
+        if 'friends' not in data['data']:
+            data['data']['friends'] = []
+        data['data']['messages'] = []
+        
+        selfNode = Node(data)
+        friendList = selfNode.getFriends()
+        for friend in friendList:
+            selfNode.add('data/friends', friend, True)
+            
+        matchedFriend = yadaServer.matchFriend(selfNode)
         for tag in decrypted['tags']:
             if Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name": tag['name'].lower()}).count():
                 alreadyAdded.append(tag['name'])
@@ -695,14 +705,6 @@ class MongoApi(object):
             
             newFriendForSelf = Node({}, {"name": tag['name'].lower(), "avatar": tag['avatar']})
             newFriendForSelf.set('source_indexer_key', newFriend.get('public_key'), True)
-            
-            
-            data['data']['friends'] = []
-            data['data']['messages'] = []
-            selfNode = Node(data)
-            selfNode.set('data/friends', selfNode.getFriends(), True)
-            matchedFriend = yadaServer.matchFriend(selfNode)
-            
             newFriendForSelf.set('routed_public_key', matchedFriend['public_key'], True) # need data - yadaserver public_key
             
             newFriendForSelf.set('data', copy.deepcopy(data.get('data')), True)
@@ -714,7 +716,7 @@ class MongoApi(object):
             output.append(copy.deepcopy(newFriendForSelf.get()))
             
             newFriendForSelf.set('data', copy.deepcopy(node.get('data')), True)
-            self.postFriend(data, newFriendForSelf.get())
+            selfNode.addFriend(newFriendForSelf.get())
             
             nodeComm = NodeCommunicator(selfNode)
             nodeComm.updateRelationship(newFriendForSelf)
