@@ -782,7 +782,7 @@ class MongoApi(object):
     def postStatus(self, data, decrypted):
         yadaServer = YadaServer()
         data = Node(public_key = data['public_key'])
-        tags = decrypted['tags']
+        tags = [tag.lower() for tag in decrypted['tags']]
         newTagList = []
         friendsAdded = []
         
