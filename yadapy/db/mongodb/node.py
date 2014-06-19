@@ -603,7 +603,7 @@ class Node(BaseNode):
                                     tempDict['data']['identity']['name'] = x['data']['identity']['name']
                                     tempDict['data']['identity']['ip_address'] = x['data']['identity']['ip_address']
                                     if 'status' in x['data']:
-                                        tempDict['data']['status'] = x['data']['status'][:10]
+                                        tempDict['data']['status'] = x['data']['status']
                                     if 'avatar' in x['data']['identity']:
                                         tempDict['data']['identity']['avatar'] = x['data']['identity']['avatar']
                                     

@@ -782,7 +782,11 @@ class MongoApi(object):
     def postStatus(self, data, decrypted):
         yadaServer = YadaServer()
         data = Node(public_key = data['public_key'])
-        tags = [tag.lower() for tag in decrypted['tags']]
+        tags = []
+        for tag in decrypted['tags']:
+            if type(tag) == type(''):
+                tag = tag.lower()
+            tags.append(tag)
         newTagList = []
         friendsAdded = []
         
@@ -811,7 +815,7 @@ class MongoApi(object):
                 data.addStatus(status)  
                 for tag in decrypted['tags']:
                     if 'share_id' in tag:
-                        statusRef = Node.db.status.find({'public_key': data.get('public_key'), 'data.status.share_id': tag['share_id']})
+                        statusRef = Node.db.status.find({'public_key': data.get('public_key'), 'status.share_id': tag['share_id']})
                         if statusRef.count():
                             pass
                             #I did it, do nothing
@@ -819,64 +823,73 @@ class MongoApi(object):
                             statusRef = Node.db.friends.find({'public_key': data.get('public_key'), 'friend.data.status.share_id': tag['share_id']})
                             
                         
-                        if statusRef.count():
-                            updateTagFriend(data, statusRef[0]['friend'], tag)
-                        else:
-                            #we are not friends with the originator of this status update. lets make friends.
-                            statusRef = Node.db.command(
-                                {
-                                    "aggregate" : "friends", "pipeline" : [
-                                        {
-                                            "$match" : {
-                                                "public_key" : data.get('public_key'),
-                                                 'friend.data.friends.data.status.share_id': tag['share_id']
-                                            }
-                                        },
-                                        {
-                                            "$match" : {
-                                                "friend.data.friends" : { "$not" : {"$size" : 0}}
-                                            }
-                                        },
-                                        {
-                                            "$unwind" : "$friend.data.friends"
-                                         },
-                                        {
-                                            "$match" : {
-                                                "friend.data.friends.data.status" : { "$not" : {"$size" : 0}}
-                                            }
-                                        },
-                                        {
-                                            "$match" : {
-                                                "friend.data.friends.data.status.share_id" : tag['share_id']
-                                            }
-                                        },
-                                        {
-                                            "$project" : {
-                                                          "_id": 0,
-                                                          "friend" : "$friend.data.friends",
-                                                        }
-                                        },
-                                    ]
-                                }
-                            )['result']
-                            for tagItem in statusRef:
-                                tagItem = tagItem['friend']
-                                friend, new = addNewTagFriend(data, tagItem, dataServerFriend)
-                                slimFriend = {
-                                   'name': friend.get('data/identity/name'), 
-                                   'public_key': friend.get('public_key'),                       
-                                   'source_indexer_key': friend.get('source_indexer_key'),
-                                   'routed_public_key': friend.get('routed_public_key'),
-                                }
-                                try:
-                                    slimFriend.update({'avatar': friend.get('data/identity/avatar')})
-                                except:
-                                    slimFriend.update({'avatar': ''})
-                                if new:
-                                    friendsAdded.append(friend.get())
-                                newTagList.append(slimFriend)
-                                updateTagFriend(data, friend, tag)
-                                
+                            if statusRef.count():
+                                updateTagFriend(data, statusRef[0]['friend'], tag)
+                            else:
+                                #we are not friends with the originator of this status update. lets make friends.
+                                statusRef = Node.db.command(
+                                    {
+                                        "aggregate" : "friends", "pipeline" : [
+                                            {
+                                                "$match" : {
+                                                    "public_key" : data.get('public_key'),
+                                                     'friend.data.friends.data.status.share_id': tag['share_id']
+                                                }
+                                            },
+                                            {
+                                                "$match" : {
+                                                    "friend.data.friends" : { "$not" : {"$size" : 0}}
+                                                }
+                                            },
+                                            {
+                                                "$unwind" : "$friend.data.friends"
+                                             },
+                                            {
+                                                "$match" : {
+                                                    "friend.data.friends.data.status" : { "$not" : {"$size" : 0}}
+                                                }
+                                            },
+                                            {
+                                                "$match" : {
+                                                    "friend.data.friends.data.status.share_id" : tag['share_id']
+                                                }
+                                            },
+                                            {
+                                                "$project" : {
+                                                              "_id": 0,
+                                                              "friend" : "$friend.data.friends",
+                                                            }
+                                            },
+                                        ]
+                                    }
+                                )['result']
+                                for tagItem in statusRef:
+                                    tagItem = tagItem['friend']
+                                    friend, new = addNewTagFriend(data, tagItem, dataServerFriend)
+                                    slimFriend = {
+                                       'name': friend.get('data/identity/name'), 
+                                       'public_key': friend.get('public_key'),
+                                    }
+                                    
+                                    try:
+                                       slimFriend.update({'source_indexer_key': friend.get('source_indexer_key')})
+                                    except:
+                                        pass
+                                    
+                                    try:
+                                       slimFriend.update({'routed_public_key': friend.get('routed_public_key')})
+                                    except:
+                                        pass
+                                    
+                                    try:
+                                        slimFriend.update({'avatar': friend.get('data/identity/avatar')})
+                                    except:
+                                        slimFriend.update({'avatar': ''})
+                                    if new:
+                                        friendsAdded.append(friend.get())
+                                    newTagList.append(slimFriend)
+                                    updateTagFriend(data, friend, tag)
+                                    
                         parentShare = Node.db.command(
                             {
                                 "aggregate" : "friends", "pipeline" : [
