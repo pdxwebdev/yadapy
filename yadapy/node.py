@@ -514,7 +514,7 @@ class Node(object):
                             tempDict['data']['identity']['name'] = friend['data']['identity']['name']
                             tempDict['data']['identity']['ip_address'] = friend['data']['identity']['ip_address']
                             if 'status' in friend['data']:
-                                tempDict['data']['status'] = friend['data']['status'][:10]
+                                tempDict['data']['status'] = friend['data']['status']
                             if 'avatar' in friend['data']['identity']:
                                 tempDict['data']['identity']['avatar'] = friend['data']['identity']['avatar']
                             
