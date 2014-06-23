@@ -784,7 +784,7 @@ class MongoApi(object):
         data = Node(public_key = data['public_key'])
         tags = []
         for tag in decrypted['tags']:
-            if type(tag) == type(''):
+            if type(tag) == type('') or type(tag) == type(u''):
                 tag = tag.lower()
             tags.append(tag)
         newTagList = []
