@@ -52,6 +52,28 @@ class Node(BaseNode):
         
     def addFriend(self, friend):
         self.db.friends.insert({'public_key': self.get('public_key'), 'friend_public_key': friend['public_key'], 'friend': friend})
+        try:
+            self.addStatus({'content': {
+                                        'ref_id': friend['public_key'], 
+                                        'type': 'friends', 
+                                        'newOrUpdate': 'new',
+                                        'name': friend['data']['identity']['name'],
+                                        'avatar': friend['data']['identity']['avatar']
+                            },                                     
+                            'timestamp': self.newTimeStamp(), 
+                            'share_id': str(uuid4()),
+                            'tags': [
+                                {
+                                'public_key': friend['public_key'],
+                                'routed_public_key': friend['routed_public_key'],
+                                'source_indexer_key': friend['source_indexer_key'],
+                                'name': friend['data']['identity']['name'],
+                                'avatar': friend['data']['identity']['avatar']
+                                }
+                                ]
+                            })
+        except:
+            pass
         
     def addMessage(self, message):
         #self.pushItem('data.messages', message)

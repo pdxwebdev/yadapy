@@ -638,6 +638,12 @@ class MongoApi(object):
                             
                         tagNode.addFriend(me.get())
                         
+                        nodeComm1 = NodeCommunicator(data)
+                        try:
+                            nodeComm1.updateRelationship(newFriend)
+                        except:
+                            pass
+                        
                         friendsAdded.append(newFriend.get())
     
                         res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : tag['friend']['data']['identity']['name'].lower()})
