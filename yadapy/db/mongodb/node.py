@@ -521,6 +521,12 @@ class Node(BaseNode):
             for friend in friendList:
                 if not friend['public_key'] in pubKeyList:
                     selfNode.add('data/friends', friend)
+                    
+        friendsCount = self.db.friends.find(
+            {
+                'public_key': self.get('public_key')
+            }
+        ).count()
         
         friend5 = self.getFriend(friendNode.get('public_key'))
         
@@ -537,6 +543,8 @@ class Node(BaseNode):
         selfNode.set('data/messages', self.getMessagesForFriend(friendNode.get('public_key')))
         selfNode.set('data/routed_friend_requests', self.getRoutedFriendRequestsForFriend(friendNode.get('public_key')))
         selfNode.set('data/status', self.getStatusesForFriend(friendNode.get('public_key')))
+        
+        selfNode.set('data/friends_count', friendsCount, True)
         
         friendNode.get().update({"data" : selfNode.get('data')})
         friendNode.preventInfiniteNesting(friendNode.get())
@@ -614,8 +622,11 @@ class Node(BaseNode):
                         
                     node._data['data']['friends'] = tempList
                     node._data['modified'] = node._data['modified']
+                    friend.sync(node.get())
                     
-                    self.db.friends.update({'public_key': self.get('public_key'), "friend_public_key": node.get('public_key')}, {'$set': {"friend.data" : node.get('data'), "friend.modified": node.get('modified')}})
+                    friend.syncStfStatuses(node.get())                                            
+                    
+                    self.db.friends.update({'public_key': self.get('public_key'), "friend_public_key": node.get('public_key')}, {'$set': {"friend.data" : friend.get('data'), "friend.modified": node.get('modified')}})
                 else:
                     raise BaseException("Friend not updated. Old node newer than inbound node.")
         elif self.get('public_key') == node.get('public_key'):

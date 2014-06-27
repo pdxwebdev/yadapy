@@ -754,10 +754,10 @@ class Node(object):
                                         if not is_self:
                                             if 'U' in permission_object_ref:
                                                 newList.append(item)
-                                                self.updateStatus(internal,key,item[key_name],"update")
+                                                self.updateStatus(internal,key,item[key_name],"update", item)
                                         else:
                                             newList.append(item)
-                                            self.updateStatus(internal,key,item[key_name],"update")
+                                            self.updateStatus(internal,key,item[key_name],"update", item)
                                     else:
                                         newList.append(internalRef_indexed[(item[key_name],)])
                                 except:
@@ -772,7 +772,7 @@ class Node(object):
                                         elif key == 'friends':
                                             self.addFriend(item)
                                         if not key_name=='guid':
-                                            self.updateStatus(internal,key,item[key_name], "new")
+                                            self.updateStatus(internal,key,item[key_name], "new", item)
                                 else:
                                     newList.append(item)
                                     if key == 'messages':
@@ -780,7 +780,7 @@ class Node(object):
                                     elif key == 'friends':
                                         self.addFriend(item)
                                     if not key_name=='guid':
-                                        self.updateStatus(internal,key,item[key_name], "new")
+                                        self.updateStatus(internal,key,item[key_name], "new", item)
                         for item in newList:
                             newList_indexed[(item[key_name],)] = item
                         for item in internalRef:
@@ -888,8 +888,26 @@ class Node(object):
                         raise
                 i=i+1
 
-
-    def updateStatus(self, jsonData, arrayKey, elementKey, newOrUpdate):
+    def syncStfStatuses(self, inbound):
+        #this is suppose to be run from a first tier Node friend.
+        if 'friends' in self.get('data') and 'friends' in inbound['data']:
+            stfIndexed = {}
+            
+            for stf in inbound['data']['friends']:
+                stfIndexed[stf['public_key']] = stf
+                
+            for internalStf in self.get('data/friends'):
+                inboundStf = stfIndexed[internalStf['public_key']] #if the public key isn't here, we have a problem with the previous sync step which should have added all friends from inbound. giving it all public keys
+                if 'status' in internalStf['data'] and 'status' in inboundStf['data']:
+                    internalStfSharesIndex = {}
+                    for internalStfShare in internalStf['data']['status']:
+                        internalStfSharesIndex[internalStfShare['share_id']] = internalStfShare
+                        
+                    for inboundStfShare in inboundStf['data']['status']:
+                        if inboundStfShare['share_id'] not in internalStfSharesIndex:
+                            internalStf['data']['status'].append(inboundStfShare)
+                    
+    def updateStatus(self, jsonData, arrayKey, elementKey, newOrUpdate, obj={}):
         """
         This method will attempt to update your status automatically based on activity
         during the sync process.
@@ -903,10 +921,16 @@ class Node(object):
             if type(item['content'])== type({}):
                 lookup[(item['content']['ref_id'],item['content']['type'])] = item
         if (elementKey,arrayKey) in lookup: return
+        
+        content = {'type': arrayKey,'ref_id':elementKey,'newOrUpdate':newOrUpdate}
+        if type(obj) == type({}) and 'data' in obj and 'identity' in obj['data']:
+            content['name'] = obj['data']['identity']['name']
+            content['avatar'] = obj['data']['identity']['avatar']
+            
         jsonData['status'].append({
             'timestamp': self.newTimeStamp(),
             'share_id': str(uuid4()),
-            'content': {'type': arrayKey,'ref_id':elementKey,'newOrUpdate':newOrUpdate}
+            'content': content
         })
         return
     
