@@ -12,7 +12,9 @@ https://github.com/pdxwebdev/yadapy/wiki/Quick-Start-Instructions
 
 yadapy is a python implementation of the Yada Project Protocol.
 
-
+======
+What is this?
+---
 The purpose of this identity management framework is to more accurately represent real-life social interaction. What we currently know as “social networking” is a square forced through the circular hole of, “every website has its own social network and every social network belongs to its containing website.”
 
 The mission is to break this model. In doing so, privacy is improved, ownership of data is granted, and information sharing is promoted, ultimately benefiting site owners in ways outlined in the features section below.
