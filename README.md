@@ -44,16 +44,3 @@ o	Websites / people indexers
 o	Symbols (tags)
 -	Another form of “glue”, answering the question commonly asked, “how do you two know each other?”
 -	Create or add context for relationships, posts, comments, etc.
-
-
-Proof of Concepts Completed:
----
-- iPhone App - http://itunes.apple.com/us/app/yada-project/id426657120?mt=8&ls=1#
-- Generic forum web site demonstrating automatic account registration and login
-- Server web site demonstrating identity management / hosting
-
-Road Map:
----
-- Testing
-- Refactoring
-- Gathering User input / feature requests
