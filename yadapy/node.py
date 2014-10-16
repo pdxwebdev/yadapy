@@ -925,7 +925,10 @@ class Node(object):
         content = {'type': arrayKey,'ref_id':elementKey,'newOrUpdate':newOrUpdate}
         if type(obj) == type({}) and 'data' in obj and 'identity' in obj['data']:
             content['name'] = obj['data']['identity']['name']
-            content['avatar'] = obj['data']['identity']['avatar']
+            if 'avatar' in obj['data']['identity']:
+                content['avatar'] = obj['data']['identity']['avatar']
+            else:
+                content['avatar'] = ''
             
         jsonData['status'].append({
             'timestamp': self.newTimeStamp(),
