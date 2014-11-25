@@ -6,9 +6,9 @@ from autobahn.twisted.websocket import WebSocketServerProtocol, WebSocketServerF
 import json, re, logging, os, sys, hashlib, base64, traceback
 from twisted.internet.protocol import Protocol, Factory
 from twisted.internet import reactor
-from nodecommunicator import NodeCommunicator
-from db.mongodb.manager import YadaServer
-from db.mongodb.node import Node
+from yadapy.nodecommunicator import NodeCommunicator
+from yadapy.db.mongodb.manager import YadaServer
+from yadapy.db.mongodb.node import Node
 from api.node import MongoApi
 from pymongo import Connection
 from lib.crypt import decrypt
@@ -27,44 +27,51 @@ ys = YadaServer()
 nodeComm = NodeCommunicator(ys)
 mongoapi = MongoApi(nodeComm)
 
-#class Echo(Protocol):
 class MyServerProtocol(WebSocketServerProtocol):    
-    #def connectionMade(self):
     def onConnect(self, request):
+        print 'connected!'
         f = open('/home/phablet/yadaserver.log', 'a')
         f.write('connected2\n')
         f.close()
-	#call (['python', '/home/phablet/notify.py'])
          
-    #def dataReceived(self, inbound):
     def onMessage(self, inbound, isBinary):
         """
         As soon as any data is received, write it back.
         """
+        print 'got data!'
 	f = open('/home/phablet/yadaserver.log', 'a')
-	if 'websocket' in inbound:
-            headers = dict(re.findall(r"(?P<name>.*?): (?P<value>.*?)\r\n", inbound))
-	    key = headers['Sec-WebSocket-Key']
-	    f.write('|---|%s|---|\n' % key)
-	    newhash = base64.b64encode(hashlib.sha1(key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11').digest())
-	    
-	    self.transport.write("""HTTP/1.1 101 Switching Protocols
-Upgrade: websocket
-Connection: Upgrade
-Sec-WebSocket-Accept: %s
+        try:
+            inboundObj = json.loads(inbound)
+            if "METHOD" in inboundObj and inboundObj['METHOD'] == "CREATE_IDENTITY":
+                f.write('got identity message')
+                f.close()
+                n = Node({}, {"name": ""})
+                n._data['idlabel'] = inboundObj['DATA']
+                n.save()
+                return
 
+            if "METHOD" in inboundObj and inboundObj['METHOD'] == "UPDATE_IDENTITY":
+                f.write('got update identity message')
+                f.close()
+                print inboundObj
+                n = Node(inboundObj['DATA'])
+                n.save()
+                return
 
-
-""" % newhash)
-	    return
-	try:
+        except:
+	    pass
+        try:
             f.write('|---|%s|---|\n' % inbound)
-	    inbound = json.loads(base64.b64decode(inbound))
-	    f.write(json.dumps(inbound))
-	    response = nodeComm.handlePacket(inbound)
-            returnData = json.dumps(response)
-            
-            self.transport.write(returnData)
+            #f.write(json.dumps(inbound))
+	    #response = nodeComm.handlePacket(inbound)
+            #returnData = json.dumps(response)
+            """
+		This is generally where a qr scanner would forward the object to postFriend api endpoint.
+		instead, we're going to 
+	    """
+            print "about to start notify.py"
+            call (['python', '/home/phablet/notify.py', inbound])
+            self.sendMessage('OK')
         except:
 	    exc_type, exc_value, exc_traceback = sys.exc_info()
 	    lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
@@ -73,16 +80,11 @@ Sec-WebSocket-Accept: %s
             f.close()
 
 def main():
-    #f = Factory()
-    #f.protocol = Echo
     f = WebSocketServerFactory("ws://localhost:8901", debug = False)
     f.protocol = MyServerProtocol
     reactor.listenTCP(8901, f)
+    print "running server"
     reactor.run()
 
 if __name__ == '__main__':
-    fpid = os.fork()
-    if fpid != 0:
-	print 'A new child ',  os.getpid()
-	sys.exit(0)
     main()
