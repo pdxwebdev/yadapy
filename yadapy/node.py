@@ -220,10 +220,12 @@ class Node(object):
 
     def newIdentity(self, identity):
         self.identityData.update(identity)
+        created_at = self.newTimeStamp()
         return copy.deepcopy({
             'public_key':self.newUuid(), 
             'private_key':self.newUuid(),
-            'modified': self.newTimeStamp(),
+            'modified': created_at,
+            'timestamp': created_at,
             'friend_requests': [],
             'data':{
                 "routed_friend_requests" : [],
