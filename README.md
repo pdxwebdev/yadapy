@@ -41,6 +41,6 @@ Technical Features:
     -	Websites / people indexers
 -	Users will exchange relationship information to authenticate with a site or app. 
 -	Web sites are one form of “glue” for users, enabling the knowledge of who has a mutual friend and to provide context for communication. Users will always request other friends through a web site or tag.
-    -	Symbols (tags)
--	Another form of “glue”, answering the question commonly asked, “how do you two know each other?”
--	Create or add context for relationships, posts, comments, etc.
+-	Symbols (tags)
+    -	Another form of “glue”, answering the question commonly asked, “how do you two know each other?”
+    -	Create or add context for relationships, posts, comments, etc.
