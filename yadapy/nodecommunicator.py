@@ -1,4 +1,4 @@
-import logging, os, json, time, copy, time, datetime, re, urllib, httplib, socket, requests
+import logging, os, ujson as json, time, copy, time, datetime, re, urllib, httplib, socket, requests
 from base64 import b64encode, b64decode
 from uuid import uuid4
 from lib.crypt import encrypt, decrypt
@@ -356,15 +356,25 @@ class NodeCommunicator(object):
         elif packet.get('method', None) == 'GET':
             
             packetData = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
+            start = time.time()
             self.node.updateFromNode(json.loads(packetData))
+            end = time.time()
+            print "updateFromNode: %s" % (end - start)
+            start = time.time()
             responseData = self.node.respondWithRelationship(Node(json.loads(packetData)))
+            end = time.time()
+            print "updateFromNode: %s" % (end - start)
+            start = time.time()
             responseData = Node(responseData)
-            return \
-                {
+            encryptedResponse =  {
                     "method" : "PUT",
                     "public_key" : responseData.get('public_key'),
                     "data" : encrypt(responseData.get('private_key'), responseData.get('private_key'), json.dumps(responseData.get()))
                 }
+            end = time.time()
+            print "updateFromNode: %s" % (end - start)
+            return encryptedResponse
+                
         elif packet.get('method', None) == 'SYNC':
             node = self.node.get()
             data = decrypt(node['private_key'], node['private_key'], b64encode(packetData))

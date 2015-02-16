@@ -220,12 +220,10 @@ class Node(object):
 
     def newIdentity(self, identity):
         self.identityData.update(identity)
-        created_at = self.newTimeStamp()
         return copy.deepcopy({
             'public_key':self.newUuid(), 
             'private_key':self.newUuid(),
-            'modified': created_at,
-            'timestamp': created_at,
+            'modified': self.newTimeStamp(),
             'friend_requests': [],
             'data':{
                 "routed_friend_requests" : [],
@@ -899,15 +897,18 @@ class Node(object):
                 stfIndexed[stf['public_key']] = stf
                 
             for internalStf in self.get('data/friends'):
-                inboundStf = stfIndexed[internalStf['public_key']] #if the public key isn't here, we have a problem with the previous sync step which should have added all friends from inbound. giving it all public keys
-                if 'status' in internalStf['data'] and 'status' in inboundStf['data']:
-                    internalStfSharesIndex = {}
-                    for internalStfShare in internalStf['data']['status']:
-                        internalStfSharesIndex[internalStfShare['share_id']] = internalStfShare
-                        
-                    for inboundStfShare in inboundStf['data']['status']:
-                        if inboundStfShare['share_id'] not in internalStfSharesIndex:
-                            internalStf['data']['status'].append(inboundStfShare)
+                try: #adding try because inbound may have less public_keys than internal
+                    inboundStf = stfIndexed[internalStf['public_key']] #if the public key isn't here, we have a problem with the previous sync step which should have added all friends from inbound. giving it all public keys
+                    if 'status' in internalStf['data'] and 'status' in inboundStf['data']:
+                        internalStfSharesIndex = {}
+                        for internalStfShare in internalStf['data']['status']:
+                            internalStfSharesIndex[internalStfShare['share_id']] = internalStfShare
+                            
+                        for inboundStfShare in inboundStf['data']['status']:
+                            if inboundStfShare['share_id'] not in internalStfSharesIndex:
+                                internalStf['data']['status'].append(inboundStfShare)
+                except Exception as e:
+                    pass
                     
     def updateStatus(self, jsonData, arrayKey, elementKey, newOrUpdate, obj={}):
         """

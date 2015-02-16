@@ -123,7 +123,7 @@ class MongoApi(object):
                         },
                     ]
                 })
-            #this is a heck because aggregation framework wont support matching the public_key with routed_public_key
+            #this is a hack because aggregation framework wont support matching the public_key with routed_public_key
             for i, r in enumerate(message['result']):
                 if 'message_public_keym' in r and 'public_keym' in r:
                     if r['public_keym'] in r['message_public_keym'] and not r['guid'] in latestMessageGUIDs:
@@ -685,9 +685,10 @@ class MongoApi(object):
             if Node.db.friends.find({"public_key" : yadaServer.get('public_key'), "friend.data.identity.name": tag['name'].lower()}).count():
                 alreadyAdded.append(tag['name'])
                 
-            res = self.getTags(data, {'tags': [tag['name']]})
-            if tag['name'] in res['tags']:
-                alreadyAdded.append(tag['name'])
+            if tag['name'] not in alreadyAdded: #because it causes errors just to check, look into this later
+                res = self.getTags(data, {'tags': [tag['name']]})
+                if tag['name'] in res['tags']:
+                    alreadyAdded.append(tag['name'])
         
             node = Node({}, {"name": tag['name'].lower(), "avatar": tag['avatar']})
             node.add('data/identity/ip_address', node.createIPAddress(Node.defaultHost, '80', '4'))
@@ -727,16 +728,18 @@ class MongoApi(object):
             nodeComm = NodeCommunicator(selfNode)
             nodeComm.updateRelationship(newFriendForSelf)
                 
-    
-            res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : tag['name'].lower()})
-            for tag in res:
-                tagNode = Node(Node.col.find({'data.identity.name': tag['friend']['data']['identity']['name']})[0])
-                tagFriendNode = Node(tag['friend'])
-                nodeComm2 = NodeCommunicator(tagNode)
-                try:
-                    nodeComm2.updateRelationship(Node(tagNode.getFriend(tagFriendNode.get('public_key'))))
-                except Exception as ex:
-                    raise ex
+            if tag['name'] not in alreadyAdded:
+                res = Node.db.friends.find({'public_key': yadaServer.get('public_key'), 'friend.data.identity.name' : tag['name'].lower()})
+                for restag in res:
+                    tagNode = Node(Node.col.find({'data.identity.name': restag['friend']['data']['identity']['name']})[0])
+                    tagFriendNode = Node(restag['friend'])
+                    nodeComm2 = NodeCommunicator(tagNode)
+                    try:
+                        nodeComm2.updateRelationship(Node(tagNode.getFriend(tagFriendNode.get('public_key'))))
+                    except Exception as ex:
+                        raise ex
+                
+                alreadyAdded.append(tag['name'])
             
         return {"requestType": "postTag", "tags": output, 'alreadyAdded': alreadyAdded}
     

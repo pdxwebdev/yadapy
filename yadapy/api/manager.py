@@ -8,12 +8,11 @@ from yadapy.db.mongodb.manager import YadaServer
 from yadapy.managercommunicator import ManagerCommunicator
 from yadapy.db.mongodb.lib.jsonencoder import MongoEncoder
 from node import MongoApi
-settings = __import__(os.getenv('DJANGO_SETTINGS_MODULE'), globals(), locals(), ['settings', 'prod'], -1)
 
 
 class MongoApiManager(MongoApi):
     
-    def __init__(self, nodeComm):
+    def __init__(self, nodeComm=None):
         self.nodeComm = nodeComm
         
     def postRoutedFriendRequest(self, data, decrypted):
@@ -21,7 +20,8 @@ class MongoApiManager(MongoApi):
         node = Node(public_key=data['public_key'])
         node.set('data/friends', node.getFriends(), True)
         nodeComm = ManagerCommunicator(node)
-        serverFriend = Node(node.getFriend(settings.node.matchFriend(node)['public_key']))
+        yadaserver = YadaServer()
+        serverFriend = Node(node.getFriend(yadaserver.matchFriend(node)['public_key']))
         friendTest = Node.db.friends.find({'public_key': data['public_key'], 'friend.routed_public_key': decrypted['routed_public_key']})
         if friendTest.count() == 0:
             nodeComm.routeRequestThroughNode(serverFriend, decrypted['routed_public_key'], decrypted.get('name', decrypted['routed_public_key']), decrypted.get('avatar', ''))

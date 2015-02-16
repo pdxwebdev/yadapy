@@ -14,8 +14,8 @@ class ManagerCommunicator(NodeCommunicator):
     impersonate = False
     
     def __init__(self, node, manager = None):
-        super(self, ManagerCommunicator).__init__(node, manager)
-
+        super(ManagerCommunicator, self).__init__(node, manager)
+    
     def routeRequestThroughNode(self, destNode, destinationPublicKey, name='new friend', avatar=''):
         
         newFriend = Node({}, {'name':'Just created for the new keys'})
