@@ -1,0 +1,389 @@
+Mandatory Identity Fields
+{
+	data: {
+		identity: {
+			name: "",
+			avatar: ""
+		}
+	}, 
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "",
+	private_key: ""
+}
+
+Mandatory Friend Fields with structure
+{
+	data: {
+		identity: {
+			name: "",
+			avatar: ""
+		}
+	}, 
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "",
+	private_key: "",
+	source_indexer_key: "",
+	routed_public_key: ""
+}
+
+Mandatory Friend Fields without structure
+{
+	data: {
+		identity: {
+			name: "",
+			avatar: ""
+		}
+	}, 
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "",
+	private_key: ""
+}
+
+Example Friendship creation:
+Identity A:
+{
+	data: {
+		identity: {
+			name: "A",
+			avatar: ""
+		}
+	}, 
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "AAA",
+	private_key: "AAA"
+}
+Identity B:
+{
+	data: {
+		identity: {
+			name: "B",
+			avatar: ""
+		}
+	}, 
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "BBB",
+	private_key: "BBB"
+}
+Identity C:
+{
+	data: {
+		identity: {
+			name: "C",
+			avatar: ""
+		}
+	}, 
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "CCC",
+	private_key: "CCC"
+}
+Identity B Creates a Friend Request for Identity A:
+{
+	data: {
+		identity: {
+			name: "B",
+			avatar: ""
+					}
+	}, 
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "DDD",
+	private_key: "DDD"
+}
+Identity B Adds This Request To Their Friends List:
+{
+	data: {
+		identity: {
+			name: "B",
+			avatar: ""
+		},
+		friends: [
+			{
+				data: {
+					identity: {
+						name: "A",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "DDD",
+				private_key: "DDD"
+			}
+		]
+	}, 
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "AAA",
+	private_key: "AAA"
+}
+Identity B Transmits the Friend Request, Identity A Accepts and Adds The Friend Request:
+{
+	data: {
+		identity: {
+			name: "A",
+			avatar: ""
+		},
+		friends: [
+			{
+				data: {
+					identity: {
+						name: "B",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "DDD",
+				private_key: "DDD"
+			}
+		]
+	},
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "AAA",
+	private_key: "AAA"
+}
+Repeat This Process For Identity C, Identity A Is Now Friends With Identities B and C:
+{
+	data: {
+		identity: {
+			name: "A",
+			avatar: ""
+		},
+		friends: [
+			{
+				data: {
+					identity: {
+						name: "B",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "DDD",
+				private_key: "DDD"
+			},
+			{
+				data: {
+					identity: {
+						name: "C",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "EEE",
+				private_key: "EEE"
+			}
+		]
+	},
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "AAA",
+	private_key: "AAA"
+}
+Identity B Finds Identity C On Identity A's Friends List So Identity B Creates a Friend Request for Identity C:
+{
+	data: {
+		identity: {
+			name: "B",
+			avatar: ""
+		}
+	}, 
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "FFF",
+	private_key: "FFF",
+	source_indexer_key: "DDD",
+	routed_public_key: "EEE"
+}
+Identity B Adds This Request To Their Friends List:
+{
+	data: {
+		identity: {
+			name: "B",
+			avatar: ""
+		},
+		friends: [
+			{
+				data: {
+					identity: {
+						name: "A",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "DDD",
+				private_key: "DDD"
+			},
+			{
+				data: {
+					identity: {
+						name: "C",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "FFF",
+				private_key: "FFF",
+				source_indexer_key: "DDD",
+				routed_public_key: "EEE"
+			}
+		]
+	}, 
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "BBB",
+	private_key: "BBB"
+}
+Identity B Transmits the Friend Request, Identity C Accepts and Adds The Friend Request:
+{
+	data: {
+		identity: {
+			name: "C",
+			avatar: ""
+		},
+		friends: [
+			{
+				data: {
+					identity: {
+						name: "A",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "EEE",
+				private_key: "EEE"
+			},
+			{
+				data: {
+					identity: {
+						name: "B",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "FFF",
+				private_key: "FFF",
+				source_indexer_key: "DDD",
+				routed_public_key: "EEE"
+			}
+		]
+	},
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "CCC",
+	private_key: "CCC"
+}
+Identity B could also Transmit The Request To Identity A If Identity C Is Not Directly Reachable. Identity A Would Hold This Request As A Routed Friend Request.
+
+{
+	data: {
+		identity: {
+			name: "A",
+			avatar: ""
+		},
+		friends: [
+			{
+				data: {
+					identity: {
+						name: "B",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "DDD",
+				private_key: "DDD"
+			},
+			{
+				data: {
+					identity: {
+						name: "C",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "EEE",
+				private_key: "EEE"
+			}
+		],
+		routed_friend_requests: [
+			{
+				data: {
+					identity: {
+						name: "B",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "FFF",
+				private_key: "FFF",
+				source_indexer_key: "DDD",
+				routed_public_key: "EEE"
+			}
+		]
+	},
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "AAA",
+	private_key: "AAA"
+}
+When Identity C Becomes Reachable, Identity A Transmits The Request To Identity C, Identity C Accepts And Adds The Request As A New Friend, Exactly as above
+{
+	data: {
+		identity: {
+			name: "C",
+			avatar: ""
+		},
+		friends: [
+			{
+				data: {
+					identity: {
+						name: "A",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "EEE",
+				private_key: "EEE"
+			},
+			{
+				data: {
+					identity: {
+						name: "B",
+						avatar: ""
+					}
+				}, 
+				timestamp: 0.0000,
+				modified: 0.0000,
+				public_key: "FFF",
+				private_key: "FFF",
+				source_indexer_key: "DDD",
+				routed_public_key: "EEE"
+			}
+		]
+	},
+	timestamp: 0.0000,
+	modified: 0.0000,
+	public_key: "CCC",
+	private_key: "CCC"
+}
+
+Next:
+Messages
+Statuses
+IP Addresses
