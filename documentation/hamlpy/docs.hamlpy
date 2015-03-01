@@ -1,0 +1,9 @@
+-extends "base.html"
+-block content
+	- for step in steps
+		-if step.title
+			%h1 {{step.title}}
+		-if step.desc
+			%h2 {{step.desc}}
+		-if step.obj
+			%pre {{step.obj}}
