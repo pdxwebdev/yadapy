@@ -2,5 +2,11 @@
 %html
 	%head
 		%title Documentation
+		%link{rel: "stylesheet", href: "static/css/bootstrap.min.css"}
+		%script{src: "static/js/sigma.min.js"}
+		%script{src: "static/js/plugins/sigma.parsers.json.min.js"}
+		%script{src: "static/js/plugins/sigma.renderers.edgeLabels.min.js"}
+		%script{src: "static/js/plugins/sigma.renderers.customEdgeShapes.min.js"}
 	%body
-		-block content
+		.container-fluid
+			-block content

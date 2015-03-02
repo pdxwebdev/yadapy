@@ -1,9 +1,127 @@
 -extends "base.html"
 -block content
-	- for step in steps
-		-if step.title
-			%h1 {{step.title}}
-		-if step.desc
-			%h2 {{step.desc}}
-		-if step.obj
-			%pre {{step.obj}}
+    :css
+        .graph {
+            max-width: 300px;
+            height: 200px;
+        }
+        #container1{
+            margin: 1200px 600px 0 0;
+        }
+
+        #container2{
+            margin: 1600px 600px 0 0;
+        }
+
+        #container3{
+            margin: 400px 600px 0 0;
+        }
+
+        #container4{
+            margin: 1800px 600px 0 0;
+        }
+
+        .obj {
+            width:600px;
+            float:left;
+        }
+        
+        .sigma-scene, .sigma-labels, .sigma-mouse {
+            margin: 0 600px 0 0;
+        }
+    :javascript
+        sigma.parsers.json('/static/json/data.json', {
+            container: 'container1',
+            settings: {
+                defaultNodeColor: '#ec5148'
+            }
+        });
+
+        sigma.parsers.json('/static/json/data2.json', {
+            container: 'container2',
+            settings: {
+                defaultNodeColor: '#ec5148'
+            }
+        });
+
+        sigma.parsers.json('/static/json/data3.json', {
+            container: 'container3',
+            settings: {
+                defaultNodeColor: '#ec5148'
+            }
+        });
+        var data = {
+          "nodes": [
+            {
+              "id": "n0",
+              "label": "A",
+              "x": 0,
+              "y": 0,
+              "size": 1
+            },
+            {
+              "id": "n1",
+              "label": "B",
+              "x": 3,
+              "y": 1,
+              "size": 1
+            },
+            {
+              "id": "n2",
+              "label": "C",
+              "x": 1,
+              "y": 3,
+              "size": 1
+            }
+          ],
+          "edges": [
+            {
+              "id": "e0",
+              "source": "n0",
+              "target": "n1",
+              "label": "DDD"
+            },
+            {
+              "id": "e1",
+              "source": "n1",
+              "target": "n2",
+              "label": "FFF"
+            },
+            {
+              "id": "e2",
+              "source": "n2",
+              "target": "n0",
+              "type": "arrow",
+              "label": "EEE"
+            }
+          ]
+        }
+        window.onload = function() {
+            var s = new sigma({                                                    
+                graph: data,                                                       
+                renderer: {                                                        
+                    container: "container4",                                        
+                    type: "canvas"                                                 
+                },                                                                 
+                settings: {
+                }                                                                  
+            });
+        }
+        
+    .col-xs-5.col-md-5
+        -for step in steps
+            .row
+                %h1 {{ step.title }}
+                %h2 {{ step.desc }}
+                %pre.obj {{ step.obj }}
+
+            -for substep in step.substeps
+                .row
+                    %h1 {{ substep.title }}
+                    %h2 {{ substep.desc }}
+                    %pre.obj {{ substep.obj }}
+    .col-xs-7.col-md-7
+        #container1.graph
+        #container2.graph
+        #container3.graph
+        #container4.graph
