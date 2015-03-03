@@ -3,23 +3,8 @@
 <style type='text/css'>
 /*<![CDATA[*/
         .graph {
-            max-width: 300px;
+            max-width: 400px;
             height: 200px;
-        }
-        #container1{
-            margin: 1200px 600px 0 0;
-        }
-
-        #container2{
-            margin: 1600px 600px 0 0;
-        }
-
-        #container3{
-            margin: 400px 600px 0 0;
-        }
-
-        #container4{
-            margin: 1800px 600px 0 0;
         }
 
         .obj {
@@ -30,111 +15,35 @@
         .sigma-scene, .sigma-labels, .sigma-mouse {
             margin: 0 600px 0 0;
         }
+
 /*]]>*/
 </style>
-<script type='text/javascript'>
-// <![CDATA[
-        sigma.parsers.json('/static/json/data.json', {
-            container: 'container1',
-            settings: {
-                defaultNodeColor: '#ec5148'
-            }
-        });
-
-        sigma.parsers.json('/static/json/data2.json', {
-            container: 'container2',
-            settings: {
-                defaultNodeColor: '#ec5148'
-            }
-        });
-
-        sigma.parsers.json('/static/json/data3.json', {
-            container: 'container3',
-            settings: {
-                defaultNodeColor: '#ec5148'
-            }
-        });
-        var data = {
-          "nodes": [
-            {
-              "id": "n0",
-              "label": "A",
-              "x": 0,
-              "y": 0,
-              "size": 1
-            },
-            {
-              "id": "n1",
-              "label": "B",
-              "x": 3,
-              "y": 1,
-              "size": 1
-            },
-            {
-              "id": "n2",
-              "label": "C",
-              "x": 1,
-              "y": 3,
-              "size": 1
-            }
-          ],
-          "edges": [
-            {
-              "id": "e0",
-              "source": "n0",
-              "target": "n1",
-              "label": "DDD"
-            },
-            {
-              "id": "e1",
-              "source": "n1",
-              "target": "n2",
-              "label": "FFF"
-            },
-            {
-              "id": "e2",
-              "source": "n2",
-              "target": "n0",
-              "type": "arrow",
-              "label": "EEE"
-            }
-          ]
-        }
-        window.onload = function() {
-            var s = new sigma({
-                graph: data,
-                renderer: {
-                    container: "container4",
-                    type: "canvas"
-                },
-                settings: {
-                }
-            });
-        }
-
-// ]]>
-</script>
     <div class='col-xs-5 col-md-5'>
         {% for step in steps %}
             <div class='row'>
                 <h1>{{ step.title }}</h1>
                 <h2>{{ step.desc }}</h2>
                 <pre class='obj'>{{ step.obj }}</pre>
+                <div id='container{{ loop.index }}' class='graph'></div>
+<script type='text/javascript'>
+// <![CDATA[
+                    $.getJSON('/static/json/data{{ loop.index }}.json', function(data){
+                        var s = new sigma({
+                            graph: data,
+                            renderer: {
+                                container: "container{{ loop.index }}",
+                                type: "canvas"
+                            },
+                            settings: {
+                                minEdgeSize: 0.5,
+                                maxEdgeSize: 4
+                            }
+                        });
+                    });
 
+// ]]>
+</script>
             </div>
-            {% for substep in step.substeps %}
-                <div class='row'>
-                    <h1>{{ substep.title }}</h1>
-                    <h2>{{ substep.desc }}</h2>
-                    <pre class='obj'>{{ substep.obj }}</pre>
-                </div>
-            {% endfor %}
         {% endfor %}
-    </div>
-    <div class='col-xs-7 col-md-7'>
-        <div id='container1' class='graph'></div>
-        <div id='container2' class='graph'></div>
-        <div id='container3' class='graph'></div>
-        <div id='container4' class='graph'></div>
     </div>
 {% endblock %}

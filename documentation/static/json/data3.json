@@ -23,15 +23,5 @@
     }
   ],
   "edges": [
-    {
-      "id": "e0",
-      "source": "n0",
-      "target": "n1"
-    },
-    {
-      "id": "e2",
-      "source": "n2",
-      "target": "n0"
-    }
   ]
 }

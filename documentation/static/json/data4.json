@@ -6,39 +6,8 @@
       "x": 0,
       "y": 0,
       "size": 1
-    },
-    {
-      "id": "n1",
-      "label": "B",
-      "x": 3,
-      "y": 1,
-      "size": 1
-    },
-    {
-      "id": "n2",
-      "label": "C",
-      "x": 1,
-      "y": 3,
-      "size": 1
     }
   ],
   "edges": [
-    {
-      "id": "e0",
-      "source": "n0",
-      "target": "n1"
-    },
-    {
-      "id": "e1",
-      "source": "n1",
-      "target": "n2"
-    },
-    {
-      "id": "e2",
-      "source": "n2",
-      "target": "n0",
-      "type": "arrow",
-      "label": "hello"
-    }
   ]
 }

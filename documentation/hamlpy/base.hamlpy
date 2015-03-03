@@ -7,6 +7,7 @@
 		%script{src: "static/js/plugins/sigma.parsers.json.min.js"}
 		%script{src: "static/js/plugins/sigma.renderers.edgeLabels.min.js"}
 		%script{src: "static/js/plugins/sigma.renderers.customEdgeShapes.min.js"}
+		%script{src: "static/js/jquery-2.1.3.min.js"}
 	%body
 		.container-fluid
 			-block content
