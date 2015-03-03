@@ -32,8 +32,8 @@
     {
       "id": "n4",
       "label": "F",
-      "x": 0.5,
-      "y": 1.5,
+      "x": 1,
+      "y": 2.5,
       "size": 1,
       "color":"red"
     }
@@ -60,13 +60,18 @@
       "source": "n1",
       "target": "n3",
       "color": "red",
-      "edgeLabelColor": "edge",
-      "type": "dotted",
-      "label": "Encrypt"
+      "edgeLabelColor": "edge"
     },
     {
       "id": "e3",
-      "source": "n3",
+      "source": "n2",
+      "target": "n4",
+      "color": "red",
+      "edgeLabelColor": "edge"
+    },
+    {
+      "id": "e4",
+      "source": "n0",
       "target": "n4",
       "color": "red",
       "edgeLabelColor": "edge",

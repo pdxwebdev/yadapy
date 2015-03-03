@@ -18,8 +18,3 @@
 		%h1 {{ step.title }}
 		%h2	{{ step.desc }}
 		%pre {{ step.obj }}
-		-for substep in step.substeps
-			.id {{ substep._id }}
-			%h1 {{ substep.title }}
-			%h2	{{ substep.desc }}
-			%pre {{ substep.obj }}

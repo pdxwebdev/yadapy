@@ -60,18 +60,14 @@
       "source": "n1",
       "target": "n3",
       "color": "red",
-      "edgeLabelColor": "edge",
-      "type": "dotted",
-      "label": "Encrypt"
+      "edgeLabelColor": "edge"
     },
     {
       "id": "e3",
-      "source": "n3",
+      "source": "n0",
       "target": "n4",
       "color": "red",
-      "edgeLabelColor": "edge",
-      "type": "curvedArrow",
-      "size": 0.4
+      "edgeLabelColor": "edge"
     }
   ]
 }

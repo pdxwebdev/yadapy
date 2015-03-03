@@ -15,27 +15,11 @@
       "size": 1
     },
     {
-      "id": "n3",
-      "label": "F",
-      "x": 2.5,
-      "y": 2.5,
-      "size": 1,
-      "color":"red"
-    },
-    {
       "id": "n2",
       "label": "C",
       "x": 1,
       "y": 3,
       "size": 1
-    },
-    {
-      "id": "n4",
-      "label": "F",
-      "x": 0.5,
-      "y": 1.5,
-      "size": 1,
-      "color":"red"
     }
   ],
   "edges": [
@@ -56,22 +40,12 @@
       "label": "E"
     },
     {
-      "id": "e2",
+      "id": "e",
       "source": "n1",
-      "target": "n3",
+      "target": "n2",
       "color": "red",
       "edgeLabelColor": "edge",
-      "type": "dotted",
-      "label": "Encrypt"
-    },
-    {
-      "id": "e3",
-      "source": "n3",
-      "target": "n4",
-      "color": "red",
-      "edgeLabelColor": "edge",
-      "type": "curvedArrow",
-      "size": 0.4
+      "label": "F"
     }
   ]
 }

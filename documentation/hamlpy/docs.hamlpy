@@ -15,7 +15,7 @@
             margin: 0 600px 0 0;
         }
         
-    .col-xs-5.col-md-5
+    .col-xs-12.col-md-12
         -for step in steps
             .row
                 %h1 {{ step.title }}
@@ -36,4 +36,4 @@
                             }                                                                  
                         });
                     });
-        
+            %hr

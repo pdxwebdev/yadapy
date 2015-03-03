@@ -19,11 +19,5 @@
 		<h1>{{ step.title }}</h1>
 		<h2>{{ step.desc }}</h2>
 		<pre>{{ step.obj }}</pre>
-		{% for substep in step.substeps %}
-			<div class='id'>{{ substep._id }}</div>
-			<h1>{{ substep.title }}</h1>
-			<h2>{{ substep.desc }}</h2>
-			<pre>{{ substep.obj }}</pre>
-		{% endfor %}
 	{% endfor %}
 {% endblock %}
