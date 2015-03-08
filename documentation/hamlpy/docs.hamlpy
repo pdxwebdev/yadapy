@@ -19,15 +19,17 @@
         -for step in steps
             .row
                 %h1 {{ step.title }}
+                -if desc and loop.index == 1
+                    {{desc.description}}
                 %h2 {{ step.desc }}
                 %pre.obj {{ step.obj }}
-                .graph{id: "container{{ loop.index }}"}
+                .graph{id: "container{{ loop.index + 3 }}"}
                 :javascript
-                    $.getJSON('/static/json/data{{ loop.index }}.json', function(data){
+                    $.getJSON('/static/json/{{page}}{{ loop.index + 3 }}.json', function(data){
                         var s = new sigma({                                                    
                             graph: data,                                                       
                             renderer: {                                                        
-                                container: "container{{ loop.index }}",                                        
+                                container: "container{{ loop.index + 3 }}",                                        
                                 type: "canvas"                                                 
                             },                                                                 
                             settings: {

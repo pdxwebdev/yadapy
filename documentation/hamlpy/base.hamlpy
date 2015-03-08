@@ -10,4 +10,19 @@
 		%script{src: "/static/js/jquery-2.1.3.min.js"}
 	%body
 		.container-fluid
+			-block nav
+				.nav
+					%a{href: "/page/nodes/"} Nodes
+					|
+					%a{href: "/page/ip_address/"} IP Address
+					|
+					%a{href: "/page/friendships/"} Friendships
+					|
+					%a{href: "/page/identity/"} Identity
+					|
+					%a{href: "/page/permissions/"} Permissions
+					|
+					%a{href: "/page/statuses/"} Statuses
+					|
+					%a{href: "/page/messages/"} Messages
 			-block content

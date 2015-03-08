@@ -11,6 +11,8 @@
 			= form.ref
 		.obj obj
 			= form.obj
+		.page page
+			= form.page
 		%input{type: 'submit'}
 
 	-for step in steps

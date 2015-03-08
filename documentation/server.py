@@ -12,12 +12,15 @@ class StepForm(Form):
     obj = TextAreaField('Object')
     ref = TextField('Parent')
     order = TextField('Order')
+    page = TextField('Page')
 
-@app.route('/')
-def docs():
+@app.route('/page/<page>/')
+def docs(page):
     con = Connection('localhost')
-    steps = con.standard.docs.find().sort("order", pymongo.ASCENDING)
-    return render_template('docs.html', steps=steps)
+    steps = con.standard.docs.find({"page": page, "component": "step"}).sort("order", pymongo.ASCENDING)
+    res = con.standard.docs.find({"page": page, "component": "description"})
+    desc = res[0] if res.count() > 0 else None
+    return render_template('docs.html', steps=steps, page=page, desc=desc)
 
 @app.route('/edit/', methods=['GET', 'POST'])
 def edit():
@@ -28,7 +31,8 @@ def edit():
             'desc': request.form['desc'],
             'ref': request.form['ref'],
             'order': int(request.form['order']),
-            'obj': request.form['obj'].strip()
+            'obj': request.form['obj'].strip(),
+            'page': request.form['page']
         })
         return redirect(url_for('edit'))
     elif request.method == 'GET':
