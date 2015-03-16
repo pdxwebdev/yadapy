@@ -23,13 +23,13 @@
                     {{desc.description}}
                 %h2 {{ step.desc }}
                 %pre.obj {{ step.obj }}
-                .graph{id: "container{{ loop.index + 3 }}"}
+                .graph{id: "container{{ loop.index }}"}
                 :javascript
-                    $.getJSON('/static/json/{{page}}{{ loop.index + 3 }}.json', function(data){
+                    $.getJSON('/static/json/{{page}}{{ loop.index }}.json', function(data){
                         var s = new sigma({                                                    
                             graph: data,                                                       
                             renderer: {                                                        
-                                container: "container{{ loop.index + 3 }}",                                        
+                                container: "container{{ loop.index }}",                                        
                                 type: "canvas"                                                 
                             },                                                                 
                             settings: {

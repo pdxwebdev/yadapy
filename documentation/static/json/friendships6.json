@@ -4,7 +4,7 @@
       "id": "n0",
       "label": "A",
       "x": 0,
-      "y": 0,
+      "y": 1,
       "size": 1
     },
     {
@@ -13,6 +13,22 @@
       "x": 3,
       "y": 1,
       "size": 1
+    },    
+    {
+      "id": "n3",
+      "label": "D",
+      "x": 0,
+      "y": 0,
+      "size": 1,
+      "color":"red"
+    },
+    {
+      "id": "n4",
+      "label": "D",
+      "x": 3,
+      "y": 0,
+      "size": 1,
+      "color":"red"
     },
     {
       "id": "n2",
@@ -23,5 +39,21 @@
     }
   ],
   "edges": [
+    {
+      "id": "e0",
+      "source": "n1",
+      "target": "n3",
+      "color": "red",
+      "edgeLabelColor": "edge",
+      "type": "curvedArrow",
+      "size": 0.4
+    },
+    {
+      "id": "e1",
+      "source": "n1",
+      "target": "n4",
+      "color": "red",
+      "edgeLabelColor": "edge"
+    }
   ]
 }

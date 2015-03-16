@@ -32,7 +32,8 @@ def edit():
             'ref': request.form['ref'],
             'order': int(request.form['order']),
             'obj': request.form['obj'].strip(),
-            'page': request.form['page']
+            'page': request.form['page'],
+            'component': 'step'
         })
         return redirect(url_for('edit'))
     elif request.method == 'GET':

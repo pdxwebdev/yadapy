@@ -27,14 +27,14 @@
                 {% endif %}
                 <h2>{{ step.desc }}</h2>
                 <pre class='obj'>{{ step.obj }}</pre>
-                <div id='container{{ loop.index + 3 }}' class='graph'></div>
+                <div id='container{{ loop.index }}' class='graph'></div>
 <script type='text/javascript'>
 // <![CDATA[
-                    $.getJSON('/static/json/{{page}}{{ loop.index + 3 }}.json', function(data){
+                    $.getJSON('/static/json/{{page}}{{ loop.index }}.json', function(data){
                         var s = new sigma({
                             graph: data,
                             renderer: {
-                                container: "container{{ loop.index + 3 }}",
+                                container: "container{{ loop.index }}",
                                 type: "canvas"
                             },
                             settings: {

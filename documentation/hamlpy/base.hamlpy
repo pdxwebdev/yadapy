@@ -14,15 +14,19 @@
 				.nav
 					%a{href: "/page/nodes/"} Nodes
 					|
+					%a{href: "/page/permissions/"} Permissions
+					|
 					%a{href: "/page/ip_address/"} IP Address
 					|
-					%a{href: "/page/friendships/"} Friendships
-					|
 					%a{href: "/page/identity/"} Identity
-					|
-					%a{href: "/page/permissions/"} Permissions
 					|
 					%a{href: "/page/statuses/"} Statuses
 					|
 					%a{href: "/page/messages/"} Messages
+					|
+					%a{href: "/page/friendships/"} Friendships
+					|
+					%a{href: "/page/algorithm/"} Syncing Algorithm
+					|
+					%a{href: "/page/mutual/"} Mutual Friends
 			-block content
