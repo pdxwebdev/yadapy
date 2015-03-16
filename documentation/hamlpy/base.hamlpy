@@ -29,4 +29,6 @@
 					%a{href: "/page/algorithm/"} Syncing Algorithm
 					|
 					%a{href: "/page/mutual/"} Mutual Friends
+					|
+					%a{href: "/use-cases/"} Use Cases
 			-block content

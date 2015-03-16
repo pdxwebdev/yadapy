@@ -41,5 +41,9 @@ def edit():
         steps = con.standard.docs.find().sort("order", pymongo.ASCENDING)
         return render_template('edit.html', form=form, steps=steps)
 
+@app.route('/use-cases/')
+def use_cases():
+    return render_template('use_cases.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
