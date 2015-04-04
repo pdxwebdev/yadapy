@@ -13,8 +13,8 @@ class ManagerCommunicator(NodeCommunicator):
 
     impersonate = False
     
-    def __init__(self, node, manager = None):
-        super(ManagerCommunicator, self).__init__(node, manager)
+    def __init__(self, node):
+        super(ManagerCommunicator, self).__init__(node)
     
     def routeRequestThroughNode(self, destNode, destinationPublicKey, name='new friend', avatar=''):
         

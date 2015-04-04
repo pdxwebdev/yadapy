@@ -172,6 +172,7 @@ class NodeCommunicator(object):
             self.handlePacket(json.loads(friendResponse))
         except:
             print "Friend does not auto approve friend requests. There was no response from friend request."
+        return friendNode
 
     def routeRequestForNode(self, destNode, destinationPublicKey, name='new friend', avatar=''):
         
