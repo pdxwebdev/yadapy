@@ -1007,6 +1007,10 @@ class MongoApi(object):
         node.addFriend(friend.get())
         nodeComm = NodeCommunicator(node)
         nodeComm.updateRelationship(friend)
+
+        for fr in node.getFriends():
+            if 'type' in fr['data']:
+                nodeComm.updateRelationship(fr)
         
         try:
             if 'routed_friend_request' in decrypted:
