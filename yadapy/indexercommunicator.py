@@ -26,19 +26,20 @@ class IndexerCommunicator(NodeCommunicator):
         #### where to send? ###
         for node in indexerRequestUpdate.get('data/friends'):
             for nodeFriend in node['data/friends']:
-                #### is this indexer already friends with that indexer? ####
-                mutual = self.node.isMutual(nodeFriend)
-                if not mutual:
-                    #### if not, make friends ####
-                    if nodeFriend['data/identity/ip_address']:
-                        mutual = self.requestFriend(
-                            "%s:%s" % (
-                                nodeFriend['data/identity/ip_address'][0]['address'], 
-                                nodeFriend['data/identity/ip_address'][0]['port']
+                if nodeFriend['data']['type'] == 'indexer':
+                    #### is this indexer already friends with that indexer? ####
+                    mutual = self.node.isMutual(nodeFriend)
+                    if not mutual:
+                        #### if not, make friends ####
+                        if nodeFriend['data/identity/ip_address']:
+                            mutual = self.requestFriend(
+                                "%s:%s" % (
+                                    nodeFriend['data/identity/ip_address'][0]['address'], 
+                                    nodeFriend['data/identity/ip_address'][0]['port']
+                                )
                             )
-                        )
-                
-                #### send friend request packet ####
-                data = b64decode(encrypt(remoteIndexerfriend.get('private_key'), remoteIndexerfriend.get('private_key'), json.dumps(indexerRequestObject)))
-                self._doRequest(self.node.get(), remoteIndexerfriend, status='INDEXER_REQUEST_UPDATE')
-                #### end send friend request packet ####
+                    
+                    #### send friend request packet ####
+                    data = b64decode(encrypt(remoteIndexerfriend.get('private_key'), remoteIndexerfriend.get('private_key'), json.dumps(indexerRequestObject)))
+                    self._doRequest(self.node.get(), remoteIndexerfriend, status='INDEXER_REQUEST_UPDATE')
+                    #### end send friend request packet ####

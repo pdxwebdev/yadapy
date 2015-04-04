@@ -199,9 +199,18 @@ class Node(BaseNode):
         indexerFriends = self.db.friends.find(
             {
                 'public_key': self.get('public_key'), 
-                'friend_public_key': {
-                    '$in': self.getRoutedPublicKeysAndSourceIndexerKeys()
-                }
+                '$or':[
+                    {
+                        'friend_public_key': {
+                            '$in': self.getRoutedPublicKeysAndSourceIndexerKeys()
+                        }
+                    },
+                    {
+                        'friend.data.type': {
+                            '$in': ['manager', 'indexer']
+                        }
+                    }
+                ]
             }
         )
         return [friend['friend'] for friend in indexerFriends]

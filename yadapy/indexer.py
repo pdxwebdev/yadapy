@@ -29,6 +29,8 @@ class Indexer(Node):
             raise InvalidIdentity("A valid server Identity was not given nor was a public_key specified.")
         
         super(Indexer, self).__init__(*args, **kwargs)
+        
+        self.set('data/type', 'indexer', True)
 
     def validIdentity(self, data):
         try:
