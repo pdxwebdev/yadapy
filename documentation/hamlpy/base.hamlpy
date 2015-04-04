@@ -1,0 +1,34 @@
+<!doctype html>
+%html
+	%head
+		%title Documentation
+		%link{rel: "stylesheet", href: "/static/css/bootstrap.min.css"}
+		%script{src: "/static/js/sigma.min.js"}
+		%script{src: "/static/js/plugins/sigma.parsers.json.min.js"}
+		%script{src: "/static/js/plugins/sigma.renderers.edgeLabels.min.js"}
+		%script{src: "/static/js/plugins/sigma.renderers.customEdgeShapes.min.js"}
+		%script{src: "/static/js/jquery-2.1.3.min.js"}
+	%body
+		.container-fluid
+			-block nav
+				.nav
+					%a{href: "/page/nodes/"} Nodes
+					|
+					%a{href: "/page/permissions/"} Permissions
+					|
+					%a{href: "/page/ip_address/"} IP Address
+					|
+					%a{href: "/page/identity/"} Identity
+					|
+					%a{href: "/page/statuses/"} Statuses
+					|
+					%a{href: "/page/messages/"} Messages
+					|
+					%a{href: "/page/friendships/"} Friendships
+					|
+					%a{href: "/page/algorithm/"} Syncing Algorithm
+					|
+					%a{href: "/page/mutual/"} Mutual Friends
+					|
+					%a{href: "/use-cases/"} Use Cases
+			-block content

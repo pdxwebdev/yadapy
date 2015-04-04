@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+	<form action='.' method='POST'>
+		<div class='title'>title			{{ form.title }}
+</div>
+		<div class='desc'>desc			{{ form.desc }}
+</div>
+		<div class='order'>order			{{ form.order }}
+</div>
+		<div class='ref'>ref			{{ form.ref }}
+</div>
+		<div class='obj'>obj			{{ form.obj }}
+</div>
+		<div class='page'>page			{{ form.page }}
+</div>
+		<input type='submit' />
+
+	</form>
+	{% for step in steps %}
+		<div class='id'>{{ step._id }}</div>
+		<h1>{{ step.title }}</h1>
+		<h2>{{ step.desc }}</h2>
+		<pre>{{ step.obj }}</pre>
+	{% endfor %}
+{% endblock %}

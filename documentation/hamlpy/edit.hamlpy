@@ -1,0 +1,22 @@
+-extends "base.html"
+-block content
+	%form{action: '.', method: 'POST'}
+		.title title
+			= form.title
+		.desc desc
+			= form.desc
+		.order order
+			= form.order
+		.ref ref
+			= form.ref
+		.obj obj
+			= form.obj
+		.page page
+			= form.page
+		%input{type: 'submit'}
+
+	-for step in steps
+		.id {{ step._id }}
+		%h1 {{ step.title }}
+		%h2	{{ step.desc }}
+		%pre {{ step.obj }}

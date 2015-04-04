@@ -1,0 +1,61 @@
+- extends "base.html"
+
+- block content
+	%h1
+		Use Cases
+	%ol.col-xs-6.col-md-6
+		%li
+			Ordering from Amazon, passing your identity to ups to help them deliver your package. 
+
+		%li
+			In a world where everyone has a public identity. You could see who is anonymous. A woman walking down the street, knowing if she's in a bad situation or not.
+
+		%li
+			Hospital situations, baby is delivered, baby can make request. 
+			Emergency situation, telling ambulance workers your identity, who should be contacted. 
+			Old people,  wondering around notifies family or organization of a potentially dangerous situation. Positioning if GPS isn't available. 
+			Inventory tracking. 
+			Transferring medical information from one organization to another. 
+
+		%li
+			Supply Chain. Each resource could be a node/identity. Item ID standardization/generization 
+
+		%li
+			Give your property to another entity, like a body shop. Keep a shop history on your car's identity, making it easier to sell. The new car fax. 
+
+		%li
+			Sell things on Craigslist list, have user feedback but still keep it off the Internet. 
+
+		%li
+			Anything that needs history shared. 
+		%li
+			You could have public comments, up or down votes on people or even objects that are iotivity enabled. Like writing on the bathroom wall. Leaving comments on objects for everyone to see. 
+
+		%li
+			Virus pathology tracking. Where was this person after they became infected? Who may also be at risk?
+
+		%li
+			Equipment maintenance. How many times was it used and about how many uses before needing service. 
+
+		%li
+			Blinds will shut once a certain outside temperature is reached - you want light, but you want to maintain the coolness of a house (like in summer time)
+
+		%li
+			Loss prevention. Attach identity as soon as item is taken from its holder. 
+
+		%h2
+			Example 1
+		%p
+			Toaster let's you and your neighbor know it's on fire. Your toaster puts your security system in emergency mode because it has permissions to do that. Then your neighbor is able to enter your house because you gave them permission to do so under emergency conditions. Your neighbor uses their relationship to gain access. 
+		%p
+			Emergency button on your phone could also put your house in anonymous access mode to allow ambulance workers to enter. 
+		%p
+			Locate your remote control by proximity. You are friends with your remote, you are also friends with your couch. You can see the friend your remote has the lowest ping time with. 
+		%p
+			Warranty registration automation. This could allow a situation where your friend is shopping and sees an item you've registered for the warranty with. The item would have a relationship with the manufacturer. The manufacturer would determine your friend is looking at the same item. Thus, show your the information your friend has about that item. Establishing temporary relationships to gather relevant information. Just analyze how your graphs compare. Marketing capabilities. 
+
+		%h2
+			Example 2
+
+		%p
+			Car to car social networking for self-driving cars. Exchanging sensor data between vehicles. Relaying relevant sensor data from vehicles no longer present but if they became present again, we would want to know it was the same vehicle that was relayed as a 2nd degree connection. Maybe it could be a p2p / cloud mix depending on latency, connectivity.

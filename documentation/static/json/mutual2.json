@@ -1,0 +1,119 @@
+{
+  "nodes": [
+    {
+      "id": "n0",
+      "label": "A",
+      "x": 3,
+      "y": 1,
+      "size": 1
+    },
+    {
+      "id": "n1",
+      "label": "B",
+      "x": 3,
+      "y": 3,
+      "size": 1
+    },
+    {
+      "id": "n2",
+      "label": "C",
+      "x": 0,
+      "y": 2,
+      "size": 1
+    },
+    {
+      "id": "n3",
+      "label": "G",
+      "x": 0,
+      "y": 4,
+      "size": 1
+    },
+    {
+      "id": "n6",
+      "label": "B",
+      "x": 3.5,
+      "y": 6,
+      "size": 1,
+      "color":"red"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "source": "n0",
+      "target": "n2",
+      "color": "red",
+      "edgeLabelColor": "edge",
+      "label": "E"
+    },
+    {
+      "id": "e01",
+      "source": "n0",
+      "target": "n1",
+      "color": "red",
+      "edgeLabelColor": "edge",
+      "label": "D"
+    },
+    {
+      "id": "e1",
+      "source": "n1",
+      "target": "n2",
+      "color": "red",
+      "edgeLabelColor": "edge",
+      "label": "F"
+    },
+    {
+      "id": "e2",
+      "source": "n1",
+      "target": "n6",
+      "color": "red",
+      "edgeLabelColor": "edge",
+      "type":"dotted",
+      "size":0.4
+    },
+    {
+      "id": "e5",
+      "source": "n2",
+      "target": "n3",
+      "color": "red",
+      "edgeLabelColor": "edge",
+      "type":"curvedArrow",
+      "size":0.4
+    },
+    {
+      "id": "e5r",
+      "source": "n2",
+      "target": "n3",
+      "color": "red",
+      "edgeLabelColor": "edge",
+      "label":"I"
+    },
+    {
+      "id": "e6",
+      "source": "n3",
+      "target": "n6",
+      "color": "red",
+      "edgeLabelColor": "edge",
+      "label":"H"
+    },
+    {
+      "id": "e7",
+      "source": "n3",
+      "target": "n6",
+      "color": "red",
+      "edgeLabelColor": "edge",
+      "type":"curvedArrow",
+      "size":0.4
+    },
+    {
+      "id": "e8",
+      "source": "n0",
+      "target": "n6",
+      "color": "red",
+      "edgeLabelColor": "edge",
+      "type":"dotted",
+      "size":0.4,
+      "label":"D"
+    }
+  ]
+}
