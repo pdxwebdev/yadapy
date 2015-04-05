@@ -1010,7 +1010,10 @@ class MongoApi(object):
         nodeComm.updateRelationship(friend)
         for fr in node.getIndexerFriends():
             if fr['public_key'] != friend.get('public_key'):
-                nodeComm.updateRelationship(Indexer(fr))
+                try:
+			nodeComm.updateRelationship(Indexer(fr))
+		except:
+			pass
                 
         try:
             if 'routed_friend_request' in decrypted:
