@@ -3,7 +3,7 @@ from base64 import b64encode, b64decode
 from lib.crypt import encrypt, decrypt
 from uuid import uuid4
 from node import Node, InvalidIdentity
-from friendnode import RoutedFriendNode
+from friendnode import FriendNode
 
 
 class Indexer(Node):
@@ -42,7 +42,6 @@ class Indexer(Node):
             and data['data']['type'] == 'indexer' \
             and 'friends' in data['data'] \
             and 'identity' in data['data'] \
-            and 'messages' in data['data'] \
             and 'name' in data['data']['identity']:
                 return True
             else:
@@ -53,16 +52,16 @@ class Indexer(Node):
     def friendRequest(self, requester, acceptor):
         newFriendship = Node({}, {'name':'Just created for the new keys'})
         #### new friend routine: requester ####
-        newRequester = RoutedFriendNode(requester, requester=requester, acceptor=acceptor)
+        newRequester = FriendNode(copy.deepcopy(requester), requester=requester, acceptor=acceptor, connector=newFriendship.get())
         #### end new friend routine ####
         
         #### new friend routine: acceptor ####
-        newAcceptor = RoutedFriendNode(acceptor, requester=requester, acceptor=acceptor, connector=node)
+        newAcceptor = FriendNode(copy.deepcopy(acceptor), requester=requester, acceptor=acceptor, connector=newFriendship.get())
         #### end new friend routine ####
-        selfCopy = copy.deepcopy(self.get())
+        
+        
+        selfCopy = Indexer(copy.deepcopy(self.get()))
         selfCopy._data['data']['friends'] = []
-        selfCopy.add('friends', newRequester)
-        selfCopy.add('friends', newRequester)
+        selfCopy.add('data/friends', newRequester.get())
+        selfCopy.add('data/friends', newAcceptor.get())
         return selfCopy
-        
-        

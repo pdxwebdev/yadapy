@@ -167,11 +167,12 @@ class NodeCommunicator(object):
         friendNode.add('data/friends', meToSend.get())
         
         #send the friend request to the manager
-        friendResponse = self._doRequest(meToSend, friendNode, json.dumps(meToSend.get()), status="FRIEND_REQUEST")
-        try:
-            self.handlePacket(json.loads(friendResponse))
-        except:
-            print "Friend does not auto approve friend requests. There was no response from friend request."
+        friendResponses = self._doRequest(meToSend, friendNode, json.dumps(meToSend.get()), status="FRIEND_REQUEST")
+        for response in friendResponses:
+            try:
+                self.handlePacket(json.loads(response))
+            except:
+                print "Friend does not auto approve friend requests. There was no response from friend request."
         return friendNode
 
     def routeRequestForNode(self, destNode, destinationPublicKey, name='new friend', avatar=''):
@@ -335,6 +336,39 @@ class NodeCommunicator(object):
                     "public_key" : responseData.get('public_key'),
                     "data" : encrypt(responseData.get('private_key'), responseData.get('private_key'), json.dumps(responseData.get()))
                 }  
+        
+        elif packet.get('status', None) == 'INDEXER_REQUEST_UPDATE':
+            packetData = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
+            loadedData = json.loads(packetData)
+            if len(loadedData['data']['friends']) == 2:#is the indexer friends with these two?
+                for remoteFriend in loadedData['data']['friends'][0]['data']['friends']:
+                    friend1 = self.node.getFriend(remoteFriend['public_key'])
+                    if friend1:
+                        break
+                for remoteFriend in loadedData['data']['friends'][1]['data']['friends']:
+                    friend2 = self.node.getFriend(remoteFriend['public_key'])
+                    if friend2:
+                        break
+                if friend1 and friend2:#is are these two friends with the sending indexer
+                    confirmed1 = False
+                    for friend in friend1['data']['friends']:
+                        if friend['public_key'] == loadedData['data']['friends'][0]['routed_public_key'] or \
+                            friend['public_key'] == loadedData['data']['friends'][0]['source_indexer_key'] or \
+                            friend['public_key'] == loadedData['data']['friends'][0]['public_key']:
+                            confirmed1 = True
+                            break
+                    confirmed2 = False
+                    for friend in friend2['data']['friends']:
+                        if friend['public_key'] == loadedData['data']['friends'][1]['routed_public_key'] or \
+                            friend['public_key'] == loadedData['data']['friends'][1]['source_indexer_key'] or \
+                            friend['public_key'] == loadedData['data']['friends'][1]['public_key']:
+                            confirmed2 = True
+                            break
+                    if confirmed1 and confirmed2:
+                        return loadedData
+                    else:
+                        return None
+            #show some kind of notification
             
         elif packet.get('method', None) == 'PUT':
             data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
@@ -381,5 +415,6 @@ class NodeCommunicator(object):
             responseData = self.node.sync(json.loads(data))
             responseData = Node(responseData)
             return responseData
+            
     def newTimeStamp(self):
         return time.time()

@@ -28,6 +28,14 @@ class FriendNode(Node):
             raise InvalidIdentity("A valid server Identity was not given nor was a public_key specified.")
         
         super(FriendNode, self).__init__(*args, **kwargs)
+        
+        self.set('routed_public_key', kwargs['acceptor']['public_key'], True)
+        self.set('source_indexer_key', kwargs['requester']['public_key'], True)
+        if 'connector' in kwargs:
+            self.set('public_key', kwargs['connector']['public_key'])
+            self.set('private_key', kwargs['connector']['private_key'])
+        self.setModifiedToNow()
+        
     
     def validIdentity(self, data):
         try:
@@ -68,13 +76,6 @@ class RoutedFriendNode(FriendNode):
             raise InvalidIdentity("A valid server Identity was not given nor was a public_key specified.")
         
         super(RoutedFriendNode, self).__init__(*args, **kwargs)
-        
-        self.set('routed_public_key', kwargs['acceptor']['public_key'], True)
-        self.set('source_indexer_key', kwargs['requester']['public_key'], True)
-        if 'connector' in kwargs:
-            self.set('public_key', kwargs['connector']['public_key'])
-            self.set('private_key', kwargs['connector']['private_key'])
-        self.setModifiedToNow()
     
     def validIdentity(self, data):
         try:
@@ -86,8 +87,7 @@ class RoutedFriendNode(FriendNode):
             and 'data' in data \
             and 'friends' in data['data'] \
             and 'identity' in data['data'] \
-            and 'name' in data['data']['identity'] \
-            and 'avatar' in data['data']['identity']:
+            and 'name' in data['data']['identity']:
                 return True
             else:
                 raise InvalidIdentity("invalid identity dictionary for identity")

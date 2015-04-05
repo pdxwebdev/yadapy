@@ -185,7 +185,10 @@ class Node(BaseNode):
         if friends.count() > 0:
             return friendList
         else:
-            return super(Node, self).get('data/friends')
+            try:
+                return super(Node, self).get('data/friends')
+            except:
+                return []
         
     def getFriendBySourceIndexerKey(self, public_key):
         friend = self.db.friends.find({'public_key': self.get('public_key'), 'friend.data.friends.source_indexer_key': public_key}, {'friend': 1})

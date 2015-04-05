@@ -101,6 +101,8 @@ class YadaServer(Manager, Node):
                         "data" : {"identity" : "$data.identity","type" : "$data.type"},
                         "_id" : 0,
                         "modified" : "$modified",
+                        "public_key": "$public_key",
+                        "private_key": "$private_key"
                     }
                 }
                 ]
