@@ -666,15 +666,6 @@ class Node(object):
     def _updateTree(self, internal, inbound, is_self=True, permission_object={}):
         if not internal or not inbound: return
         if type(inbound) == type({}):
-            if 'modified' not in internal or 'modified' not in inbound:
-                #CRUD: UPDATE
-                if not is_self:
-                    if 'U' in permission_object:
-                        internal['modified'] = int(time.time())
-                        inbound['modified'] = int(time.time())
-                else:
-                    internal['modified'] = int(time.time())
-                    inbound['modified'] = int(time.time())
             if 'label' not in internal or 'label' not in inbound:
                 #CRUD: UPDATE
                 if not is_self:
