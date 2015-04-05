@@ -53,7 +53,7 @@ class MyServerProtocol(WebSocketServerProtocol):
             if "METHOD" in inboundObj and inboundObj['METHOD'] == "UPDATE_IDENTITY":
                 f.write('got update identity message')
                 f.close()
-                print inboundObj
+                print json.dumps(inboundObj, indent=2)
                 n = Node(inboundObj['DATA'])
                 n.save()
                 return

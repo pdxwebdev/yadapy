@@ -337,7 +337,6 @@ class NodeCommunicator(object):
                 }  
             
         elif packet.get('method', None) == 'PUT':
-            
             data = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             self.node.updateFromNode(json.loads(data))
         
