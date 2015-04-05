@@ -770,15 +770,23 @@ class Node(object):
                                         if key == 'messages':
                                             self.addMessage(item)
                                         elif key == 'friends':
-                                            self.addFriend(item)
+                                            try:
+                                                Node(item)
+                                                Node.addFriend(self, item)
+                                            except:
+                                                pass
                                         if not key_name=='guid':
                                             self.updateStatus(internal,key,item[key_name], "new", item)
                                 else:
                                     newList.append(item)
                                     if key == 'messages':
-                                        self.addMessage(item)
+                                        Node.addMessage(self, item)
                                     elif key == 'friends':
-                                        self.addFriend(item)
+                                        try:
+                                            Node(item)
+                                            Node.addFriend(self, item)
+                                        except:
+                                            pass
                                     if not key_name=='guid':
                                         self.updateStatus(internal,key,item[key_name], "new", item)
                         for item in newList:

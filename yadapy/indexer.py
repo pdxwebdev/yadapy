@@ -30,7 +30,7 @@ class Indexer(Node):
         
         super(Indexer, self).__init__(*args, **kwargs)
         
-        self.set('data/type', 'indexer', True)
+        self.set('data/type', u'indexer', True)
 
     def validIdentity(self, data):
         try:

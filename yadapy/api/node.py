@@ -3,6 +3,7 @@ from uuid import uuid4
 from yadapy.lib.crypt import decrypt, encrypt
 from pymongo import Connection
 from base64 import b64encode, b64decode
+from yadapy.indexer import Indexer
 from yadapy.db.mongodb.node import Node
 from yadapy.db.mongodb.manager import YadaServer
 from yadapy.nodecommunicator import NodeCommunicator
@@ -1002,16 +1003,15 @@ class MongoApi(object):
             friend = Node.db.friends.find({"public_key" : data['public_key'], "friend.source_indexer_key" : decrypted['source_indexer_key']}, {'friend': 1})
             if friend.count():
                 return {'status': 'already friends'}
-        
+
         friend = Node(decrypted)
         node.addFriend(friend.get())
         nodeComm = NodeCommunicator(node)
         nodeComm.updateRelationship(friend)
-
-        for fr in node.getFriends():
-            if 'type' in fr['data']:
-                nodeComm.updateRelationship(fr)
-        
+        for fr in node.getIndexerFriends():
+            if fr['public_key'] != friend.get('public_key'):
+                nodeComm.updateRelationship(Indexer(fr))
+                
         try:
             if 'routed_friend_request' in decrypted:
                 sourceIndexer = Node(node.getFriend(decrypted['routed_friend_request']))
