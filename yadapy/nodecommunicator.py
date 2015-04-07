@@ -337,7 +337,7 @@ class NodeCommunicator(object):
                     "data" : encrypt(responseData.get('private_key'), responseData.get('private_key'), json.dumps(responseData.get()))
                 }  
         
-        elif packet.get('status', None) == 'INDEXER_REQUEST_UPDATE':
+        elif packet.get('status', None) in ['INDEXER_REQUEST_ACCEPT', 'INDEXER_REQUEST_UPDATE']:
             packetData = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             loadedData = json.loads(packetData)
             if len(loadedData['data']['friends']) == 2:#is the indexer friends with these two?

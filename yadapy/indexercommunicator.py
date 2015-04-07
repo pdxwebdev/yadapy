@@ -19,6 +19,12 @@ class IndexerCommunicator(NodeCommunicator):
         super(IndexerCommunicator, self).__init__(node)
     
     def disseminateRequest(self, requester, acceptor):
+        self.disseminate(requester, acceptor, 'INDEXER_REQUEST_UPDATE')
+    
+    def disseminateAcceptance(self, requester, acceptor):
+        self.disseminate(requester, acceptor, 'INDEXER_REQUEST_ACCEPT')
+        
+    def disseminate(self, requester, acceptor, status):
     
         #### combine under current indexer context ####
         indexerRequestObject = self.node.friendRequest(requester, acceptor)
@@ -44,5 +50,5 @@ class IndexerCommunicator(NodeCommunicator):
                         
                             #### send friend request packet ####
                             data = b64decode(encrypt(remoteIndexerFriend.get('private_key'), remoteIndexerFriend.get('private_key'), json.dumps(indexerRequestObject.get())))
-                            self._doRequest(self.node.get(), remoteIndexerFriend, data, status='INDEXER_REQUEST_UPDATE')
+                            self._doRequest(self.node.get(), remoteIndexerFriend, data, status=status)
                             #### end send friend request packet ####
