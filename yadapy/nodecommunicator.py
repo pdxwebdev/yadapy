@@ -15,9 +15,8 @@ class NodeCommunicator(object):
 
     impersonate = False
     
-    def __init__(self, node, manager = None):
+    def __init__(self, node):
         self.node = node
-        self.manager = manager
     
     def _doRequest(self, toNode, hostNode, data, method='PUT', status=None):
         
@@ -235,7 +234,7 @@ class NodeCommunicator(object):
         
         self._doRequest(sourceNodeCopy, destNode, data, method="PUT", status="PROMOTION_REQUEST")
 
-    def handlePacket(self, packet):
+    def handlePacket(self, packet, callbackCls = None):
         
         packetData = b64decode(packet['data'])
         friend = self.node.getFriend(packet['public_key'])
@@ -355,19 +354,24 @@ class NodeCommunicator(object):
                         if friend['public_key'] == loadedData['data']['friends'][0]['routed_public_key'] or \
                             friend['public_key'] == loadedData['data']['friends'][0]['source_indexer_key'] or \
                             friend['public_key'] == loadedData['data']['friends'][0]['public_key']:
-                            confirmed1 = True
+                            confirmed1 = friend
                             break
                     confirmed2 = False
                     for friend in friend2['data']['friends']:
                         if friend['public_key'] == loadedData['data']['friends'][1]['routed_public_key'] or \
                             friend['public_key'] == loadedData['data']['friends'][1]['source_indexer_key'] or \
                             friend['public_key'] == loadedData['data']['friends'][1]['public_key']:
-                            confirmed2 = True
+                            confirmed2 = friend
                             break
                     if confirmed1 and confirmed2:
-                        return loadedData
+                        callbackCls = callbackCls(friend1, friend2)
+                        if packet.get('status', None) == 'INDEXER_REQUEST_UPDATE':
+                            callbackCls.friendRequestSuccess()
+                        elif packet.get('status', None) == 'INDEXER_REQUEST_ACCEPT':
+                            callbackCls.friendAcceptSuccess()
+                        return {}
                     else:
-                        return None
+                        return {}
             #show some kind of notification
             
         elif packet.get('method', None) == 'PUT':
