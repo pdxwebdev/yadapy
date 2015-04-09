@@ -155,6 +155,8 @@ class Node(BaseNode):
             return super(Node, self).get('data/friends')
 
     def getFriendsWhoTaggedMe(self, limit=5):
+        self.db.friends.ensure_index([("public_key",1), ("friend.data.status.tags.public_key",1)])
+        self.db.friends.ensure_index([('friend.data.status.timestamp', -1)])
         friends = self.db.friends.find(
             {
                 'public_key': self.get('public_key'),
