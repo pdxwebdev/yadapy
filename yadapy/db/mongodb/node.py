@@ -394,7 +394,13 @@ class Node(BaseNode):
     
     def getIdentity(self):
         return self.db.identities.find({'public_key': self.get('public_key')}, {'data.identity': 1, "_id": 0})[0]['data']['identity']
-        
+    
+    def getNodeType(self):
+        return self.db.identities.find({'public_key': self.get('public_key')}, {'data.type': 1, "_id": 0})[0]['data']['type']
+    
+    def getStaticFriend(self):
+        return [x['friend'] for x in self.db.friends.find({'public_key': self.get('public_key'),'friend.data.type': 'static'})]
+    
     def getMessagesForFriend(self, public_key):
         messages = self.db.messages.find({'public_key': self.get('public_key'), 'friend_public_key': public_key})
             
@@ -529,7 +535,23 @@ class Node(BaseNode):
                     return None
             
             else:
-                return None
+                useKeys = []
+                for friend in externalNode['data']['friends']:
+                    useKeys.append(friend['public_key'])
+                friends = self.db.friends.find(
+                    {
+                        'public_key': self.get('public_key'),
+                        'friend.data.friends.public_key': {'$in': useKeys}                    
+                    },
+                    {
+                        '_id': 0,
+                        'friend': 1
+                    }
+                )
+                if friends.count():
+                    return Node(friends[0]['friend'])
+                else:
+                    return None
         
     def respondWithRelationship(self, friendNode):
         """
@@ -542,6 +564,8 @@ class Node(BaseNode):
         #TODO: apply permissions to dictionary for this relationship
         
         selfNode = Node({}, self.getIdentity())
+        
+        selfNode.set('data/type', self.getNodeType(), True)
         
         indexerList = self.getIndexerFriends()
         if len(indexerList) > 1:
@@ -563,6 +587,19 @@ class Node(BaseNode):
                 'public_key': self.get('public_key')
             }
         ).count()
+        
+        if 'type' in self.get('data') and self.get('data/type') in ['manager', 'indexer']:
+            staticFriends = self.getStaticFriend()
+            if staticFriends:
+                pubKeyList = [key['public_key'] for key in selfNode.get('data/friends')]
+                for friend in staticFriends:
+                    if not friend['public_key'] in pubKeyList:
+                        selfNode.add('data/friends', friend)
+            else:
+                staticFriend = Node({}, {'name':'static friend'})
+                staticFriend.set('data/type', 'static', True)
+                self.addFriend(staticFriend.get())
+                selfNode.add('data/friends', friend)
         
         friend5 = self.getFriend(friendNode.get('public_key'))
         

@@ -36,19 +36,28 @@ class IndexerCommunicator(NodeCommunicator):
                 #TODO: Make the type get passed around with second degree relationships
                 if 'source_indexer_key' not in nodeFriend:# this is not good, needs to evaluate 'data/type' instead
                     #### is this indexer already friends with that indexer? ####
-                    #remoteIndexerFriend = self.node.isMutual(nodeFriend)
-                    #if not remoteIndexerFriend:
-                    #### if not, make friends ####
-                    if nodeFriend['data']['identity']['ip_address']:
+                    
+                    remoteIndexerFriend = self.node.isMutual(nodeFriend)
+                    if remoteIndexerFriend and remoteIndexerFriend['data']['identity']['ip_address']:
+                        self.doRequest(remoteIndexerFriend, indexerRequestObject, contacted, status)
+                    elif nodeFriend['data']['identity']['ip_address']:
+                        #### if not, make friends ####
                         host = "%s:%s" % (
                             nodeFriend['data']['identity']['ip_address'][0]['address'], 
                             nodeFriend['data']['identity']['ip_address'][0]['port']
                         )
-                        if host not in contacted:
-                            remoteIndexerFriend = self.requestFriend(host)
-                            contacted.append(host)
+                        remoteIndexerFriend = self.requestFriend(host)
+                    self.doRequest(remoteIndexerFriend, indexerRequestObject, contacted, status)
                         
-                            #### send friend request packet ####
-                            data = b64decode(encrypt(remoteIndexerFriend.get('private_key'), remoteIndexerFriend.get('private_key'), json.dumps(indexerRequestObject.get())))
-                            self._doRequest(self.node.get(), remoteIndexerFriend, data, status=status)
-                            #### end send friend request packet ####
+    def doRequest(self, node, indexerRequestObject, contacted, status):
+        if host not in contacted:
+            host = "%s:%s" % (
+                node['data']['identity']['ip_address'][0]['address'], 
+                node['data']['identity']['ip_address'][0]['port']
+            )
+            contacted.append(host)
+        
+            #### send friend request packet ####
+            data = b64decode(encrypt(node.get('private_key'), node.get('private_key'), json.dumps(indexerRequestObject.get())))
+            self._doRequest(self.node.get(), node, data, status=status)
+            #### end send friend request packet ####

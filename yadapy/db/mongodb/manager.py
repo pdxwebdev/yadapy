@@ -166,7 +166,8 @@ class YadaServer(Manager, Node):
                                         "_id": 0, 
                                         'data.identity': 1, 
                                         'data.messages': 1, 
-                                        'data.status': 1
+                                        'data.status': 1,
+                                        'data.type': 1
                                         }
                                        )
             if identities.count() > 0:
