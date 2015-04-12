@@ -1003,11 +1003,13 @@ class MongoApi(object):
             friend = Node.db.friends.find({"public_key" : data['public_key'], "friend.source_indexer_key" : decrypted['source_indexer_key']}, {'friend': 1})
             if friend.count():
                 return {'status': 'already friends'}
-
+        mutual = node.isMutual(decrypted)
         friend = Node(decrypted)
         node.addFriend(friend.get())
         nodeComm = NodeCommunicator(node)
         nodeComm.updateRelationship(friend)
+        if mutual:
+            node.removeFriend(friend.get())
         for fr in node.getIndexerFriends():
             if fr['public_key'] != friend.get('public_key'):
                 try:

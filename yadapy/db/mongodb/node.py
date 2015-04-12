@@ -120,7 +120,10 @@ class Node(BaseNode):
             return "save ok"
         except:
             raise
-    
+   
+    def removeFriend(self, friend):
+        self.db.friends.remove({"friend_public_key":friend['public_key']})
+     
     def setFriendData(self, friend, data):
         self.setFriendAttribute(friend, 'data', data)
 
@@ -396,7 +399,11 @@ class Node(BaseNode):
         return self.db.identities.find({'public_key': self.get('public_key')}, {'data.identity': 1, "_id": 0})[0]['data']['identity']
     
     def getNodeType(self):
-        return self.db.identities.find({'public_key': self.get('public_key')}, {'data.type': 1, "_id": 0})[0]['data']['type']
+        result = self.db.identities.find({'public_key': self.get('public_key')}, {'data.type': 1, "_id": 0})[0]['data']
+        if 'type' in result:
+            return result['type']
+        else:
+            return 'node'
     
     def getStaticFriend(self):
         return [x['friend'] for x in self.db.friends.find({'public_key': self.get('public_key'),'friend.data.type': 'static'})]
@@ -508,7 +515,9 @@ class Node(BaseNode):
                 }
             )
             if friends.count():
-                return Node(friends[0]['friend'])  
+                return Node(friends[0]['friend'])
+            else:
+                raise 
         except:
             if 'source_indexer_key' in externalNode and 'routed_public_key' in externalNode:
                 friends = self.db.friends.find(
@@ -589,6 +598,7 @@ class Node(BaseNode):
         ).count()
         
         if 'type' in self.get('data') and self.get('data/type') in ['manager', 'indexer']:
+            selfNode.set('data/friends', [])
             staticFriends = self.getStaticFriend()
             if staticFriends:
                 pubKeyList = [key['public_key'] for key in selfNode.get('data/friends')]
