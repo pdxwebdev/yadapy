@@ -16,8 +16,8 @@ from yadapy.manager import YadaServer as Manager
 
 class YadaServer(Manager, Node):
     conn = None
-    host = 'localhost'
-    port = 27017
+    host = None
+    port = None
     
     def __init__(self):
         self._data['modified'] = 0

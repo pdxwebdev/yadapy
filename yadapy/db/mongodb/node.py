@@ -12,8 +12,8 @@ except:
  
 class Node(BaseNode):
     conn = None
-    host = 'localhost'
-    port = 27021
+    host = None
+    port = None
     def __init__(self, *args, **kwargs):
         
         if 'host' in kwargs:
