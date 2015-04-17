@@ -670,7 +670,7 @@ class Node(object):
         """
         if 'friends' not in self.get('data'):
             self._data['data']['friends'] = []
-        self._updateTree(self.get(), inbound, is_self, permission_object, array_update = True)
+        self._updateTree(self.get(), inbound, is_self, permission_object, array_update)
         
 
     def _updateTree(self, internal, inbound, is_self=True, permission_object={}, array_update = True):
@@ -711,7 +711,8 @@ class Node(object):
                         inboundRef['modified'] = curTime
                 elif type(inboundRef) == type([]):
                     if not array_update:
-                        return
+                        internal[key] = inboundRef
+                        continue
                     key_name = ''
                     internalRef_indexed={} 
                     newList=[]
@@ -841,8 +842,6 @@ class Node(object):
             except:
                 pass
         if type(inbound) == type([]):
-            if not array_update:
-                return
             i=0
             for key, inboundRef in enumerate(inbound):
                 if not is_self:

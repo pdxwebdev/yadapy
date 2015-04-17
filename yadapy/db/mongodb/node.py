@@ -686,7 +686,7 @@ class Node(BaseNode):
                                 selfInFriend = f
                                 break
                     try:
-                        self.sync(selfInFriend, is_self = False, permission_object = node.get('permissions'), array_update = False)
+                        self.sync(selfInFriend, is_self = False, permission_object = node.get('permissions'))
                     except:
                         pass
                     
@@ -727,7 +727,7 @@ class Node(BaseNode):
                         
                     node._data['data']['friends'] = tempList
                     node._data['modified'] = node._data['modified']
-                    friend.sync(node.get())
+                    friend.sync(node.get(), array_update = False)
                     
                     friend.syncStfStatuses(node.get())                                            
                     
