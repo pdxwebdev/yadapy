@@ -155,8 +155,7 @@ class NodeCommunicator(object):
         friendNode.set('private_key', friendPrivateKey)
         friendNode.add('data/identity/ip_address', self.node.createIPAddress(host))
         
-        self.node.add('data/friends', friendNode.get())
-        self.node.save()
+        self.node.addFriend(friendNode.get())
         
         #build the friend request
         meToSend = Node(copy.deepcopy(self.node.get()))
@@ -205,7 +204,7 @@ class NodeCommunicator(object):
         
         return selectedFriend.get()
         
-    def updateRelationship(self, destNode):
+    def updateRelationship(self, destNode, toInclude = None):
         destNodeCopyNode = Node(copy.deepcopy(destNode.get()))
         sourceNodeCopy = self.node.get()
         
@@ -214,12 +213,15 @@ class NodeCommunicator(object):
         else:
             dictToSend = self.node.respondWithRelationship(destNodeCopyNode)
         
+        if toInclude:
+            dictToSend['include_node'] = toInclude
+        
         data = b64decode(encrypt(destNode.get('private_key'), destNode.get('private_key'), json.dumps(dictToSend)))
         
         responses = self._doRequest(sourceNodeCopy, destNode, data, method="GET")
         for response in responses:
             self.handlePacket(json.loads(response))
-
+            
     def grantPromotion(self, destNode):
         destNodeCopyNode = Node(copy.deepcopy(destNode.get()))
         sourceNodeCopy = Node(copy.deepcopy(self.node.get()))
@@ -395,7 +397,8 @@ class NodeCommunicator(object):
             
             packetData = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             start = time.time()
-            self.node.updateFromNode(json.loads(packetData))
+            friend = json.loads(packetData)
+            self.node.updateFromNode(friend)
             end = time.time()
             print "updateFromNode: %s" % (end - start)
             start = time.time()

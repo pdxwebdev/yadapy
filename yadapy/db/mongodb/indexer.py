@@ -4,13 +4,14 @@ from uuid import uuid4
 from random import randrange
 from pymongo import Connection
 from node import Node
+from yadapy.indexer import Indexer
 try:
     from pymongo.objectid import ObjectId
 except:
     from bson.objectid import ObjectId
 
  
-class Indexer(Node):
+class Indexer(Indexer, Node):
     conn = None
     host = None
     port = None

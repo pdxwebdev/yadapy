@@ -962,7 +962,7 @@ class MongoApi(object):
                         if friend:
                             nodeComm.updateRelationship(Node(friend))
                 except Exception as ex:
-                    raise ex
+                    logging.warning(ex)
                 
             for tag in status['tags']:
                 res = []

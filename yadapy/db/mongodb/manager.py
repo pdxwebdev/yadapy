@@ -196,6 +196,7 @@ class YadaServer(Manager, Node):
             {
                 "$project" : {
                     "public_key" : "$data.friends.public_key",
+                    "friend_public_key" : "$data.friends.public_key",
                     "_id" : 0
                 }
             }

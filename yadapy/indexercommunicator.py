@@ -50,11 +50,11 @@ class IndexerCommunicator(NodeCommunicator):
                     self.doRequest(remoteIndexerFriend, indexerRequestObject, contacted, status)
                         
     def doRequest(self, node, indexerRequestObject, contacted, status):
+        host = "%s:%s" % (
+            node['data']['identity']['ip_address'][0]['address'], 
+            node['data']['identity']['ip_address'][0]['port']
+        )
         if host not in contacted:
-            host = "%s:%s" % (
-                node['data']['identity']['ip_address'][0]['address'], 
-                node['data']['identity']['ip_address'][0]['port']
-            )
             contacted.append(host)
         
             #### send friend request packet ####

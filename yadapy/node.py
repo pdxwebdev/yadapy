@@ -149,6 +149,9 @@ class Node(object):
                     elif type(entity[el]) == type(assignment) or force == True:
                         entity[el] = assignment
                         entity['modified'] = self.newTimeStamp()
+                    elif type(entity[el]) == type(u'') and type(assignment) == type('') or type(entity[el]) == type('') and type(assignment) == type(u'') or force == True:
+                        entity[el] = assignment
+                        entity['modified'] = self.newTimeStamp()
                     else:
                         raise InvalidIdentity("Type mismatch when setting element for '%s' key" % path)
         except KeyError:
@@ -409,6 +412,10 @@ class Node(object):
                         friend.set('web_token', node.get('web_token'))
                     tempList = []
                     for x in friend._data['data']['friends']:
+                        if 'immutable' in x and x['immutable'] == 'true':
+                            tempDict = x
+                            tempList.append(tempDict)
+                            continue
                         tempDict = {} 
                         tempDict['public_key'] = x['public_key']
                         if 'data' in x:
@@ -495,7 +502,10 @@ class Node(object):
     def replaceIdentityOfFriendsWithPubKeys(self, node = None):
         tempList = []
         for i, friend in enumerate(self.get('data/friends')):
-            
+            if 'immutable' in friend and friend['immutable'] == 'true':
+                tempDict = friend
+                tempList.append(tempDict)
+                continue
             tempDict = {} 
             tempDict['public_key'] = friend['public_key']
             
@@ -649,7 +659,7 @@ class Node(object):
                        
         return {'public_key':pub_keys, 'timestamp':self.newTimeStamp(),'thread_id':thread_id,'subject':subject,'message':b64encode(message),'guid':guid} 
 
-    def sync(self, inbound, is_self=True, permission_object={}):
+    def sync(self, inbound, is_self=True, permission_object={}, array_update = True):
         """
         This kicks off the _updateTree method which will synchronize the two identity objects
         @inbound dictionary Is the object to synchronize against
@@ -660,10 +670,10 @@ class Node(object):
         """
         if 'friends' not in self.get('data'):
             self._data['data']['friends'] = []
-        self._updateTree(self.get(), inbound, is_self, permission_object)
+        self._updateTree(self.get(), inbound, is_self, permission_object, array_update = True)
         
 
-    def _updateTree(self, internal, inbound, is_self=True, permission_object={}):
+    def _updateTree(self, internal, inbound, is_self=True, permission_object={}, array_update = True):
         if not internal or not inbound: return
         if type(inbound) == type({}):
             if 'label' not in internal or 'label' not in inbound:
@@ -695,13 +705,13 @@ class Node(object):
                         internal[key] = inboundRef
                     continue
                 if type(inboundRef) == type({}):
-                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref)
+                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref, array_update)
                     if type(inboundRef) == type({}):
                         curTime = int(time.time())
                         inboundRef['modified'] = curTime
                 elif type(inboundRef) == type([]):
-                    if key == 'messages':
-                        pass
+                    if not array_update:
+                        return
                     key_name = ''
                     internalRef_indexed={} 
                     newList=[]
@@ -715,7 +725,7 @@ class Node(object):
                         key_name = key_dict[key]
                     else:
                         key_name = 'guid'
-                        self._updateTree(internalRef,inboundRef,is_self,permission_object_ref)
+                        self._updateTree(internalRef,inboundRef,is_self,permission_object_ref, array_update)
                     if key_name != '':
                         for index, item in enumerate(internalRef):
                             try:
@@ -787,7 +797,7 @@ class Node(object):
                                 newList.append(item)
                         internal[key]=newList
                     else:
-                        self._updateTree(internalRef,inboundRef,is_self,permission_object_ref)
+                        self._updateTree(internalRef,inboundRef,is_self,permission_object_ref, array_update)
                         if type(inboundRef) == type({}):
                             curTime = int(time.time())
                             #CRUD: UPDATE
@@ -831,6 +841,8 @@ class Node(object):
             except:
                 pass
         if type(inbound) == type([]):
+            if not array_update:
+                return
             i=0
             for key, inboundRef in enumerate(inbound):
                 if not is_self:
@@ -851,13 +863,13 @@ class Node(object):
                         continue
                 curTime = int(time.time())
                 if type(inboundRef) == type({}):
-                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref)
+                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref, array_update)
                     if type(inboundRef) == type({}):
                         inboundRef['modified'] = curTime
                         if 'label' not in inboundRef:
                             inboundRef['label'] = 'default'
                 elif type(inboundRef) == type([]):
-                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref)
+                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref, array_update)
                     if type(inboundRef) == type({}):
                         inboundRef['modified'] = curTime
                         if 'label' not in inboundRef:

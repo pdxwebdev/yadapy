@@ -492,6 +492,14 @@ class Node(BaseNode):
         if directFriend:
             return Node(directFriend)
         
+        return self.alreadyFriends(externalNode, notThisNode)
+    
+    def alreadyFriends(self, externalNode, notThisNode = None):
+        #to determine if an external node is already your friend
+    
+        if isinstance(externalNode, Node):
+            externalNode = externalNode.get()
+                    
         try:
             friend2Keys = self.getRPandSIKeys(externalNode)
             
@@ -544,24 +552,28 @@ class Node(BaseNode):
                     return None
             
             else:
-                useKeys = []
-                for friend in externalNode['data']['friends']:
-                    useKeys.append(friend['public_key'])
-                friends = self.db.friends.find(
-                    {
-                        'public_key': self.get('public_key'),
-                        'friend.data.friends.public_key': {'$in': useKeys}                    
-                    },
-                    {
-                        '_id': 0,
-                        'friend': 1
-                    }
-                )
-                if friends.count():
-                    return Node(friends[0]['friend'])
+                if 'type' in externalNode['data'] and externalNode['data']['type'] in ['manager', 'indexer']:
+                    useKeys = []
+                    for friend in externalNode['data']['friends']:
+                        useKeys.append(friend['public_key'])
+                    friends = self.db.friends.find(
+                        {
+                            'public_key': self.get('public_key'),
+                            'friend.data.friends.public_key': {'$in': useKeys},
+                            'friend.data.type': 'static'                 
+                        },
+                        {
+                            '_id': 0,
+                            'friend': 1
+                        }
+                    )
+                    if friends.count():
+                        return Node(friends[0]['friend'])
+                    else:
+                        return None
                 else:
                     return None
-        
+                
     def respondWithRelationship(self, friendNode):
         """
         This method will return a dictionary prepared to be encrypted, encoded and sent
@@ -580,24 +592,7 @@ class Node(BaseNode):
         if len(indexerList) > 1:
             pass
         
-        if indexerList:
-            [selfNode.add('data/friends', indexer) for indexer in indexerList]
-        
-        pubKeyList = [key['public_key'] for key in selfNode.get('data/friends')]
-        
-        friendList = self.getFriendsWhoTaggedMe(15)
-        if friendList:
-            for friend in friendList:
-                if not friend['public_key'] in pubKeyList:
-                    selfNode.add('data/friends', friend)
-                    
-        friendsCount = self.db.friends.find(
-            {
-                'public_key': self.get('public_key')
-            }
-        ).count()
-        
-        if 'type' in self.get('data') and self.get('data/type') in ['manager', 'indexer']:
+        if 'data' in self.get() and 'type' in self.get('data') and self.get('data/type') in ['manager', 'indexer']:
             selfNode.set('data/friends', [])
             staticFriends = self.getStaticFriend()
             if staticFriends:
@@ -610,24 +605,47 @@ class Node(BaseNode):
                 staticFriend.set('data/type', 'static', True)
                 self.addFriend(staticFriend.get())
                 selfNode.add('data/friends', friend)
-        
-        friend5 = self.getFriend(friendNode.get('public_key'))
-        
-        pubKeyList = [key['public_key'] for key in selfNode.get('data/friends')]
-        if not friend5['public_key'] in pubKeyList:
-            selfNode.add('data/friends', friend5)
-        
-        #indexer giveaway
-        friendsRoutedThroughIndexers = self.getFriendsRoutedThroughIndexers(indexerList)
-        for friendRoutedThroughIndexer in friendsRoutedThroughIndexers:
-            if not friendRoutedThroughIndexer['public_key'] in pubKeyList:
-                selfNode.add('data/friends', friendRoutedThroughIndexer)
-        
+        else:
+            if indexerList:
+                [selfNode.add('data/friends', indexer) for indexer in indexerList]
+            
+            pubKeyList = [key['public_key'] for key in selfNode.get('data/friends')]
+            
+            friendList = self.getFriendsWhoTaggedMe(15)
+            if friendList:
+                for friend in friendList:
+                    if not friend['public_key'] in pubKeyList:
+                        selfNode.add('data/friends', friend)
+                        
+            friendsCount = self.db.friends.find(
+                {
+                    'public_key': self.get('public_key')
+                }
+            ).count()
+            
+            friend5 = self.getFriend(friendNode.get('public_key'))
+            
+            pubKeyList = [key['public_key'] for key in selfNode.get('data/friends')]
+            if not friend5['public_key'] in pubKeyList:
+                selfNode.add('data/friends', friend5)
+            
+            #indexer giveaway
+            friendsRoutedThroughIndexers = self.getFriendsRoutedThroughIndexers(indexerList)
+            for friendRoutedThroughIndexer in friendsRoutedThroughIndexers:
+                if not friendRoutedThroughIndexer['public_key'] in pubKeyList:
+                    selfNode.add('data/friends', friendRoutedThroughIndexer)
+            
+            selfNode.set('data/friends_count', friendsCount, True)
+            
+        if 'include_node' in friendNode.get():
+            includeFriend = self.getFriend(friendNode.get('include_node'))
+            includeFriend['immutable'] = "true"
+            selfNode.add('data/friends', includeFriend)
+            
         selfNode.set('data/messages', self.getMessagesForFriend(friendNode.get('public_key')))
         selfNode.set('data/routed_friend_requests', self.getRoutedFriendRequestsForFriend(friendNode.get('public_key')))
         selfNode.set('data/status', self.getStatusesForFriend(friendNode.get('public_key')))
         
-        selfNode.set('data/friends_count', friendsCount, True)
         
         friendNode.get().update({"data" : selfNode.get('data')})
         friendNode.preventInfiniteNesting(friendNode.get())
@@ -668,7 +686,7 @@ class Node(BaseNode):
                                 selfInFriend = f
                                 break
                     try:
-                        self.sync(selfInFriend, is_self = False, permission_object = node.get('permissions'))
+                        self.sync(selfInFriend, is_self = False, permission_object = node.get('permissions'), array_update = False)
                     except:
                         pass
                     
@@ -677,6 +695,10 @@ class Node(BaseNode):
                         
                     tempList = []
                     for x in node._data['data']['friends']:
+                        if 'immutable' in x and x['immutable'] == 'true':
+                            tempDict = x
+                            tempList.append(tempDict)
+                            continue
                         tempDict = {} 
                         tempDict['public_key'] = x['public_key']
             
