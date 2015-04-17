@@ -559,8 +559,7 @@ class Node(BaseNode):
                     friends = self.db.friends.find(
                         {
                             'public_key': self.get('public_key'),
-                            'friend.data.friends.public_key': {'$in': useKeys},
-                            'friend.data.type': 'static'                 
+                            'friend.data.friends.public_key': {'$in': useKeys}
                         },
                         {
                             '_id': 0,
