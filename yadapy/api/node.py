@@ -1005,12 +1005,14 @@ class MongoApi(object):
                 return {'status': 'already friends'}
         mutual = node.isMutual(decrypted)
         friend = Node(decrypted)
-        node.addFriend(friend.get())
         nodeComm = NodeCommunicator(node)
-        nodeComm.updateRelationship(friend)
-        if mutual:
-            node.removeFriend(friend.get())
-        for fr in node.getIndexerFriends():
+        node.addFriend(friend.get())
+	if mutual:
+            nodeComm.updateRelationship(friend)
+	    friend.removeFriend(friend.get())
+	    friend = mutual
+	nodeComm.updateRelationship(friend)
+	for fr in node.getIndexerFriends():
             if fr['public_key'] != friend.get('public_key'):
                 try:
 			nodeComm.updateRelationship(Indexer(fr))
