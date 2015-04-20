@@ -482,7 +482,7 @@ class Node(BaseNode):
                 ]
             })['result'][0]['ip_address']
             
-    def isMutual(self, externalNode, notThisNode = None):
+    def isMutual(self, externalNode, notThisNode = None, source_node = None, dest_node=None):
         #to determine if an external node is already your friend
     
         if isinstance(externalNode, Node):
@@ -491,6 +491,28 @@ class Node(BaseNode):
         directFriend = self.getFriend(externalNode['public_key'])
         if directFriend:
             return Node(directFriend)
+        
+        if 'type' in self.get('data') and self.get('data/type') in ['manager', 'indexer']:
+            useKeys = [source_node['public_key'], dest_node['public_key']]
+            friends = self.db.friends.find(
+                {
+                    'public_key': self.get('public_key'),
+                    '$or' : [
+                             {'friend.dest_node_key': {'$in': useKeys}},
+                             {'friend.source_node_key': {'$in': useKeys}}
+                    ],
+                    
+                }, 
+                {
+                    '_id': 0,
+                    'friend': 1
+                }
+            )
+            if friends.count():
+                return Node(friends[0]['friend'])
+            
+        if 'friends' not in externalNode['data']:
+            return None
         
         return self.alreadyFriends(externalNode, notThisNode)
     
@@ -550,7 +572,27 @@ class Node(BaseNode):
                         return None
                 else:
                     return None
-            
+            elif 'type' in self.get('data') and self.get('data/type') in ['manager', 'indexer']:
+                useKeys = []
+                for friend in externalNode['data']['friends']:
+                    useKeys.append(friend['public_key'])
+                friends = self.db.friends.find(
+                    {
+                        'public_key': self.get('public_key'),
+                        'friend_public_key': {'$in': useKeys}                    
+                    },
+                    {
+                        '_id': 0,
+                        'friend': 1
+                    }
+                )
+                if friends.count():
+                    if friends[0]['friend']['public_key'] != externalNode['public_key']:
+                        return Node(friends[0]['friend'])
+                    else:
+                        None
+                else:
+                    return None
             else:
                 if 'type' in externalNode['data'] and externalNode['data']['type'] in ['manager', 'indexer']:
                     useKeys = []

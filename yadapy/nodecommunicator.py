@@ -145,7 +145,7 @@ class NodeCommunicator(object):
         responses = self._doRequest(self.node, self.node, data, status="MANAGE_SYNC")
         return responses
 
-    def requestFriend(self, host):
+    def requestFriend(self, host, source_node = None, dest_node = None):
                 
         #save the manager friend to the node
         friendPublicKey = unicode(uuid4())
@@ -153,6 +153,9 @@ class NodeCommunicator(object):
         friendNode = Node({}, {"name" : "new manager" })
         friendNode.set('public_key', friendPublicKey)
         friendNode.set('private_key', friendPrivateKey)
+        if source_node and dest_node:
+            friendNode.set('source_node_key', source_node['public_key'], True)
+            friendNode.set('dest_node_key', dest_node['public_key'], True)
         friendNode.add('data/identity/ip_address', self.node.createIPAddress(host))
         
         self.node.addFriend(friendNode.get())
@@ -161,7 +164,9 @@ class NodeCommunicator(object):
         meToSend = Node(copy.deepcopy(self.node.get()))
         meToSend.set('public_key', friendPublicKey)
         meToSend.set('private_key', friendPrivateKey)
-        
+        if source_node and dest_node:
+            meToSend.set('source_node_key', source_node['public_key'], True)
+            meToSend.set('dest_node_key', dest_node['public_key'], True)
         friendNode.add('data/friends', meToSend.get())
         
         #send the friend request to the manager
@@ -366,11 +371,11 @@ class NodeCommunicator(object):
                             confirmed2 = friend
                             break
                     if confirmed1 and confirmed2:
-                        callbackCls = callbackCls(friend1, friend2)
+                        callbackCls = callbackCls()
                         if packet.get('status', None) == 'INDEXER_REQUEST_UPDATE':
-                            callbackCls.friendRequestSuccess()
+                            callbackCls.friendRequestSuccess(friend1, friend2)
                         elif packet.get('status', None) == 'INDEXER_REQUEST_ACCEPT':
-                            callbackCls.friendAcceptSuccess()
+                            callbackCls.friendAcceptSuccess(friend1, friend2)
                         return {}
                     else:
                         return {}
@@ -398,6 +403,9 @@ class NodeCommunicator(object):
             packetData = decrypt(friend['private_key'], friend['private_key'], b64encode(packetData))
             start = time.time()
             friend = json.loads(packetData)
+            if 'messages' in friend['data']:
+                callbackCls = callbackCls()
+                callbackCls.handleMessages(friend['data']['messages'])
             self.node.updateFromNode(friend)
             end = time.time()
             print "updateFromNode: %s" % (end - start)
