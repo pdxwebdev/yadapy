@@ -3,7 +3,7 @@
 from autobahn.twisted.websocket import WebSocketServerProtocol, WebSocketServerFactory
 # Copyright (c) Twisted Matrix Laboratories.
 # See LICENSE for details.
-import json, re, logging, os, sys, hashlib, base64, traceback
+import json, re, logging, os, sys, hashlib, base64, traceback, requests
 from twisted.internet.protocol import Protocol, Factory
 from twisted.internet import reactor
 from yadapy.nodecommunicator import NodeCommunicator
@@ -70,7 +70,9 @@ class MyServerProtocol(WebSocketServerProtocol):
 		instead, we're going to 
 	    """
             print "about to start notify.py"
-            call (['python', '/home/phablet/notify.py', inbound])
+	    r = requests.get(inbound)
+            friend = r.text
+            call (['python', '/home/phablet/notify.py', friend])
             self.sendMessage('OK')
         except:
 	    exc_type, exc_value, exc_traceback = sys.exc_info()
