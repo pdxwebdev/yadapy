@@ -492,7 +492,7 @@ class Node(BaseNode):
         if directFriend:
             return Node(directFriend)
         
-        if 'type' in self.get('data') and self.get('data/type') in ['manager', 'indexer']:
+        if 'data' in self.get() and 'type' in self.get('data') and self.get('data/type') in ['manager', 'indexer']:
             useKeys = [source_node['public_key'], dest_node['public_key']]
             friends = self.db.friends.find(
                 {
@@ -590,7 +590,7 @@ class Node(BaseNode):
                     if friends[0]['friend']['public_key'] != externalNode['public_key']:
                         return Node(friends[0]['friend'])
             
-            if 'type' in externalNode['data'] and externalNode['data']['type'] in ['manager', 'indexer']:
+            if 'data' in externalNode and 'type' in externalNode['data'] and externalNode['data']['type'] in ['manager', 'indexer']:
                 useKeys = []
                 for friend in externalNode['data']['friends']:
                     useKeys.append(friend['public_key'])
