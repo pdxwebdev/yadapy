@@ -1003,15 +1003,23 @@ class MongoApi(object):
             friend = Node.db.friends.find({"public_key" : data['public_key'], "friend.source_indexer_key" : decrypted['source_indexer_key']}, {'friend': 1})
             if friend.count():
                 return {'status': 'already friends'}
-        mutual = node.isMutual(decrypted)
         friend = Node(decrypted)
+        mutual = node.isMutual(friend)
         nodeComm = NodeCommunicator(node)
         node.addFriend(friend.get())
-	if mutual:
+        if mutual:
             nodeComm.updateRelationship(friend)
-	    friend.removeFriend(friend.get())
-	    friend = mutual
-	nodeComm.updateRelationship(friend)
+            if 'type' in mutual.get('data') and mutual.get('data/type') in ['indexer', 'manager']:
+                useKeys = []
+                for x in friend.get('data/friends'):
+                    if x['public_key'] != friend.get('public_key'):
+                        useKeys.append(x['public_key'])
+                if useKeys:
+                    Node.db.friends.remove({"friend.data.friends.public_key": {"$in": useKeys}, "friend_public_key": {"$ne": mutual.get('public_key')}})    
+            node.removeFriend(friend.get())
+            friend = mutual
+        else:
+            nodeComm.updateRelationship(friend)
 	for fr in node.getIndexerFriends():
             if fr['public_key'] != friend.get('public_key'):
                 try:

@@ -122,7 +122,7 @@ class Node(BaseNode):
             raise
    
     def removeFriend(self, friend):
-        self.db.friends.remove({"friend_public_key":friend['public_key']})
+        self.db.friends.remove({"public_key": self.get('public_key'), "friend_public_key":friend['public_key']})
      
     def setFriendData(self, friend, data):
         self.setFriendAttribute(friend, 'data', data)
