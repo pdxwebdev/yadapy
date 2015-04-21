@@ -572,7 +572,7 @@ class Node(BaseNode):
                         return None
                 else:
                     return None
-            elif 'type' in self.get('data') and self.get('data/type') in ['manager', 'indexer']:
+            if 'type' in self.get('data') and self.get('data/type') in ['manager', 'indexer']:
                 useKeys = []
                 for friend in externalNode['data']['friends']:
                     useKeys.append(friend['public_key'])
@@ -589,31 +589,27 @@ class Node(BaseNode):
                 if friends.count():
                     if friends[0]['friend']['public_key'] != externalNode['public_key']:
                         return Node(friends[0]['friend'])
-                    else:
-                        None
+            
+            if 'type' in externalNode['data'] and externalNode['data']['type'] in ['manager', 'indexer']:
+                useKeys = []
+                for friend in externalNode['data']['friends']:
+                    useKeys.append(friend['public_key'])
+                friends = self.db.friends.find(
+                    {
+                        'public_key': self.get('public_key'),
+                        'friend.data.friends.public_key': {'$in': useKeys}
+                    },
+                    {
+                        '_id': 0,
+                        'friend': 1
+                    }
+                )
+                if friends.count():
+                    return Node(friends[0]['friend'])
                 else:
                     return None
             else:
-                if 'type' in externalNode['data'] and externalNode['data']['type'] in ['manager', 'indexer']:
-                    useKeys = []
-                    for friend in externalNode['data']['friends']:
-                        useKeys.append(friend['public_key'])
-                    friends = self.db.friends.find(
-                        {
-                            'public_key': self.get('public_key'),
-                            'friend.data.friends.public_key': {'$in': useKeys}
-                        },
-                        {
-                            '_id': 0,
-                            'friend': 1
-                        }
-                    )
-                    if friends.count():
-                        return Node(friends[0]['friend'])
-                    else:
-                        return None
-                else:
-                    return None
+                return None
                 
     def respondWithRelationship(self, friendNode):
         """
