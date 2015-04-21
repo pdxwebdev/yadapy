@@ -572,7 +572,7 @@ class Node(BaseNode):
                         return None
                 else:
                     return None
-            if 'type' in self.get('data') and self.get('data/type') in ['manager', 'indexer']:
+            if 'data' in self.get() and 'type' in self.get('data') and self.get('data/type') in ['manager', 'indexer']:
                 useKeys = []
                 for friend in externalNode['data']['friends']:
                     useKeys.append(friend['public_key'])
