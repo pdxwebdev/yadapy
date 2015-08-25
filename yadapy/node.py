@@ -37,7 +37,7 @@ class Node(object):
         self.identityData = copy.deepcopy({
           "name" : "",
           "avatar": "",
-          "modified" : self.newTimeStamp(),
+          "timestamp" : self.newTimeStamp(),
           "label" : "default",
           "location" : [
             {
@@ -227,6 +227,7 @@ class Node(object):
             'public_key':self.newUuid(), 
             'private_key':self.newUuid(),
             'modified': self.newTimeStamp(),
+            'timestamp': self.newTimeStamp(),
             'friend_requests': [],
             'data':{
                 "routed_friend_requests" : [],

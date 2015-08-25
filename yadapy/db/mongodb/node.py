@@ -641,7 +641,7 @@ class Node(BaseNode):
                 staticFriend = Node({}, {'name':'static friend'})
                 staticFriend.set('data/type', 'static', True)
                 self.addFriend(staticFriend.get())
-                selfNode.add('data/friends', friend)
+                selfNode.add('data/friends', staticFriend.get())
         else:
             if indexerList:
                 [selfNode.add('data/friends', indexer) for indexer in indexerList]
