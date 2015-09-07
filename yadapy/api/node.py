@@ -987,13 +987,16 @@ class MongoApi(object):
             decrypted['data']['messages'] = []
             
         if 'friends' not in decrypted['data']:
-            decrypted['data']['friends'] = []
+            return {'status': 'error: no friend key in identity'}
+            
+        if not decrypted['data']['friends']:
+            return {'status': 'error: no friends in identity, therefore it cannot be identified.'}
             
         if 'public_key' not in decrypted:
-            decrypted['public_key'] = ''
+            return {'status': 'error: no public_key key in identity'}
             
         if 'private_key' not in decrypted:
-            decrypted['private_key'] = ''
+            return {'status': 'error: no private_key key in identity'}
             
         friend = Node.db.friends.find({"public_key" : data['public_key'], "friend_public_key" : decrypted['public_key']}, {'friend': 1})
         if friend.count():
@@ -1003,10 +1006,18 @@ class MongoApi(object):
             friend = Node.db.friends.find({"public_key" : data['public_key'], "friend.source_indexer_key" : decrypted['source_indexer_key']}, {'friend': 1})
             if friend.count():
                 return {'status': 'already friends'}
+
+        #TODO: check black and white lists here
+        #black list relationship
+        #black list identity
+        #white list relationship
+        #white list identity
+
         friend = Node(decrypted)
         mutual = node.isMutual(friend)
         nodeComm = NodeCommunicator(node)
         node.addFriend(friend.get())
+
         if mutual:
             nodeComm.updateRelationship(friend)
             if 'type' in mutual.get('data') and mutual.get('data/type') in ['indexer', 'manager']:
@@ -1020,13 +1031,14 @@ class MongoApi(object):
             friend = mutual
         else:
             nodeComm.updateRelationship(friend)
-	for fr in node.getIndexerFriends():
+
+        for fr in node.getIndexerFriends():
             if fr['public_key'] != friend.get('public_key'):
                 try:
-			nodeComm.updateRelationship(Indexer(fr))
-		except:
-			pass
-                
+                    nodeComm.updateRelationship(Indexer(fr))
+                except:
+                    pass
+                    
         try:
             if 'routed_friend_request' in decrypted:
                 sourceIndexer = Node(node.getFriend(decrypted['routed_friend_request']))

@@ -499,6 +499,37 @@ class Node(object):
             if friend.get('public_key') in message['public_key']:
                 messageList.append(message)
         self.set('data/messages', messageList)
+
+    def stripNodeForQr(self):
+        if 'messages' in self._data['data']:
+            self._data['data']['messages'] = []
+        
+        if 'status' in self._data['data']:
+            self._data['data']['status'] = []
+        
+        if 'friends' in self._data['data']:
+            self._data['data']['friends'] = []
+        
+        if 'routed_friend_requests' in self._data['data']:
+            del self._data['data']['routed_friend_requests']
+            
+        if 'routed_messages' in self._data['data']:
+            del self._data['data']['routed_messages']
+            
+        if 'birth_date' in self._data['data']['identity']:
+            del self._data['data']['identity']['birth_date']
+            
+        if 'location' in self._data['data']['identity']:
+            del self._data['data']['identity']['location']
+        
+        if 'label' in self._data['data']['identity']:
+            del self._data['data']['identity']['label']
+            
+        if 'friend_requests' in self._data:
+            del self._data['friend_requests']
+        
+        if '_id' in self._data:
+            del self._data['_id']
         
     def replaceIdentityOfFriendsWithPubKeys(self, node = None):
         tempList = []

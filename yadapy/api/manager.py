@@ -29,3 +29,8 @@ class MongoApiManager(MongoApi):
             friend = Node.db.friends.find({'public_key': data['public_key'], 'friend.routed_public_key': decrypted['routed_public_key']})
             return {"status": "request sent", "friend": friend[0]['friend']}
         return {"status": "already friends"}
+
+    def createIdentity(self, data, decrypted):
+        node = Node({}, decrypted)
+        node.save()
+        return {'public_key': node.get('public_key'), 'method': 'GET', 'data': encrypt(node.get('private_key'), node.get('private_key'), json.dumps(node.get()))}
