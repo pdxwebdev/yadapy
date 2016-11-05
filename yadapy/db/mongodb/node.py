@@ -2,7 +2,7 @@ import logging, os, marshal, json, cPickle, time, copy, time, datetime, re, urll
 from base64 import b64encode, b64decode
 from uuid import uuid4
 from random import randrange
-from pymongo import Connection
+from pymongo import MongoClient
 from yadapy.node import Node as BaseNode
 try:
     from pymongo.objectid import ObjectId

@@ -4,280 +4,22 @@ from uuid import uuid4
 from random import randrange
 
 class Node(object):
-    _data = {} # Where the actual identity dictionary data is stored.
-    _db = {}
-    identityData = {}
-    _initialFriends = []
+    relationship = None
+    shared_secret = None
+    relations = None
     
-    def __init__(self, *args, **kwargs):
-        super(Node, self).__init__()
-        
-        self.args = args
-        self.kwargs = kwargs
-        
-        if 'identityData' in kwargs:
-            identityData = kwargs['identityData']
-        else:
-            identityData = args[0]
-            
-        try:
-            newIdentity = ''
-            newIdentity = args[1]
-        except:
-            if kwargs.get('newIdentity', None):
-                newIdentity = kwargs.get('newIdentity', None)
-            
-        if len(args)>2:
-            self._initialFriends = args[2]
-        elif 'initialFriends' in kwargs:
-            self._initialFriends = kwargs.get('initialFriends', None)
-        else:
-            self._initialFriends = []
-            
-        self.identityData = copy.deepcopy({
-          "name" : "",
-          "avatar": "",
-          "timestamp" : self.newTimeStamp(),
-          "label" : "default",
-          "location" : [
-            {
-              "physical_address" : {
-                "city" : "",
-                "state" : "",
-                "address" : "",
-                "unit" : "",
-                "country" : ""
-              },
-              "web_address" : [
-                {
-                  "url" : "",
-                  "label" : "home"
-                }
-              ],
-              "label" : "Default",
-              "phone" : [
-                {
-                  "prefix" : "",
-                  "area_code" : "",
-                  "number" : "",
-                  "country_code" : "",
-                  "label" : "home"
-                }
-              ],
-              "guid" : self.newUuid(),
-              "email" : [
-                {
-                  "username" : "",
-                  "domain" : "",
-                  "label" : "home"
-                }
-              ]
-            }
-          ],
-          "birth_date" : {
-            "label" : "default",
-            "year" : "",
-            "day" : "",
-            "modified" : self.newTimeStamp(),
-            "month" : ""
-          },
-          "ip_address" : []
-        })
-        if identityData:
-            self.setData(identityData)
-        elif newIdentity:
-            self.setData(self.newIdentity(newIdentity))
-        else:
-            raise InvalidIdentity("An identity cannot be created. No identity data provided. Try ({}, {'name': 'my name'})")
-        
-    def get(self, path=""):
-        """
-        Takes a key path separated by forward slashes / to find an entity of the identity
-        
-        Example:
-        id.get("data/friends") #would return the friends list
-        
-        """
-        if path == "":
-            return self._data
-        try:
-            splitPath = filter(None, path.split('/'))
-            entity = {}
-            entity = self._data
-            num = len(splitPath) - 1
-            for idx, el in enumerate(splitPath):
-                if type(entity) == type([]):
-                    el = int(el)
-                entity = entity[el]
-            return entity
-        except KeyError:
-            logging.debug("Path '%s' is invalid for this identity" % path)
-            raise
-        except:
-            raise
+    def __init__(self):
+        if not self.relations:
+            self.relations = []
+        self.validate()
     
-    def set(self, path="", assignment="", create=False, force=False):
-        """
-        Takes a key path separated by forward slashes / to find an entity of the identity
-        Second parameter is the value or expression being assigned
-        
-        Example:
-        id.set("data/identity/name","Matt") #would return the friends list
-        
-        """
-        if path == "":
-            return self._data
-        try:
-            splitPath = filter(None, path.split('/'))
-            entity = {}
-            entity = self._data
-            num = len(splitPath) - 1
-            for idx, el in enumerate(splitPath):
-                if type(entity) == type([]):
-                    el = int(el)
-                if idx < num:
-                    entity = entity[el]
-                else:
-                    if not el in entity and create == True:
-                        entity[el] = assignment
-                        if type(entity) == type([]):
-                            entity[el]['timestamp'] = self.newTimeStamp()
-                            entity[el]['modified'] = self.newTimeStamp()
-                        else:
-                            entity['timestamp'] = self.newTimeStamp()
-                            entity['modified'] = self.newTimeStamp()
-                    elif type(entity[el]) == type(assignment) or force == True:
-                        entity[el] = assignment
-                        entity['modified'] = self.newTimeStamp()
-                    elif type(entity[el]) == type(u'') and type(assignment) == type('') or type(entity[el]) == type('') and type(assignment) == type(u'') or force == True:
-                        entity[el] = assignment
-                        entity['modified'] = self.newTimeStamp()
-                    else:
-                        raise InvalidIdentity("Type mismatch when setting element for '%s' key" % path)
-        except KeyError:
-            raise
-        except InvalidIdentity:
-            raise
-        except:
-            raise
+    def validate(self):
+        assert isinstance(self.identity, Identity)
+        assert isinstance(self.relationship_id, RelationshipIdentifier)
+        assert isinstance(self.shared_secret, SharedSecret)
 
-    def add(self, path="", assignment="", create=False):
-        """
-        @path string Takes a key path separated by forward slashes / to find an entity of the identity
-        Second parameter is the value or expression being assigned
-        
-        Example:
-        id.add("data/messages",[{..message object..}]) #would append a message 
-                                                       #to the messages list
-        
-        """
-        try:
-            array = self.get(path)
-        except KeyError:
-            if create == True:
-                array = []
-            else:
-                raise
-        except:
-            raise
-        
-        if type([]) == type(array):
-            if type(assignment) == type([]):
-                array.extend(assignment)
-            else:
-                array.append(assignment)
-            
-        self.set(path, array, create)
-        self.setModifiedToNow()
-
-    def delKey(self, path="", assignment=""):
-        """
-        Takes a key path separated by forward slashes / to find an entity of the identity
-        Second parameter is the value or expression being assigned
-        
-        Example:
-        id.add("status") #would delete the status key
-        
-        """
-        if path == "":
-            return self._data
-        try:
-            splitPath = filter(None, path.split('/'))
-            entity = {}
-            entity = self._data
-            num = len(splitPath) - 1
-            for idx, el in enumerate(splitPath):
-                if idx < num:
-                    entity = entity[el]
-                else:
-                    if el in entity:
-                        del entity[el]
-                    else:
-                        raise InvalidIdentity("Invalid path encountered with deleting key %" % el)
-        except KeyError:
-            raise
-        except InvalidIdentity:
-            raise
-        except:
-            raise
-
-    def newIdentity(self, identity):
-        self.identityData.update(identity)
-        return copy.deepcopy({
-            'public_key':self.newUuid(), 
-            'private_key':self.newUuid(),
-            'modified': self.newTimeStamp(),
-            'timestamp': self.newTimeStamp(),
-            'friend_requests': [],
-            'data':{
-                "routed_friend_requests" : [],
-                "routed_messages" : [],
-                "messages" : [],
-                "friends" : self._initialFriends,
-                "status" : [],
-                "identity" : self.identityData
-            }
-        })
-    
-    def getData(self, path=""):
-        return self.get(path)
-    
-    def setData(self, data):
-        if self.validIdentity(data):
-            self._data = data
-            
-    def validIdentity(self, data):
-        try:
-            if 'public_key' in data \
-            and 'private_key' in data \
-            and 'modified' in data \
-            and 'data' in data \
-            and 'friends' in data['data'] \
-            and 'identity' in data['data'] \
-            and 'messages' in data['data'] \
-            and 'name' in data['data']['identity']:
-                return True
-            else:
-                raise InvalidIdentity("invalid identity dictionary for identity")
-        except InvalidIdentity:
-            raise
-        
-    def dedupIP(self):
-        addresses = self.get('data/identity/ip_address')
-        newList = {}
-        for index, item in enumerate(addresses):
-            if 'guid' not in item:
-                item['guid'] = str(uuid4())
-            if 'modified' not in item:
-                item['modified'] = int(time.time())
-            if 'protocol_version' not in item:
-                item['protocol_version'] = '4'
-            if 'address' not in item:
-                continue
-            if item['address'] == '':
-                continue
-            newList[item['guid']] = item
-        self.get('data/identity/ip_address', [item for index, item in newList.items()])
+    def addRelation(self, relation):
+        self.relations.append(relation)
 
     def getFriendTopLevelMeta(self, public_key):
         return self.getFriend(public_key)
@@ -703,232 +445,6 @@ class Node(object):
         if 'friends' not in self.get('data'):
             self._data['data']['friends'] = []
         self._updateTree(self.get(), inbound, is_self, permission_object, array_update)
-        
-
-    def _updateTree(self, internal, inbound, is_self=True, permission_object={}, array_update = True):
-        if not internal or not inbound: return
-        if type(inbound) == type({}):
-            if 'label' not in internal or 'label' not in inbound:
-                #CRUD: UPDATE
-                if not is_self:
-                    if 'U' in permission_object:
-                        internal['label'] = 'default'
-                        inbound['label'] = 'default'
-                else:
-                    internal['label'] = 'default'
-                    inbound['label'] = 'default'
-                    
-            for key, inboundRef in inbound.items():
-                if not is_self:
-                    if key not in permission_object:
-                        permission_object_ref = permission_object
-                    else:
-                        permission_object_ref = permission_object[key]
-                else:
-                    permission_object_ref = permission_object
-                try:
-                    internalRef = internal[key]
-                except:
-                    #CRUD: UPDATE
-                    if not is_self:
-                        if 'U' in permission_object_ref:
-                            internal[key] = inboundRef
-                    else:
-                        internal[key] = inboundRef
-                    continue
-                if type(inboundRef) == type({}):
-                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref, array_update)
-                    if type(inboundRef) == type({}):
-                        curTime = int(time.time())
-                        inboundRef['modified'] = curTime
-                elif type(inboundRef) == type([]):
-                    if not array_update:
-                        internal[key] = inboundRef
-                        continue
-                    key_name = ''
-                    internalRef_indexed={} 
-                    newList=[]
-                    newList_indexed={}
-                    key_dict={
-                              'status':'share_id',
-                              'messages':'guid',
-                              'friends':'public_key'
-                    }
-                    if key in key_dict:
-                        key_name = key_dict[key]
-                    else:
-                        key_name = 'guid'
-                        self._updateTree(internalRef,inboundRef,is_self,permission_object_ref, array_update)
-                    if key_name != '':
-                        for index, item in enumerate(internalRef):
-                            try:
-                                internalRef_indexed[(item[key_name],)] = item
-                            except:
-                                internalRef[index][key_name] = str(uuid4())
-                                internalRef_indexed[(internalRef[index][key_name],)] = item
-                                logging.warning("object could not be referenced with the key '%s'. Assigning a new one." %key_name)
-                        for item in inboundRef:
-                            if key_name not in item:
-                                continue
-                            if (item[key_name],) in internalRef_indexed:
-                                if 'modified' not in internalRef_indexed[(item[key_name],)] and 'modified' in item: 
-                                    newList.append(item)
-                                    self.updateStatus(internal,key,item[key_name],"update")
-                                    continue
-                                if 'modified' not in item and 'modified' in internalRef_indexed[(item[key_name],)]: 
-                                    newList.append(internalRef_indexed[(item[key_name],)])
-                                    continue
-                                if 'modified' not in item and 'modified' not in internalRef_indexed[(item[key_name],)]:
-                                    internalRef_indexed[(item[key_name],)]['modified'] = self.newTimeStamp()
-                                    item['modified'] = 0
-                                try:
-                                    timeType = 'modified' if 'modified' in internalRef_indexed[(item[key_name],)] and 'modified' in item else 'timestamp'
-                                    if float(internalRef_indexed[(item[key_name],)][timeType]) < float(item[timeType]):
-                                        #CRUD: UPDATE
-                                        if not is_self:
-                                            if 'U' in permission_object_ref:
-                                                newList.append(item)
-                                                self.updateStatus(internal,key,item[key_name],"update", item)
-                                        else:
-                                            newList.append(item)
-                                            self.updateStatus(internal,key,item[key_name],"update", item)
-                                    else:
-                                        newList.append(internalRef_indexed[(item[key_name],)])
-                                except:
-                                    raise
-                            else:
-                                #CRUD: CREATE
-                                if not is_self:
-                                    if 'C' in permission_object_ref:
-                                        newList.append(item)
-                                        if key == 'messages':
-                                            self.addMessage(item)
-                                        elif key == 'friends':
-                                            try:
-                                                Node(item)
-                                                Node.addFriend(self, item)
-                                            except:
-                                                pass
-                                        if not key_name=='guid':
-                                            self.updateStatus(internal,key,item[key_name], "new", item)
-                                else:
-                                    newList.append(item)
-                                    if key == 'messages':
-                                        Node.addMessage(self, item)
-                                    elif key == 'friends':
-                                        try:
-                                            Node(item)
-                                            Node.addFriend(self, item)
-                                        except:
-                                            pass
-                                    if not key_name=='guid':
-                                        self.updateStatus(internal,key,item[key_name], "new", item)
-                        for item in newList:
-                            newList_indexed[(item[key_name],)] = item
-                        for item in internalRef:
-                            if (item[key_name],) not in newList_indexed:
-                                newList.append(item)
-                        internal[key]=newList
-                    else:
-                        self._updateTree(internalRef,inboundRef,is_self,permission_object_ref, array_update)
-                        if type(inboundRef) == type({}):
-                            curTime = int(time.time())
-                            #CRUD: UPDATE
-                            if not is_self:
-                                if 'U' in permission_object_ref:
-                                    inboundRef['modified'] = curTime
-                            else:
-                                inboundRef['modified'] = curTime
-                else:
-                    
-                    if 'modified' not in inbound:
-                        continue
-                    if 'modified' not in internal:
-                        #CRUD: UPDATE
-                        if not is_self:
-                            if 'U' in permission_object_ref:
-                                internal[key] = inboundRef
-                                continue
-                        else:
-                            internal[key] = inboundRef
-                            continue
-                    try:
-                        #CRUD: UPDATE
-                        if not is_self:
-                            if 'U' in permission_object_ref:
-                                Node.updatePair(key,internal,internalRef,inbound,inboundRef)
-                        else:
-                            Node.updatePair(key,internal,internalRef,inbound,inboundRef)
-                    except:
-                        raise
-            try:
-                if float(internal['modified'])<float(inbound['modified']):
-                    print 'update made to dict %s to %s' %(internal['modified'],inbound['modified'])
-                    logging.debug('update made to dict %s to %s' %(internal['modified'],inbound['modified']))
-                    #CRUD: UPDATE
-                    if not is_self:
-                        if 'U' in permission_object_ref:
-                            internal['modified'] = inbound['modified']
-                    else:
-                        internal['modified'] = inbound['modified']
-            except:
-                pass
-        if type(inbound) == type([]):
-            i=0
-            for key, inboundRef in enumerate(inbound):
-                if not is_self:
-                    if key not in permission_object:
-                        permission_object_ref = permission_object
-                else:
-                    permission_object_ref = permission_object
-                try:
-                    internalRef = internal[i]
-                except:
-                    #CRUD: CREATE
-                    if not is_self:
-                        if 'C' in permission_object_ref:
-                            internal.append(inboundRef)
-                            continue
-                    else:
-                        internal.append(inboundRef)
-                        continue
-                curTime = int(time.time())
-                if type(inboundRef) == type({}):
-                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref, array_update)
-                    if type(inboundRef) == type({}):
-                        inboundRef['modified'] = curTime
-                        if 'label' not in inboundRef:
-                            inboundRef['label'] = 'default'
-                elif type(inboundRef) == type([]):
-                    self._updateTree(internalRef,inboundRef,is_self,permission_object_ref, array_update)
-                    if type(inboundRef) == type({}):
-                        inboundRef['modified'] = curTime
-                        if 'label' not in inboundRef:
-                            inboundRef['label'] = 'default'
-                else:
-                    
-                    if 'modified' not in internal:
-                        #CRUD: UPDATE
-                        if not is_self:
-                            if 'U' in permission_object_ref:
-                                internal[i] = inboundRef
-                                continue
-                        else:
-                            internal[i] = inboundRef
-                            continue
-                    try:
-                        if int(internal['modified'])<int(inbound['modified']):
-                            print 'update made to list'
-                            logging.debug('update made to list')
-                            #CRUD: UPDATE
-                            if not is_self:
-                                if 'U' in permission_object_ref:
-                                    internal[i] = inboundRef
-                            else:
-                                internal[i] = inboundRef
-                    except:
-                        raise
-                i=i+1
 
     def syncStfStatuses(self, inbound):
         #this is suppose to be run from a first tier Node friend.
@@ -1092,8 +608,138 @@ class Node(object):
         for friend in self.get('data/friends'):
             Node(friend).stripIdentityAndFriendsForProtocolV1()
 
-class InvalidIdentity(Exception):
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
+
+class RelationshipIdentifier(object):
+    relationship_id = None
+
+    def validate():
+
+        try:
+            val = UUID(self.relationship_id, version=4)
+        except ValueError:
+            raise Exception('Invalid UUID Version 4')
+
+        if val.hex != self.relationship_id:
+            raise Exception('Invalid UUID Version 4')
+
+
+class NewRelationshipIdentifier(RelationshipIdentifier):
+
+    def __init__(self):
+        self.relationship_id = str(uuid4())
+
+
+class ExistingRelationshipIdentifier(RelationshipIdentifier):
+
+    def __init__(self, relationship_id):
+        self.relationship_id = relationship_id
+        self.validate()
+
+
+class SharedSecret(object):
+    shared_secret = None
+
+    def valid_uuid4(uuid_string):
+
+        try:
+            val = UUID(uuid_string, version=4)
+        except ValueError:
+            raise Exception('Invalid UUID Version 4')
+
+        if val.hex != uuid_string:
+            raise Exception('Invalid UUID Version 4')
+
+
+class NewSharedSecret(SharedSecret):
+
+    def __init__(self):
+        self.shared_secret = str(uuid4())
+
+
+class ExistingSharedSecret(SharedSecret):
+
+    def __init__(self, shared_secret):
+        self.valid_uuid4(shared_secret)
+        self.shared_secret = shared_secret
+            
+
+class Identity(object):
+    name = None
+    avatar = None
+
+    def __init__(self, name, avatar):
+        self.name = name
+        self.avatar = avatar
+        self.validate()
+
+    def validate(self):
+        if type(self.name) != type('') or type(self.avatar) != type(''):
+            raise Exception("invalid identity params")
+
+class NewNode(Node):
+    def __init__(self, identity):
+        self.shared_secret = NewSharedSecret()
+        self.relationship_id = NewRelationshipIdentifier()
+        self.identity = identity
+        super(NewNode, self).__init__()
+
+
+class ExistingNode(Node):
+    def __init__(self, shared_secret, relationship_id, identity):
+        self.shared_secret = shared_secret
+        self.relationship_id = relationship_id
+        self.identity = identity
+        super(ExistingNode, self).__init__()
+
+
+class Relation(Node):
+    pass
+
+
+class NewRelation(Relation):
+    def __init__(self, node):
+        self.shared_secret = NewSharedSecret()
+        self.relationship_id = NewRelationshipIdentifier()
+        self.identity = node.identity
+        super(NewRelation, self).__init__()
+
+
+class ExistingRelation(Relation):
+    def __init__(self, relationship_id, shared_secret, identity):
+        self.relationship_id = relationship_id
+        self.shared_secret = shared_secret
+        self.identity = identity
+        super(ExistingRelation, self).__init__()
+
+
+class Relationship(Node):
+    """
+    meta class
+    """
+    source_node = None
+    dest_node = None
+
+    def validate(self):
+        assert isinstance(self.relationship_id, RelationshipIdentifier)
+        assert isinstance(self.shared_secret, SharedSecret)
+
+
+class NewRelationship(Relationship):
+    
+    def __init__(self, source_relation, dest_relation):
+        self.source_node = source_relation
+        self.dest_node = dest_relation
+        self.relationship_id = NewRelationshipIdentifier()
+        self.shared_secret = NewSharedSecret()
+        super(NewRelationship, self).__init__()
+
+
+class ExistingRelationship(Relationship):
+
+    def __init__(self, source_relation, dest_relation, relationship_id, shared_secret):
+        self.source_node = source_relation
+        self.dest_node = dest_relation
+        self.relationship_id = relationship_id
+        self.shared_secret = shared_secret
+        super(ExistingRelationship, self).__init__(source_relation, dest_relation)
+
